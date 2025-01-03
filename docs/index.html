@@ -75,6 +75,63 @@
     <p>Input: A Boolean adjacency matrix $M$.</p>
     <p>Question: Does $M$ contain no triangles?</p>
     <p>Answer: True / False</p>
+    <h3>Example Instance: 5 x 5 matrix</h3>
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>c0</th>
+          <th>c1</th>
+          <th>c2</th>
+          <th>c3</th>
+          <th>c4</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>r0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>1</td>
+          <td>0</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td><strong>r1</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>1</td>
+          <td>0</td>
+        </tr>
+        <tr>
+          <td><strong>r2</strong></td>
+          <td><strong>1</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td><strong>r3</strong></td>
+          <td>0</td>
+          <td>1</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+        <tr>
+          <td><strong>r4</strong></td>
+          <td><strong>1</strong></td>
+          <td>0</td>
+          <td><strong>1</strong></td>
+          <td>0</td>
+          <td>0</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><em>Example Solution:</em></p>
+    <p>Triangle Found (4, 0, 2): In Rows 2 &amp; 4 and Columns 0 &amp; 2</p>
     <h1>Our Algorithm - Runtime $O(n + m)$</h1>
     <h2>The algorithm explanation:</h2>
     <p>

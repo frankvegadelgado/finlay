@@ -23,6 +23,20 @@ Question: Does $M$ contain no triangles?
 
 Answer: True / False
 
+### Example Instance: 5 x 5 matrix
+
+|        | c0    | c1  | c2    | c3  | c4  |
+| ------ | ----- | --- | ----- | --- | --- |
+| **r0** | 0     | 0   | 1     | 0   | 1   |
+| **r1** | 0     | 0   | 0     | 1   | 0   |
+| **r2** | **1** | 0   | 0     | 0   | 1   |
+| **r3** | 0     | 1   | 0     | 0   | 0   |
+| **r4** | **1** | 0   | **1** | 0   | 0   |
+
+_Example Solution:_
+
+Triangle Found (4, 0, 2): In Rows 2 & 4 and Columns 0 & 2
+
 # Our Algorithm - Runtime $O(n + m)$
 
 ## The algorithm explanation:
