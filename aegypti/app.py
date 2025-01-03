@@ -30,13 +30,13 @@ def main():
     
     logger.info(f"Parsing the Input File done in: {(time.time() - started) * 1000.0} milliseconds")
     
-    # Quadratic Time Solution
-    logger.info("Quadratic Time Solution started")
+    # O(n + m) Time Solution
+    logger.info("O(n + m) Time Solution started")
     started = time.time()
     
     answer = algorithm.string_result_format(algorithm.is_triangle_free(testMatrix))
     
-    logger.info(f"Quadratic Time Solution done in: {(time.time() - started) * 1000.0} milliseconds")
+    logger.info(f"O(n + m) Time Solution done in: {(time.time() - started) * 1000.0} milliseconds")
     
     # Output the solution
     output = f"{parser.get_file_name(filepath)}: {answer}" 

@@ -1,6 +1,6 @@
 # Triangle-Free Solver
 
-![Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
+![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
 This work builds upon [The Triangle Finding Problem](https://doi.org/10.13140/RG.2.2.14848.14088).
 
@@ -51,9 +51,7 @@ We detect triangles in a graph using a depth-first search (DFS) and a coloring s
 
 # Compile and Environment
 
-## Downloading and Installing
-
-Install Python >=3.8.
+## Install Python >=3.8.
 
 ## Install Aegypti's Library and its Dependencies with:
 
@@ -121,7 +119,7 @@ where it is described all the possible options.
 # Complexity
 
 ```diff
-+ We present a quadratic-time algorithm for Triangle-Free Problem.
++ We present a O(n + m) algorithm for Triangle-Free Problem.
 + This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
 ```
 

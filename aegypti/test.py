@@ -65,10 +65,10 @@ def is_triangle_free(matrix):
 
   n = matrix.shape[0]  # Get the number of vertices from the matrix shape
 
-  for i in range(n):
-    for j in range(i + 1, n):
-      if matrix[i, j] == 1:  # Use NumPy indexing for clarity
-        if np.any(matrix[i, j+1:] & matrix[j, j+1:]):  # Check for any common neighbors
+  for i in range(n - 2):
+    for j in range(i + 1, n - 1):
+      for k in range(j + 1, n):
+        if matrix[i, j] == 1 and matrix[j, k] == 1 and matrix[i, k] == 1: 
           return False
   return True
 
