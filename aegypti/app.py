@@ -1,5 +1,4 @@
 #                     Triangle-Free Solver
-#                            Finlay
 #                          Frank Vega
 #                      Juanary 3rd, 2024
 

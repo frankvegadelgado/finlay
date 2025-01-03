@@ -23,39 +23,40 @@ def is_triangle_free(adjacency_matrix):
 
 
 def triangle_free(graph):
-    """
-    Checks if a graph is Triangle-free using Depth-First Search (DFS) iteratively.
+  """
+  Checks if a graph is Triangle-free using Depth-First Search (DFS).
 
-    Args:
-        graph: A dictionary representing the graph, where keys are nodes 
-               and values are lists of their neighbors.
+  Args:
+    graph: A dictionary representing the graph, where keys are nodes
+          and values are lists of their neighbors.
 
-    Returns:
-        None if the graph is triangle-free, (a, b, c) triangle vertices otherwise.
-    """
-    colors = {}
-    stack = []
+  Returns:
+    None if the graph is triangle-free, triangle vertices otherwise.
+  """
+  colors = {}
+  stack = []
 
-    for node in graph:
-        if node not in colors:
-          stack.append((node, 1)) 
+  for node in graph:
+    if node not in colors:
+      stack.append((node, 1))
 
-          while stack:
-              current_node, current_color = stack.pop()
-              colors[current_node] = current_color
+      while stack:
+        current_node, current_color = stack.pop()
+        colors[current_node] = current_color
 
-              for neighbor in graph[current_node]:
-              
-                if neighbor not in colors:
+        for neighbor in graph[current_node]:
 
-                  stack.append((neighbor, current_color + 1))
+          if neighbor not in colors:
 
-                elif (current_color - colors[neighbor]) == 2:
+            stack.append((neighbor, current_color + 1))
 
-                    common = (graph[current_node] & graph[neighbor]) - {current_node, neighbor}
-                    return (current_node, neighbor, next(iter(common)))
+          elif (current_color - colors[neighbor]) == 2:
 
-    return None
+            common = (graph[current_node] & graph[neighbor]) - {current_node, neighbor}
+            return (current_node, neighbor, next(iter(common)))
+
+  return None
+
 
 def create_graph(adjacency_matrix):
   """

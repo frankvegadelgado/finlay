@@ -1,6 +1,8 @@
-# Finlay Triangle-Free Solver
+# Triangle-Free Solver
 
 ![Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
+
+This work builds upon [The Triangle Finding Problem](https://doi.org/10.13140/RG.2.2.14848.14088).
 
 # Triangle-Free Problem
 
@@ -29,9 +31,9 @@ We detect triangles in a graph using a depth-first search (DFS) and a coloring s
 
 ## Runtime Analysis:
 
-1. _Depth-First Search (DFS)_: A standard DFS on a graph with $V$ vertices and $E$ edges takes $O(\mid V \mid + \mid E \mid)$ time, where $\mid \ldots \mid$ denotes the cardinality set function (e.g., $n = \mid V \mid$ and $m = \mid E \mid$). This is because in the worst case, we visit every vertex and explore every edge.
-2. _Coloring and Checking for Color Difference:_ During the DFS, a single node may either assign colors or check the color difference to its neighbors in constant time. Since we do this for each vertex during the DFS, the total operations across the whole algorithm is still the worst running time of the standard DFS.
-3. _Overall Runtime:_ Combining these components, the overall runtime is $O(\mid V \mid + \mid E \mid)$ (for DFS with coloring and checking at the same time).
+1. _Depth-First Search (DFS)_: A standard depth-first search (DFS) on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has a time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots \mid$ represents the cardinality (e.g., $n = \mid V \mid$ and $m = \mid E \mid$). This is because in the worst case, we visit every vertex and explore every edge.
+2. _Coloring and Checking for Color Difference:_ In the Depth-First Search (DFS), each node performs either color assignment or a constant-time check of color differences with its neighbors. Because this operation is executed for every vertex during the DFS traversal, the overall computational complexity remains equivalent to the standard DFS algorithm's worst-case running time.
+3. _Overall Runtime:_ The combined depth-first search, coloring, and checking process has a time complexity of $O(\mid V \mid + \mid E \mid)$.
 
 # Compile and Environment
 
@@ -39,10 +41,10 @@ We detect triangles in a graph using a depth-first search (DFS) and a coloring s
 
 Install Python >=3.8.
 
-## Install Finlay's Library and its Dependencies with:
+## Install Aegypti's Library and its Dependencies with:
 
 ```
-pip install finlay
+pip install aegypti
 ```
 
 ---
@@ -64,7 +66,7 @@ cd finlay
 triangle -i .\benchmarks\testMatrix1.txt
 ```
 
-utilizing the `triangle` command provided by Finlay's Library to execute the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt`. The file `testMatrix1.txt` represents the example described herein. We also support .xz, .lzma, .bz2, and .bzip2 compressed .txt files.
+utilizing the `triangle` command provided by Aegypti's Library to execute the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt`. The file `testMatrix1.txt` represents the example described herein. We also support .xz, .lzma, .bz2, and .bzip2 compressed .txt files.
 
 ## The console output will display:
 

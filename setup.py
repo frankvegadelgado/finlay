@@ -4,7 +4,7 @@ import setuptools
 
 VERSION = "1.0.0"
 
-NAME = "finlay"
+NAME = "aegypti"
 
 INSTALL_REQUIRES = [
     "numpy>=2.2.1"
@@ -34,12 +34,12 @@ setuptools.setup(
     python_requires=">=3.8",
     # Requirements
     install_requires=INSTALL_REQUIRES,
-    packages=["finlay"],
+    packages=["aegypti"],
     long_description=Path("README.md").read_text(),
     long_description_content_type="text/markdown",
     entry_points={
         'console_scripts': [
-            'triangle = finlay.app:main'
+            'triangle = aegypti.app:main'
         ]
     }
 )

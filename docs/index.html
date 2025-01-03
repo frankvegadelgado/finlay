@@ -32,12 +32,18 @@
     ></script>
   </head>
   <body>
-    <h1>Finlay Triangle-Free Solver</h1>
+    <h1>Triangle-Free Solver</h1>
     <p>
       <img
         src="finlay.jpg"
         alt="Carlos Juan Finlay (Pioneer in the research of yellow fever)"
       />
+    </p>
+    <p>
+      This work builds upon
+      <a href="https://doi.org/10.13140/RG.2.2.14848.14088"
+        >The Triangle Finding Problem</a
+      >.
     </p>
     <h1>Triangle-Free Problem</h1>
     <p>
@@ -83,30 +89,32 @@
     <h2>Runtime Analysis:</h2>
     <ol>
       <li>
-        <em>Depth-First Search (DFS)</em>: A standard DFS on a graph with $V$
-        vertices and $E$ edges takes $O(\mid V \mid + \mid E \mid)$ time, where
-        $\mid \ldots \mid$ denotes the cardinality set function (e.g., $n = \mid
-        V \mid$ and $m = \mid E \mid$). This is because in the worst case, we
-        visit every vertex and explore every edge.
+        <em>Depth-First Search (DFS)</em>: A standard depth-first search (DFS)
+        on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has a
+        time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots
+        \mid$ represents the cardinality (e.g., $n = \mid V \mid$ and $m = \mid
+        E \mid$). This is because in the worst case, we visit every vertex and
+        explore every edge.
       </li>
       <li>
-        <em>Coloring and Checking for Color Difference:</em> During the DFS, a
-        single node may either assign colors or check the color difference to
-        its neighbors in constant time. Since we do this for each vertex during
-        the DFS, the total operations across the whole algorithm is still the
-        worst running time of the standard DFS.
+        <em>Coloring and Checking for Color Difference:</em> In the Depth-First
+        Search (DFS), each node performs either color assignment or a
+        constant-time check of color differences with its neighbors. Because
+        this operation is executed for every vertex during the DFS traversal,
+        the overall computational complexity remains equivalent to the standard
+        DFS algorithm's worst-case running time.
       </li>
       <li>
-        <em>Overall Runtime:</em> Combining these components, the overall
-        runtime is $O(\mid V \mid + \mid E \mid)$ (for DFS with coloring and
-        checking at the same time).
+        <em>Overall Runtime:</em> The combined depth-first search, coloring, and
+        checking process has a time complexity of $O(\mid V \mid + \mid E
+        \mid)$.
       </li>
     </ol>
     <h1>Compile and Environment</h1>
     <h2>Downloading and Installing</h2>
     <p>Install Python &gt;=3.8.</p>
-    <h2>Install Finlay's Library and its Dependencies with:</h2>
-    <pre><code>pip install finlay
+    <h2>Install Aegypti's Library and its Dependencies with:</h2>
+    <pre><code>pip install aegypti
 </code></pre>
     <hr />
     <h1>Execute</h1>
@@ -123,7 +131,7 @@ cd finlay
     <pre><code>triangle -i .\benchmarks\testMatrix1.txt
 </code></pre>
     <p>
-      utilizing the <code>triangle</code> command provided by Finlay's Library
+      utilizing the <code>triangle</code> command provided by Aegypti's Library
       to execute the Boolean adjacency matrix
       <code>finlay\benchmarks\testMatrix1.txt</code>. The file
       <code>testMatrix1.txt</code> represents the example described herein. We
