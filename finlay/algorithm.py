@@ -21,46 +21,39 @@ def is_triangle_free(adjacency_matrix):
   
   return triangle_free(create_graph(adjacency_matrix))
 
+
 def triangle_free(graph):
     """
-    Checks if a graph is Triangle-free using Depth-First Search (DFS).
+    Checks if a graph is Triangle-free using Depth-First Search (DFS) iteratively.
 
     Args:
         graph: A dictionary representing the graph, where keys are nodes 
                and values are lists of their neighbors.
 
     Returns:
-      True if the graph is triangle-free, False otherwise.
+        None if the graph is triangle-free, (a, b, c) triangle vertices otherwise.
     """
     colors = {}
+    stack = []
 
-    def dfs(node, color):
-        """
-        Recursive DFS helper function.
-
-        Args:
-            node: The current node being visited.
-            color: The color to assign to the current node.
-        """
-        colors[node] = color
-
-        for neighbor in graph[node]:
-            if neighbor not in colors:
-                triangle = dfs(neighbor, color + 1)
-                if triangle:
-                    return triangle
-            elif (color - colors[neighbor]) == 2:
-                common = (graph[node] & graph[neighbor]) - {node, neighbor}
-                return (node, neighbor, next(iter(common)))
-
-        return None
-
-    # Start DFS traversal from each unvisited node
     for node in graph:
         if node not in colors:
-            triangle = dfs(node, 1)
-            if triangle:
-                return triangle
+          stack.append((node, 1)) 
+
+          while stack:
+              current_node, current_color = stack.pop()
+              colors[current_node] = current_color
+
+              for neighbor in graph[current_node]:
+              
+                if neighbor not in colors:
+
+                  stack.append((neighbor, current_color + 1))
+
+                elif (current_color - colors[neighbor]) == 2:
+
+                    common = (graph[current_node] & graph[neighbor]) - {current_node, neighbor}
+                    return (current_node, neighbor, next(iter(common)))
 
     return None
 
@@ -84,7 +77,21 @@ def create_graph(adjacency_matrix):
 
   return graph
 
-def string_format(triangle):
+
+def string_simple_format(is_free):
+  """
+  Returns a string indicating whether a graph is triangle-free.
+
+  Args:
+    is_free: An Boolean value, True if the graph is triangle-free, False otherwise.
+
+  Returns:
+    "Triangle Free" if triangle is True, "Triangle Found" otherwise.
+  """
+  return "Triangle Free" if is_free  else "Triangle Found"
+
+
+def string_result_format(triangle):
   """
   Returns a string indicating whether a graph is triangle-free.
 
@@ -94,4 +101,4 @@ def string_format(triangle):
   Returns:
     "Triangle Free" if triangle is None, "Triangle Found (a, b, c)" otherwise.
   """
-  return "Triangle Free" if (triangle is None or triangle == True) else (f"Triangle Found {triangle}" if (triangle != False) else "Triangle Found")
+  return "Triangle Free" if triangle is None else f"Triangle Found {triangle}"

@@ -75,19 +75,16 @@ def is_triangle_free(matrix):
 # Run all algorithm test cases
 for i in range(1, 28):
     testMatrix = parser.read('benchmarks/testMatrix' + str(i) + '.txt')
-    result = algorithm.string_format(algorithm.is_triangle_free(testMatrix))
-    print("Algorithm Test Case " + str(i) + ": " + result)
-    print("Algorithm Brute Force Test " + str(i) + ": " + algorithm.string_format(is_triangle_free(testMatrix)))
+    print("Algorithm Test Case " + str(i) + ": " + algorithm.string_result_format(algorithm.is_triangle_free(testMatrix)))
+    print("Algorithm Brute Force Test " + str(i) + ": " + algorithm.string_simple_format(is_triangle_free(testMatrix)))
 
 for i in range(28, 42):
     randomMatrix = generate_bipartite_graph(i)
-    result = algorithm.string_format(algorithm.is_triangle_free(randomMatrix))
-    print("Algorithm Triangle-Free Test " + str(i) + ": " + result)
-    print("Algorithm Brute Force Test " + str(i) + ": " + algorithm.string_format(is_triangle_free(randomMatrix)))
+    print("Algorithm Triangle-Free Test " + str(i) + ": " + algorithm.string_result_format(algorithm.is_triangle_free(randomMatrix)))
+    print("Algorithm Brute Force Test " + str(i) + ": " + algorithm.string_simple_format(is_triangle_free(randomMatrix)))
 
 for i in range(42, 56):
     randomMatrix = generate_random_matrix(i)
-    result = algorithm.string_format(algorithm.is_triangle_free(randomMatrix))
-    print("Algorithm Random Test " + str(i) + ": " + result)
-    print("Algorithm Brute Force Test " + str(i) + ": " + algorithm.string_format(is_triangle_free(randomMatrix)))
+    print("Algorithm Random Test " + str(i) + ": " + algorithm.string_result_format(algorithm.is_triangle_free(randomMatrix)))
+    print("Algorithm Brute Force Test " + str(i) + ": " + algorithm.string_simple_format(is_triangle_free(randomMatrix)))
 

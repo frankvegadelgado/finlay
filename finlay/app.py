@@ -35,7 +35,7 @@ def main():
     logger.info("Quadratic Time Solution started")
     started = time.time()
     
-    answer = algorithm.string_format(algorithm.is_triangle_free(testMatrix))
+    answer = algorithm.string_result_format(algorithm.is_triangle_free(testMatrix))
     
     logger.info(f"Quadratic Time Solution done in: {(time.time() - started) * 1000.0} milliseconds")
     
