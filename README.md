@@ -2,7 +2,7 @@
 
 ![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
-This work builds upon [The Triangle Finding Problem](https://doi.org/10.13140/RG.2.2.14848.14088).
+This work builds upon [The Triangle Finding Problem](https://www.researchgate.net/publication/387698746_The_Triangle_Finding_Problem).
 
 # Triangle-Free Problem
 
@@ -119,7 +119,7 @@ where it is described all the possible options.
 # Complexity
 
 ```diff
-+ We present a O(n + m) algorithm for Triangle-Free Problem.
++ We propose an O(n + m) algorithm to solve the Triangle-Free Problem..
 + This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
 ```
 
