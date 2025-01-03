@@ -1,0 +1,169 @@
+<html>
+  <head>
+    <title>FINLAY</title>
+    <style>
+      body {
+        background-color: black;
+        color: white;
+      }
+      code:not(.language-diff) {
+        background-color: white;
+        color: black;
+        display: inline-block;
+      }
+      code.language-diff {
+        background-color: while;
+        color: green;
+      }
+    </style>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js"],
+        "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] },
+        tex2jax: { inlineMath: [ ["$", "$"], ["\\(","\\)"] ], displayMath: [ ["$$","$$"], ["\\[", "\\]"] ], processEscapes: true, ignoreClass: "tex2jax_ignore|dno" },
+        TeX: { noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } } },
+        messageStyle: "none"
+      });
+    </script>
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"
+    ></script>
+  </head>
+  <body>
+    <h1>Finlay Triangle-Free Solver</h1>
+    <p>
+      <img
+        src="finlay.jpg"
+        alt="Carlos Juan Finlay (Pioneer in the research of yellow fever)"
+      />
+    </p>
+    <h1>Triangle-Free Problem</h1>
+    <p>
+      The Triangle-Free problem is a fundamental decision problem in graph
+      theory. Given an undirected graph, the problem asks whether it's possible
+      to determine if the graph contains no triangles (cycles of length 3). In
+      other words, it checks if there exists a configuration where no three
+      vertices are connected by edges that form a closed triangle.
+    </p>
+    <p>This problem is important for various reasons:</p>
+    <ul>
+      <li>
+        <strong>Graph Analysis:</strong> It's a basic building block for more
+        complex graph algorithms and has applications in social network
+        analysis, web graph analysis, and other domains.
+      </li>
+      <li>
+        <strong>Computational Complexity:</strong> It serves as a benchmark
+        problem in the study of efficient algorithms for graph properties. While
+        the naive approach has a time complexity of $O(n^3)$, there are more
+        efficient algorithms with subcubic complexity.
+      </li>
+    </ul>
+    <p>
+      Understanding the Triangle-Free problem is essential for anyone working
+      with graphs and graph algorithms.
+    </p>
+    <h2>Problem Statement</h2>
+    <p>Input: A Boolean adjacency matrix $M$.</p>
+    <p>Question: Does $M$ contain no triangles?</p>
+    <p>Answer: True / False</p>
+    <h1>Our Algorithm - Runtime $O(n + m)$</h1>
+    <h2>The algorithm explanation:</h2>
+    <p>
+      We detect triangles in a graph using a depth-first search (DFS) and a
+      coloring scheme. During the DFS traversal, each visited node assigns
+      unique, consecutive integer colors to its uncolored neighbors.
+      Specifically, if a node assigns color $c$ to one neighbor, this neighbor
+      assigns $c+1$ to the next, and so on. A triangle exists if two adjacent
+      nodes share two colored neighbors, and the colors assigned to these shared
+      neighbors differ by exactly two.
+    </p>
+    <h2>Runtime Analysis:</h2>
+    <ol>
+      <li>
+        <em>Depth-First Search (DFS)</em>: A standard DFS on a graph with $V$
+        vertices and $E$ edges takes $O(\mid V \mid + \mid E \mid)$ time, where
+        $\mid \ldots \mid$ denotes the cardinality set function (e.g., $n = \mid
+        V \mid$ and $m = \mid E \mid$). This is because in the worst case, we
+        visit every vertex and explore every edge.
+      </li>
+      <li>
+        <em>Coloring and Checking for Color Difference:</em> During the DFS, a
+        single node may either assign colors or check the color difference to
+        its neighbors in constant time. Since we do this for each vertex during
+        the DFS, the total operations across the whole algorithm is still the
+        worst running time of the standard DFS.
+      </li>
+      <li>
+        <em>Overall Runtime:</em> Combining these components, the overall
+        runtime is $O(\mid V \mid + \mid E \mid)$ (for DFS with coloring and
+        checking at the same time).
+      </li>
+    </ol>
+    <h1>Compile and Environment</h1>
+    <h2>Downloading and Installing</h2>
+    <p>Install Python &gt;=3.8.</p>
+    <h2>Install Finlay's Library and its Dependencies with:</h2>
+    <pre><code>pip install finlay
+</code></pre>
+    <hr />
+    <h1>Execute</h1>
+    <hr />
+    <ol>
+      <li>Go to the package directory to use the benchmarks:</li>
+    </ol>
+    <pre><code>git clone https://github.com/frankvegadelgado/finlay.git
+cd finlay
+</code></pre>
+    <ol start="2">
+      <li>Execute the script:</li>
+    </ol>
+    <pre><code>triangle -i .\benchmarks\testMatrix1.txt
+</code></pre>
+    <p>
+      utilizing the <code>triangle</code> command provided by Finlay's Library
+      to execute the Boolean adjacency matrix
+      <code>finlay\benchmarks\testMatrix1.txt</code>. The file
+      <code>testMatrix1.txt</code> represents the example described herein. We
+      also support .xz, .lzma, .bz2, and .bzip2 compressed .txt files.
+    </p>
+    <h2>The console output will display:</h2>
+    <pre><code>testMatrix1.txt: Triangle Found (4, 0, 2)
+</code></pre>
+    <p>
+      which implies that the Boolean adjacency matrix
+      <code>finlay\benchmarks\testMatrix1.txt</code> contains a triangle
+      combining the coordinates <code>(4, 0, 2)</code>.
+    </p>
+    <h1>Command Options</h1>
+    <p>In the batch console, running the command:</p>
+    <pre><code>triangle -h
+</code></pre>
+    <p>will display the following help output:</p>
+    <pre><code>usage: triangle [-h] -i INPUTFILE [-l]
+
+Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUTFILE, --inputFile INPUTFILE
+                        Input file path
+  -l, --log             Enable file logging
+</code></pre>
+    <p>where it is described all the possible options.</p>
+    <h1>Code</h1>
+    <ul>
+      <li>Python code by <strong>Frank Vega</strong>.</li>
+    </ul>
+    <h1>Complexity</h1>
+    <pre><code class="language-diff">+ We present a quadratic-time algorithm for Triangle-Free Problem.
++ This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
+</code></pre>
+    <h1>License</h1>
+    <ul>
+      <li>MIT.</li>
+    </ul>
+  </body>
+</html>
