@@ -28,7 +28,7 @@ def triangle_free(graph):
 
   Args:
     graph: A dictionary representing the graph, where keys are nodes
-          and values are lists of their neighbors.
+          and values are sets of their neighbors.
 
   Returns:
     None if the graph is triangle-free, triangle vertices otherwise.
@@ -67,7 +67,7 @@ def create_graph(adjacency_matrix):
 
   Returns:
     An adjacency list that represents the graph as a dictionary, where keys are 
-    vertex indices and values are lists of adjacent vertices.
+    vertex indices and values are sets of adjacent vertices.
   """
 
   n = adjacency_matrix.shape[0]  # Get the number of vertices from the matrix shape
