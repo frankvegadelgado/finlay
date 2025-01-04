@@ -119,7 +119,7 @@ where it is described all the possible options.
 # Complexity
 
 ```diff
-+ We propose an O(n + m) algorithm to solve the Triangle-Free Problem..
++ We propose an O(n + m) algorithm to solve the Triangle-Free Problem.
 + This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
 ```
 
