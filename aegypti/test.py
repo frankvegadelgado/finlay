@@ -141,22 +141,22 @@ def main():
       print(f"Sparsity: {1 - (sparse_matrix.nnz / (sparse_matrix.shape[0] * sparse_matrix.shape[1]))}")
       
       # A Solution with O(n + m) Time Complexity
-      logger.info("A Solution with O(n + m) Time Complexity started")
+      logger.info("A solution with a time complexity of O(n + m) started")
       started = time.time()
       
       answer = algorithm.string_result_format(algorithm.is_triangle_free(sparse_matrix))
       
-      logger.info(f"A Solution with O(n + m) Time Complexity done in: {(time.time() - started) * 1000.0} milliseconds")
+      logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
       
       print(f"Algorithm Smart Test {i + 1}: {answer}")
       
       # A Solution with O(n + m) Time Complexity
-      logger.info("A Solution of at least O(m^(2.372)) Time Complexity started")
+      logger.info("A solution with a time complexity of at least O(m^(2.372)) started")
       started = time.time()
       
       answer = algorithm.string_simple_format(is_triangle_free(sparse_matrix))
       
-      logger.info(f"A Solution with at least O(m^(2.372)) Time Complexity done in: {(time.time() - started) * 1000.0} milliseconds")
+      logger.info(f"A solution with a time complexity of at least O(m^(2.372)) done in: {(time.time() - started) * 1000.0} milliseconds")
       
       print(f"Algorithm Naive Test {i + 1}: {answer}")
         

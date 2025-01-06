@@ -30,13 +30,13 @@ def main():
     
     logger.info(f"Parsing the Input File done in: {(time.time() - started) * 1000.0} milliseconds")
     
-    # A Solution with O(n + m) Time Complexity
-    logger.info("A Solution with O(n + m) Time Complexity started")
+    # A solution with a time complexity of O(n + m)
+    logger.info("A solution with a time complexity of O(n + m) started")
     started = time.time()
     
     answer = algorithm.string_result_format(algorithm.is_triangle_free(testMatrix))
     
-    logger.info(f"A Solution with O(n + m) Time Complexity done in: {(time.time() - started) * 1000.0} milliseconds")
+    logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
     
     # Output the solution
     output = f"{parser.get_file_name(filepath)}: {answer}" 
