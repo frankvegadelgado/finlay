@@ -2,6 +2,7 @@ import lzma
 import bz2
 import os
 import numpy as np
+import scipy.sparse as sparse
 
 def get_file_name(filepath):
     """
@@ -31,63 +32,66 @@ def get_extension_without_dot(filepath):
     _, ext = os.path.splitext(filename)
     return ext[1:] if ext else None
 
-def is_symmetric(matrix):
-  """
-  Checks if an adjacency matrix represents a directed graph.
-
-  Args:
-    matrix: A 2D NumPy array representing the adjacency matrix.
-
-  Returns:
-    True if the matrix is symmetric (i.e., not equal to its transpose), 
-    False otherwise.
-  """
-  return np.allclose(matrix, matrix.T)
-
-def has_one_on_diagonal(arr):
-  """
-  Checks if there is a 1 on the diagonal of a NumPy array.
-
-  Args:
-    arr: The input NumPy array.
-
-  Returns:
-    True if there is a 1 on the diagonal, False otherwise.
-  """
-  diagonal = np.diag(arr)
-  return np.any(diagonal == 1)
-
-
-def matrix(lines):
+def has_one_on_diagonal(adjacency_matrix):
     """
-    Parses a list of lines and returns a matrix.
+    Checks if there is a 1 on the diagonal of a SciPy sparse matrix.
 
     Args:
-        lines: A list of lines from the matrix file.
+      adjacency_matrix: A SciPy sparse matrix (e.g., csc_matrix) representing the adjacency matrix.
 
     Returns:
-        An n x n NumPy array representing the matrix.
+        True if there is a 1 on the diagonal, False otherwise.
     """
+    diagonal = adjacency_matrix.diagonal()
+    return np.any(diagonal == 1)
 
-    n = len(lines)
-    matrix = np.zeros((n, n), dtype=int)  # Create an n x n matrix of zeros
+def is_symmetric(matrix):
+    """Checks if a SciPy sparse matrix is symmetric.
 
-    for rowIndex, line in enumerate(lines):
-        row = line.strip().split(' ')
-        if len(row) != n:
-            raise ValueError(f"Error: incorrect number of columns in row {rowIndex}")
-        matrix[rowIndex] = [int(cell) for cell in row]
+    Args:
+        matrix: A SciPy sparse matrix.
 
+    Returns:
+        bool: True if the matrix is symmetric, False otherwise.
+        Raises TypeError: if the input is not a sparse matrix.
+    """
+    if not sparse.issparse(matrix):
+        raise TypeError("Input must be a SciPy sparse matrix.")
+
+    rows, cols = matrix.shape
+    if rows != cols:
+        return False  # Non-square matrices cannot be symmetric
+
+    # Efficiently check for symmetry
+    return (matrix != matrix.T).nnz == 0
+
+def create_sparse_matrix_from_file(file):
+    data = []
+    row_indices = []
+    col_indices = []
+    rows = 0
+    cols = 0
+
+    for i, line in enumerate(file):
+        line = line.strip()  # Remove newline characters
+        cols = max(cols, len(line))
+        for j, char in enumerate(line):
+            if char == '1':
+                data.append(1)
+                row_indices.append(i)
+                col_indices.append(j)
+        rows+=1
+
+    matrix = sparse.csc_matrix((data, (row_indices, col_indices)), shape=(rows, cols))
     symmetry = is_symmetric(matrix)
     one_on_diagonal = has_one_on_diagonal(matrix)
-
     if symmetry and not one_on_diagonal:
         return matrix
     elif one_on_diagonal:
         raise ValueError("The input matrix contains a 1 on the diagonal, which is invalid. Adjacency matrices for undirected graphs must have zeros on the diagonal (A[i][i] == 0 for all i).")
     else:
         raise ValueError("The input matrix is not symmetric. Adjacency matrices for undirected graphs must satisfy A[i][j] == A[j][i] for all i and j.")
-
+    
 def read(filepath):
     """Reads a file and returns its lines in an array format.
 
@@ -103,19 +107,20 @@ def read(filepath):
     """
 
     try:
+        matrix = None
         extension = get_extension_without_dot(filepath)
-        if extension == 'txt':
+        if extension is None or extension == 'txt':
             with open(filepath, 'r') as file:
-                lines = file.readlines()
+                matrix = create_sparse_matrix_from_file(file)
         elif extension == 'xz' or extension == 'lzma':
             with lzma.open(filepath, 'rt') as file:
-                lines = file.readlines()
+                matrix = create_sparse_matrix_from_file(file)
         elif extension == 'bz2' or extension == 'bzip2':
             with bz2.open(filepath, 'rt') as file:
-                lines = file.readlines()
+                matrix = create_sparse_matrix_from_file(file)
         else:
             raise ValueError(f"Unsupported file extension: {extension}")
 
-        return matrix(lines)
+        return matrix
     except FileNotFoundError:
         raise FileNotFoundError(f"File not found: {filepath}")

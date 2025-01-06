@@ -131,18 +131,32 @@
         </tr>
       </tbody>
     </table>
+    <p>
+      A matrix is represented in a text file using the following string
+      representation:
+    </p>
+    <pre><code>00101
+00010
+10001
+01000
+10100
+</code></pre>
+    <p>
+      This represents a 5x5 matrix where each line corresponds to a row, and '1'
+      indicates a connection or presence of an element, while '0' indicates its
+      absence.
+    </p>
     <p><em>Example Solution:</em></p>
     <p>Triangle Found (4, 0, 2): In Rows 2 &amp; 4 and Columns 0 &amp; 2</p>
+    <hr />
     <h1>Our Algorithm - Runtime $O(n + m)$</h1>
     <h2>The algorithm explanation:</h2>
     <p>
       We detect triangles in a graph using a depth-first search (DFS) and a
       coloring scheme. During the DFS traversal, each visited node assigns
-      unique, consecutive integer colors to its uncolored neighbors.
-      Specifically, if a node assigns color $c$ to one neighbor, this neighbor
-      assigns $c+1$ to the next, and so on. A triangle exists if two adjacent
-      nodes share two colored neighbors, and the colors assigned to these shared
-      neighbors differ by exactly two.
+      unique, consecutive integer colors to its uncolored neighbors. A triangle
+      exists if two adjacent nodes share two colored neighbors, and the colors
+      assigned to these shared neighbors differ by exactly two.
     </p>
     <h2>Runtime Analysis:</h2>
     <ol>
@@ -218,6 +232,32 @@ options:
   -l, --log             Enable file logging
 </code></pre>
     <p>where it is described all the possible options.</p>
+    <hr />
+    <p>
+      A command-line tool, <code>test_triangle</code>, has been developed for
+      testing randomly and large sparse matrices. It accepts the following
+      options:
+    </p>
+    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-l]
+
+The Finlay Testing application.
+
+options:
+  -h, --help            show this help message and exit
+  -d DIMENSION, --dimension DIMENSION
+                        An integer specifying the square dimensions of random matrix tests.
+  -n NUM_TESTS, --num_tests NUM_TESTS
+                        An integer specifying the number of random matrix tests.
+  -s SPARSITY, --sparsity SPARSITY
+                        Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).
+  -l, --log             Enable file logging
+</code></pre>
+    <p>
+      This tool is designed to perform tests on randomly generated square
+      matrices of varying sparsity. The options allow users to control the
+      matrix dimensions, the number of tests to run, and the matrix sparsity.
+      File logging can also be enabled.
+    </p>
     <h1>Code</h1>
     <ul>
       <li>Python code by <strong>Frank Vega</strong>.</li>

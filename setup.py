@@ -2,12 +2,13 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 
 NAME = "aegypti"
 
 INSTALL_REQUIRES = [
-    "numpy>=2.2.1"
+    "numpy>=2.2.1",
+    "scipy>=1.15.0" 
 ]
 
 setuptools.setup(
@@ -39,7 +40,8 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     entry_points={
         'console_scripts': [
-            'triangle = aegypti.app:main'
+            'triangle = aegypti.app:main',
+            'test_triangle = aegypti.test:main'
         ]
     }
 )
