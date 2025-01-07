@@ -152,7 +152,7 @@ options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         Input file path
-  -a, --all             Enable find all triangles
+  -a, --all             Enable the identification of all triangles represented by two vertices of the triangle.
   -l, --log             Enable file logging
 ```
 
@@ -175,7 +175,7 @@ options:
                         An integer specifying the number of random matrix tests.
   -s SPARSITY, --sparsity SPARSITY
                         Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).
-  -a, --all             Enable find all triangles
+  -a, --all             Enable the identification of all triangles represented by two vertices of the triangle.
   -w, --write           Enable write random matrix to file
   -l, --log             Enable file logging
 ```

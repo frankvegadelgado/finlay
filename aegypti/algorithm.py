@@ -67,7 +67,7 @@ def find_all_triangles(adjacency_matrix):
   Returns:
       None if the graph is triangle-free, triangle vertices otherwise.
       In the case of multiple triangles, returns a list of triangle vertices.
-      Vertices are represented as a 2-tuple containing only two vertices of the triangle.
+      Triangles are represented as a 2-tuple containing only two vertices of the triangle.
       Each vertex pair in the list represents a triangle, possibly with repetitions.
       The remaining vertex can be inferred from the adjacency matrix.
   """
@@ -137,7 +137,7 @@ def string_all_results_format(triangles):
 
   Args:
     triangles: A list value, None if the graph is triangle-free, a list of triangle vertices otherwise.
-    Vertices are represented as a 2-tuple containing only two vertices of the triangle.
+    Triangles are represented as a 2-tuple containing only two vertices of the triangle.
     Each vertex pair in the list represents a triangle, possibly with repetitions.
     The remaining vertex can be inferred from the adjacency matrix.
   

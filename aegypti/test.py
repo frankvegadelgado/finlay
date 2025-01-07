@@ -142,7 +142,7 @@ def main():
     helper.add_argument('-d', '--dimension', type=int, help="An integer specifying the square dimensions of random matrix tests.", required=True)
     helper.add_argument('-n', '--num_tests', type=int, default=5, help="An integer specifying the number of random matrix tests.")
     helper.add_argument('-s', '--sparsity', type=restricted_float, default=0.95, help="Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).")
-    helper.add_argument('-a', '--all', action='store_true', help='Enable find all triangles')
+    helper.add_argument('-a', '--all', action='store_true', help='Enable the identification of all triangles represented by two vertices of the triangle.')
     helper.add_argument('-w', '--write', action='store_true', help='Enable write random matrix to file')
     helper.add_argument('-l', '--log', action='store_true', help='Enable file logging')
     

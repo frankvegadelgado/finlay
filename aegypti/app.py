@@ -15,7 +15,7 @@ def main():
     # Define the parameters
     helper = argparse.ArgumentParser(prog="triangle", description='Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.')
     helper.add_argument('-i', '--inputFile', type=str, help='Input file path', required=True)
-    helper.add_argument('-a', '--all', action='store_true', help='Enable find all triangles')
+    helper.add_argument('-a', '--all', action='store_true', help='Enable the identification of all triangles represented by two vertices of the triangle.')
     helper.add_argument('-l', '--log', action='store_true', help='Enable file logging')
     
     # Initialize the parameters
