@@ -135,52 +135,58 @@ This is because the algorithm primarily relies on a Depth-First Search (DFS) tra
 
 # Command Options
 
-In the batch console, running the command:
+To display the help message and available options, run the following command in your terminal:
 
 ```bash
 triangle -h
 ```
 
-will display the following help output:
+This will output:
 
 ```
-usage: triangle [-h] -i INPUTFILE [-a] [-l]
+usage: triangle [-h] -i INPUTFILE [-a] [-b] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
 options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
-                        Input file path
-  -a, --all             Enable the identification of all triangles represented by two vertices of the triangle.
-  -l, --log             Enable file logging
+                        Input file path.
+  -a, --all             Identify all triangles, represented by pairs of vertices.
+  -b, --bruteForce      Enable comparison with a brute-force approach using matrix multiplication.
+  -l, --log             Enable file logging.
+  --version             show program's version number and exit
 ```
 
-where it is described all the possible options.
+This output describes all available options.
 
 ---
 
-A command-line tool, `test_triangle`, has been developed for testing randomly and large sparse matrices. It accepts the following options:
+A command-line tool, `test_triangle`, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:
 
 ```
-usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-w] [-l]
+usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-w] [-l] [--version]
 
 The Finlay Testing Application.
 
 options:
   -h, --help            show this help message and exit
   -d DIMENSION, --dimension DIMENSION
-                        An integer specifying the square dimensions of random matrix tests.
+                        An integer specifying the dimensions of the square matrices.
   -n NUM_TESTS, --num_tests NUM_TESTS
-                        An integer specifying the number of random matrix tests.
+                        An integer specifying the number of tests to run.
   -s SPARSITY, --sparsity SPARSITY
-                        Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).
-  -a, --all             Enable the identification of all triangles represented by two vertices of the triangle.
-  -w, --write           Enable write random matrix to file
-  -l, --log             Enable file logging
+                        Sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse).
+  -a, --all             Identify all triangles, represented by pairs of vertices.
+  -b, --bruteForce      Enable comparison with a brute-force approach using matrix multiplication.
+  -w, --write           Write the generated random matrix to a file in the current directory.
+  -l, --log             Enable file logging.
+  --version             show program's version number and exit
 ```
 
-This tool is designed to perform tests on randomly generated square matrices of varying sparsity. The options allow users to control the matrix dimensions, the number of tests to run, and the matrix sparsity. In additon, the random matrix can be written to the directory from which the command is run. File logging can also be enabled.
+**This tool is designed to benchmark algorithms for sparse matrix operations.**
+
+It generates random square matrices with configurable dimensions (`-d`), sparsity levels (`-s`), and number of tests (`-n`). While a comparison with a brute-force matrix multiplication approach is available, it's recommended to avoid this for large datasets due to performance limitations. Additionally, the generated matrix can be written to the current directory (`-w`), and file logging can be enabled (`-l`) to record the test results.
 
 # Code
 

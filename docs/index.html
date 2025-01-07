@@ -260,50 +260,65 @@ cd finlay
       (DFS) traversal of the graph.
     </p>
     <h1>Command Options</h1>
-    <p>In the batch console, running the command:</p>
+    <p>
+      To display the help message and available options, run the following
+      command in your terminal:
+    </p>
     <pre><code class="language-bash">triangle -h
 </code></pre>
-    <p>will display the following help output:</p>
-    <pre><code>usage: triangle [-h] -i INPUTFILE [-a] [-l]
+    <p>This will output:</p>
+    <pre><code>usage: triangle [-h] -i INPUTFILE [-a] [-b] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
 options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
-                        Input file path
-  -a, --all             Enable the identification of all triangles represented by two vertices of the triangle.
-  -l, --log             Enable file logging
+                        Input file path.
+  -a, --all             Identify all triangles, represented by pairs of vertices.
+  -b, --bruteForce      Enable comparison with a brute-force approach using matrix multiplication.
+  -l, --log             Enable file logging.
+  --version             show program's version number and exit
 </code></pre>
-    <p>where it is described all the possible options.</p>
+    <p>This output describes all available options.</p>
     <hr />
     <p>
       A command-line tool, <code>test_triangle</code>, has been developed for
-      testing randomly and large sparse matrices. It accepts the following
-      options:
+      testing algorithms on randomly generated, large sparse matrices. It
+      accepts the following options:
     </p>
-    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-w] [-l]
+    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-w] [-l] [--version]
 
 The Finlay Testing Application.
 
 options:
   -h, --help            show this help message and exit
   -d DIMENSION, --dimension DIMENSION
-                        An integer specifying the square dimensions of random matrix tests.
+                        An integer specifying the dimensions of the square matrices.
   -n NUM_TESTS, --num_tests NUM_TESTS
-                        An integer specifying the number of random matrix tests.
+                        An integer specifying the number of tests to run.
   -s SPARSITY, --sparsity SPARSITY
-                        Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).
-  -a, --all             Enable the identification of all triangles represented by two vertices of the triangle.
-  -w, --write           Enable write random matrix to file
-  -l, --log             Enable file logging
+                        Sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse).
+  -a, --all             Identify all triangles, represented by pairs of vertices.
+  -b, --bruteForce      Enable comparison with a brute-force approach using matrix multiplication.
+  -w, --write           Write the generated random matrix to a file in the current directory.
+  -l, --log             Enable file logging.
+  --version             show program's version number and exit
 </code></pre>
     <p>
-      This tool is designed to perform tests on randomly generated square
-      matrices of varying sparsity. The options allow users to control the
-      matrix dimensions, the number of tests to run, and the matrix sparsity. In
-      additon, the random matrix can be written to the directory from which the
-      command is run. File logging can also be enabled.
+      <strong
+        >This tool is designed to benchmark algorithms for sparse matrix
+        operations.</strong
+      >
+    </p>
+    <p>
+      It generates random square matrices with configurable dimensions
+      (<code>-d</code>), sparsity levels (<code>-s</code>), and number of tests
+      (<code>-n</code>). While a comparison with a brute-force matrix
+      multiplication approach is available, it's recommended to avoid this for
+      large datasets due to performance limitations. Additionally, the generated
+      matrix can be written to the current directory (<code>-w</code>), and file
+      logging can be enabled (<code>-l</code>) to record the test results.
     </p>
     <h1>Code</h1>
     <ul>

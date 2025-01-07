@@ -1,6 +1,7 @@
-# Created on 01/06/2025
+# Created on 01/07/2025
 # Author: Frank Vega
 
+import numpy as np
 import scipy.sparse as sparse
 
 
@@ -104,6 +105,37 @@ def find_all_triangles(adjacency_matrix):
             triangles.append((min(current_node, neighbor), max(current_node, neighbor)))
   
   return triangles if triangles else None
+
+
+def is_triangle_free_brute_force(adj_matrix):
+    """
+    Checks if a graph represented by a sparse adjacency matrix is triangle-free using matrix multiplication.
+
+    Args:
+        adj_matrix: A SciPy sparse matrix (e.g., csc_matrix) representing the adjacency matrix.
+
+    Returns:
+        True if the graph is triangle-free, False otherwise.
+        Raises ValueError if the input matrix is not square.
+        Raises TypeError if the input is not a sparse matrix.
+    """
+
+    if not sparse.issparse(adj_matrix):
+        raise TypeError("Input must be a SciPy sparse matrix.")
+
+    rows, cols = adj_matrix.shape
+    if rows != cols:
+        raise ValueError("Adjacency matrix must be square.")
+
+    # Calculate A^3 (matrix multiplication of A with itself three times)
+    adj_matrix_cubed = adj_matrix @ adj_matrix @ adj_matrix #more efficient than matrix power
+
+    # Check the diagonal of A^3. A graph has a triangle if and only if A^3[i][i] > 0 for some i.
+    # Because A^3[i][i] represents the number of paths of length 3 from vertex i back to itself.
+    # Efficiently get the diagonal of a sparse matrix
+    diagonal = adj_matrix_cubed.diagonal()
+    return np.all(diagonal == 0)
+
 
 def string_simple_format(is_free):
   """

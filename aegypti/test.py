@@ -78,35 +78,6 @@ def random_matrix_tests(matrix_shape, sparsity=0.9):
 
     return symmetric_matrix
 
-def is_triangle_free(adj_matrix):
-    """
-    Checks if a graph represented by a sparse adjacency matrix is triangle-free using matrix multiplication.
-
-    Args:
-        adj_matrix: A SciPy sparse matrix (e.g., csc_matrix) representing the adjacency matrix.
-
-    Returns:
-        True if the graph is triangle-free, False otherwise.
-        Raises ValueError if the input matrix is not square.
-        Raises TypeError if the input is not a sparse matrix.
-    """
-
-    if not sparse.issparse(adj_matrix):
-        raise TypeError("Input must be a SciPy sparse matrix.")
-
-    rows, cols = adj_matrix.shape
-    if rows != cols:
-        raise ValueError("Adjacency matrix must be square.")
-
-    # Calculate A^3 (matrix multiplication of A with itself three times)
-    adj_matrix_cubed = adj_matrix @ adj_matrix @ adj_matrix #more efficient than matrix power
-
-    # Check the diagonal of A^3. A graph has a triangle if and only if A^3[i][i] > 0 for some i.
-    # Because A^3[i][i] represents the number of paths of length 3 from vertex i back to itself.
-    # Efficiently get the diagonal of a sparse matrix
-    diagonal = adj_matrix_cubed.diagonal()
-    return np.all(diagonal == 0)
-
 def restricted_float(x):
     try:
         x = float(x)
@@ -139,13 +110,14 @@ def main():
     
     # Define the parameters
     helper = argparse.ArgumentParser(prog="test_triangle", description="The Finlay Testing Application.")
-    helper.add_argument('-d', '--dimension', type=int, help="An integer specifying the square dimensions of random matrix tests.", required=True)
-    helper.add_argument('-n', '--num_tests', type=int, default=5, help="An integer specifying the number of random matrix tests.")
-    helper.add_argument('-s', '--sparsity', type=restricted_float, default=0.95, help="Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).")
-    helper.add_argument('-a', '--all', action='store_true', help='Enable the identification of all triangles represented by two vertices of the triangle.')
-    helper.add_argument('-w', '--write', action='store_true', help='Enable write random matrix to file')
-    helper.add_argument('-l', '--log', action='store_true', help='Enable file logging')
-    
+    helper.add_argument('-d', '--dimension', type=int, help="An integer specifying the dimensions of the square matrices.", required=True)
+    helper.add_argument('-n', '--num_tests', type=int, default=5, help="An integer specifying the number of tests to run.")
+    helper.add_argument('-s', '--sparsity', type=restricted_float, default=0.95, help="Sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse).")
+    helper.add_argument('-a', '--all', action='store_true', help='Identify all triangles, represented by pairs of vertices.')
+    helper.add_argument('-b', '--bruteForce', action='store_true', help='Enable comparison with a brute-force approach using matrix multiplication.')
+    helper.add_argument('-w', '--write', action='store_true', help='Write the generated random matrix to a file in the current directory.')
+    helper.add_argument('-l', '--log', action='store_true', help='Enable file logging.')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.0.8')
 
     # Initialize the parameters
     args = helper.parse_args()
@@ -155,6 +127,7 @@ def main():
     logger = applogger.Logger(applogger.FileLogger() if (args.log) else applogger.ConsoleLogger())
     all_triangles = args.all
     hash_string = generate_short_hash(6 + math.ceil(math.log2(num_tests))) if args.write else None
+    brute_force = args.bruteForce
 
     # Perform the tests    
     for i in range(num_tests):
@@ -182,15 +155,16 @@ def main():
         
         logger.info(f"Algorithm Smart Test {i + 1}: {answer}")
         
-        # A Solution with O(n + m) Time Complexity
-        logger.info("A solution with a time complexity of at least O(m^(2.372)) started")
-        started = time.time()
-        
-        answer = algorithm.string_simple_format(is_triangle_free(sparse_matrix))
-        
-        logger.info(f"A solution with a time complexity of at least O(m^(2.372)) done in: {(time.time() - started) * 1000.0} milliseconds")
-        
-        logger.info(f"Algorithm Naive Test {i + 1}: {answer}")
+        # A Solution with at least O(m^(2.372)) Time Complexity
+        if brute_force:
+            logger.info("A solution with a time complexity of at least O(m^(2.372)) started")
+            started = time.time()
+            
+            answer = algorithm.string_simple_format(algorithm.is_triangle_free_brute_force(sparse_matrix))
+            
+            logger.info(f"A solution with a time complexity of at least O(m^(2.372)) done in: {(time.time() - started) * 1000.0} milliseconds")
+            
+            logger.info(f"Algorithm Naive Test {i + 1}: {answer}")
 
         if args.write:
             logger.info(f"Saving Matrix {i + 1}")
