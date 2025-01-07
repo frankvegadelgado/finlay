@@ -65,8 +65,6 @@ def is_symmetric(matrix):
     # Efficiently check for symmetry
     return (matrix != matrix.T).nnz == 0
 
-import scipy.sparse as sparse
-
 def create_sparse_matrix_from_file(file):
     """Creates a sparse matrix from a file containing a binary representation.
 
@@ -112,7 +110,7 @@ def create_sparse_matrix_from_file(file):
     else:
         raise ValueError("The input matrix is not symmetric. Adjacency matrices for undirected graphs must satisfy A[i][j] == A[j][i] for all i and j.")
 
-def sparse_matrix_to_file(matrix, filename):
+def save_sparse_matrix_to_file(matrix, filename):
     """
     Writes a SciPy sparse matrix to a text file in 0/1 format.
 
@@ -120,16 +118,15 @@ def sparse_matrix_to_file(matrix, filename):
         matrix: The SciPy sparse matrix.
         filename: The name of the output text file.
     """
-
     with open(filename, 'w') as f:
-        for i in range(matrix.shape[0]):  # Iterate over rows
-            row_str = ""
-            for j in range(matrix.shape[1]):  # Iterate over columns
-                if matrix[i, j] != 0:
-                    row_str += "1"
-                else:
-                    row_str += "0"
-            f.write(row_str + "\n")
+        for i in range(matrix.shape[0]):
+            row = matrix.getrow(i)  # Get the i-th row as a sparse row
+            row_str = np.zeros(matrix.shape[1], dtype='U1') #Preallocate an array of unicode strings
+            row_str[:] = '0' # Fill with '0'
+            row_indices = row.nonzero()[1] #Get the non zero indices of the row
+            row_str[row_indices] = '1' # Set '1' at non zero indices
+            f.write("".join(row_str) + "\n")
+
 
 def read(filepath):
     """Reads a file and returns its lines in an array format.

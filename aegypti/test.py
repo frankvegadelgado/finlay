@@ -195,7 +195,7 @@ def main():
         if args.write:
             logger.info(f"Saving Matrix {i + 1}")
             filename = f"sparse_matrix_{i + 1}_{hash_string}.txt"
-            parser.sparse_matrix_to_file(sparse_matrix, filename)
+            parser.save_sparse_matrix_to_file(sparse_matrix, filename)
             logger.info(f"Matrix {i + 1} written to file {filename}.")
 if __name__ == "__main__":
   main()      
