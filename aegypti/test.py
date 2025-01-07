@@ -110,13 +110,13 @@ def main():
     
     # Define the parameters
     helper = argparse.ArgumentParser(prog="test_triangle", description="The Finlay Testing Application.")
-    helper.add_argument('-d', '--dimension', type=int, help="An integer specifying the dimensions of the square matrices.", required=True)
-    helper.add_argument('-n', '--num_tests', type=int, default=5, help="An integer specifying the number of tests to run.")
-    helper.add_argument('-s', '--sparsity', type=restricted_float, default=0.95, help="Sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse).")
-    helper.add_argument('-a', '--all', action='store_true', help='Identify all triangles, represented by pairs of vertices.')
-    helper.add_argument('-b', '--bruteForce', action='store_true', help='Enable comparison with a brute-force approach using matrix multiplication.')
-    helper.add_argument('-w', '--write', action='store_true', help='Write the generated random matrix to a file in the current directory.')
-    helper.add_argument('-l', '--log', action='store_true', help='Enable file logging.')
+    helper.add_argument('-d', '--dimension', type=int, help="an integer specifying the dimensions of the square matrices", required=True)
+    helper.add_argument('-n', '--num_tests', type=int, default=5, help="an integer specifying the number of tests to run")
+    helper.add_argument('-s', '--sparsity', type=restricted_float, default=0.95, help="sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)")
+    helper.add_argument('-a', '--all', action='store_true', help='identify all triangles, represented by pairs of vertices')
+    helper.add_argument('-b', '--bruteForce', action='store_true', help='enable comparison with a brute-force approach using matrix multiplication')
+    helper.add_argument('-w', '--write', action='store_true', help='write the generated random matrix to a file in the current directory')
+    helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
     helper.add_argument('--version', action='version', version='%(prog)s 0.0.8')
 
     # Initialize the parameters
