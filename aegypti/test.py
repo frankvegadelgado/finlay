@@ -1,13 +1,18 @@
-# Created on 01/06/2024
+# Created on 01/07/2024
 # Author: Frank Vega
 
 from . import algorithm
 from . import applogger
+from . import parser
 
 import time
 import numpy as np
 import argparse
 import scipy.sparse as sparse
+import random
+import string
+import math
+
 
 def make_symmetric(matrix):
     """Makes an arbitrary sparse matrix symmetric efficiently.
@@ -67,7 +72,9 @@ def random_matrix_tests(matrix_shape, sparsity=0.9):
 
     sparse_matrix = sparse.csc_matrix((data, (row_indices, col_indices)), shape=(rows, cols))
 
-    symmetric_matrix = make_symmetric(sparse_matrix) - sparse.diags(sparse_matrix.diagonal())
+    symmetric_matrix = make_symmetric(sparse_matrix)  
+
+    symmetric_matrix.setdiag(0)
 
     return symmetric_matrix
 
@@ -110,55 +117,85 @@ def restricted_float(x):
         raise argparse.ArgumentTypeError("%r not in range [0.0, 1.0]"%(x,))
     return x
 
+def generate_short_hash(length=6):
+    """Generates a short random alphanumeric hash string.
+
+    Args:
+        length: The desired length of the hash string (default is 6).
+
+    Returns:
+        A random alphanumeric string of the specified length.
+        Returns None if length is invalid.
+    """
+
+    if not isinstance(length, int) or length <= 0:
+        print("Error: Length must be a positive integer.")
+        return None
+
+    characters = string.ascii_letters + string.digits  # alphanumeric chars
+    return ''.join(random.choice(characters) for i in range(length))
+
 def main():
     
     # Define the parameters
-    helper = argparse.ArgumentParser(prog="test_triangle", description="The Finlay Testing application.")
+    helper = argparse.ArgumentParser(prog="test_triangle", description="The Finlay Testing Application.")
     helper.add_argument('-d', '--dimension', type=int, help="An integer specifying the square dimensions of random matrix tests.", required=True)
     helper.add_argument('-n', '--num_tests', type=int, default=5, help="An integer specifying the number of random matrix tests.")
     helper.add_argument('-s', '--sparsity', type=restricted_float, default=0.95, help="Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).")
+    helper.add_argument('-a', '--all', action='store_true', help='Enable find all triangles')
+    helper.add_argument('-w', '--write', action='store_true', help='Enable write random matrix to file')
     helper.add_argument('-l', '--log', action='store_true', help='Enable file logging')
     
+
     # Initialize the parameters
     args = helper.parse_args()
     num_tests = args.num_tests
     matrix_shape = (args.dimension, args.dimension)
     sparsity = args.sparsity
     logger = applogger.Logger(applogger.FileLogger() if (args.log) else applogger.ConsoleLogger())
-    
+    all_triangles = args.all
+    hash_string = generate_short_hash(6 + math.ceil(math.log2(num_tests))) if args.write else None
 
+    # Perform the tests    
     for i in range(num_tests):
-      
-      print(f"Creating Matrix {i + 1}")
-      
-      sparse_matrix = random_matrix_tests(matrix_shape, sparsity)
-
-      if sparse_matrix is None:
-          continue
-
-      print(f"Matrix shape: {sparse_matrix.shape}")
-      print(f"Number of non-zero elements: {sparse_matrix.nnz}")
-      print(f"Sparsity: {1 - (sparse_matrix.nnz / (sparse_matrix.shape[0] * sparse_matrix.shape[1]))}")
-      
-      # A Solution with O(n + m) Time Complexity
-      logger.info("A solution with a time complexity of O(n + m) started")
-      started = time.time()
-      
-      answer = algorithm.string_result_format(algorithm.is_triangle_free(sparse_matrix))
-      
-      logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
-      
-      print(f"Algorithm Smart Test {i + 1}: {answer}")
-      
-      # A Solution with O(n + m) Time Complexity
-      logger.info("A solution with a time complexity of at least O(m^(2.372)) started")
-      started = time.time()
-      
-      answer = algorithm.string_simple_format(is_triangle_free(sparse_matrix))
-      
-      logger.info(f"A solution with a time complexity of at least O(m^(2.372)) done in: {(time.time() - started) * 1000.0} milliseconds")
-      
-      print(f"Algorithm Naive Test {i + 1}: {answer}")
         
+        logger.info(f"Creating Matrix {i + 1}")
+        
+        sparse_matrix = random_matrix_tests(matrix_shape, sparsity)
+
+        if sparse_matrix is None:
+            continue
+
+        logger.info(f"Matrix shape: {sparse_matrix.shape}")
+        logger.info(f"Number of non-zero elements: {sparse_matrix.nnz}")
+        logger.info(f"Sparsity: {1 - (sparse_matrix.nnz / (sparse_matrix.shape[0] * sparse_matrix.shape[1]))}")
+        
+        # A Solution with O(n + m) Time Complexity
+        logger.info("A solution with a time complexity of O(n + m) started")
+        started = time.time()
+        
+        result = algorithm.find_all_triangles(sparse_matrix) if all_triangles else algorithm.is_triangle_free(sparse_matrix)
+
+        answer =  algorithm.string_all_results_format(result) if all_triangles else algorithm.string_result_format(result)
+
+        logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
+        
+        logger.info(f"Algorithm Smart Test {i + 1}: {answer}")
+        
+        # A Solution with O(n + m) Time Complexity
+        logger.info("A solution with a time complexity of at least O(m^(2.372)) started")
+        started = time.time()
+        
+        answer = algorithm.string_simple_format(is_triangle_free(sparse_matrix))
+        
+        logger.info(f"A solution with a time complexity of at least O(m^(2.372)) done in: {(time.time() - started) * 1000.0} milliseconds")
+        
+        logger.info(f"Algorithm Naive Test {i + 1}: {answer}")
+
+        if args.write:
+            logger.info(f"Saving Matrix {i + 1}")
+            filename = f"sparse_matrix_{i + 1}_{hash_string}.txt"
+            parser.sparse_matrix_to_file(sparse_matrix, filename)
+            logger.info(f"Matrix {i + 1} written to file {filename}.")
 if __name__ == "__main__":
   main()      

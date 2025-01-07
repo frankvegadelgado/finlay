@@ -172,3 +172,4 @@ cython_debug/
 
 # user custom
 app.log
+sparse_matrix_*

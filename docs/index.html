@@ -7,13 +7,25 @@
         color: white;
       }
       code:not(.language-diff) {
-        background-color: white;
+        background-color: #f0f0f0; /* Light gray background */
         color: black;
         display: inline-block;
       }
       code.language-diff {
         background-color: while;
         color: green;
+      }
+      /* Basic styling for bash commands */
+      .language-bash {
+        color: #0000ff !important; /* Blue command */
+        font-family: monospace; /* Monospace font for code */
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto; /* Horizontal scrolling if needed */
+        font-size: 14px; /* Adjust as needed */
+        line-height: 1.4;
+        font-weight: bold;
+        margin-bottom: 10px;
       }
     </style>
     <script type="text/x-mathjax-config">
@@ -73,7 +85,7 @@
       with graphs and graph algorithms.
     </p>
     <h2>Problem Statement</h2>
-    <p>Input: A Boolean adjacency matrix $M$.</p>
+    <p>Input: A Boolean Adjacency Matrix $M$.</p>
     <p>Question: Does $M$ contain no triangles?</p>
     <p>Answer: True / False</p>
     <h3>Example Instance: 5 x 5 matrix</h3>
@@ -185,7 +197,7 @@
     <h1>Compile and Environment</h1>
     <h2>Install Python &gt;=3.8.</h2>
     <h2>Install Aegypti's Library and its Dependencies with:</h2>
-    <pre><code>pip install aegypti
+    <pre><code class="language-bash">pip install aegypti
 </code></pre>
     <hr />
     <h1>Execute</h1>
@@ -193,13 +205,13 @@
     <ol>
       <li>Go to the package directory to use the benchmarks:</li>
     </ol>
-    <pre><code>git clone https://github.com/frankvegadelgado/finlay.git
+    <pre><code class="language-bash">git clone https://github.com/frankvegadelgado/finlay.git
 cd finlay
 </code></pre>
     <ol start="2">
       <li>Execute the script:</li>
     </ol>
-    <pre><code>triangle -i .\benchmarks\testMatrix1.txt
+    <pre><code class="language-bash">triangle -i .\benchmarks\testMatrix1.txt
 </code></pre>
     <p>
       utilizing the <code>triangle</code> command provided by Aegypti's Library
@@ -216,12 +228,43 @@ cd finlay
       <code>finlay\benchmarks\testMatrix1.txt</code> contains a triangle
       combining the coordinates <code>(4, 0, 2)</code>.
     </p>
+    <h2>Finding All Triangles - Runtime $O(n + m)$</h2>
+    <p>
+      The <code>-a</code> flag enables the discovery of all triangles within the
+      graph.
+    </p>
+    <p><strong>Example:</strong></p>
+    <pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2.txt -a
+</code></pre>
+    <p><strong>Output:</strong></p>
+    <pre><code>testMatrix2.txt: Triangles Found (3, 4), (2, 8), (1, 8), (3, 10), (0, 3), (0, 2), (0, 1)
+</code></pre>
+    <p>
+      When multiple triangles exist, the output provides a list of their
+      vertices.
+    </p>
+    <p><strong>Vertex Representation:</strong></p>
+    <p>
+      Each vertex pair in the list represents a triangle, possibly with
+      repetitions. The remaining vertex for each triangle can be determined by
+      referring to the adjacency matrix.
+    </p>
+    <h3>Runtime Analysis (Find All Triangles)</h3>
+    <p>The runtime complexity remains <strong>O(n + m)</strong>, where:</p>
+    <ul>
+      <li><strong>n</strong> represents the number of nodes in the graph.</li>
+      <li><strong>m</strong> represents the number of edges in the graph.</li>
+    </ul>
+    <p>
+      This is because the algorithm primarily relies on a Depth-First Search
+      (DFS) traversal of the graph.
+    </p>
     <h1>Command Options</h1>
     <p>In the batch console, running the command:</p>
-    <pre><code>triangle -h
+    <pre><code class="language-bash">triangle -h
 </code></pre>
     <p>will display the following help output:</p>
-    <pre><code>usage: triangle [-h] -i INPUTFILE [-l]
+    <pre><code>usage: triangle [-h] -i INPUTFILE [-a] [-l]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
@@ -229,6 +272,7 @@ options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         Input file path
+  -a, --all             Enable find all triangles
   -l, --log             Enable file logging
 </code></pre>
     <p>where it is described all the possible options.</p>
@@ -238,9 +282,9 @@ options:
       testing randomly and large sparse matrices. It accepts the following
       options:
     </p>
-    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-l]
+    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-w] [-l]
 
-The Finlay Testing application.
+The Finlay Testing Application.
 
 options:
   -h, --help            show this help message and exit
@@ -250,13 +294,16 @@ options:
                         An integer specifying the number of random matrix tests.
   -s SPARSITY, --sparsity SPARSITY
                         Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).
+  -a, --all             Enable find all triangles
+  -w, --write           Enable write random matrix to file
   -l, --log             Enable file logging
 </code></pre>
     <p>
       This tool is designed to perform tests on randomly generated square
       matrices of varying sparsity. The options allow users to control the
-      matrix dimensions, the number of tests to run, and the matrix sparsity.
-      File logging can also be enabled.
+      matrix dimensions, the number of tests to run, and the matrix sparsity. In
+      additon, the random matrix can be written to the directory from which the
+      command is run. File logging can also be enabled.
     </p>
     <h1>Code</h1>
     <ul>
@@ -264,6 +311,7 @@ options:
     </ul>
     <h1>Complexity</h1>
     <pre><code class="language-diff">+ We propose an O(n + m) algorithm to solve the Triangle-Free Problem.
++ We can also identify all triangles defined by two vertices in O(n + m) time.
 + This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
 </code></pre>
     <h1>License</h1>

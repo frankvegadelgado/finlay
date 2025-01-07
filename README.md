@@ -17,7 +17,7 @@ Understanding the Triangle-Free problem is essential for anyone working with gra
 
 ## Problem Statement
 
-Input: A Boolean adjacency matrix $M$.
+Input: A Boolean Adjacency Matrix $M$.
 
 Question: Does $M$ contain no triangles?
 
@@ -69,7 +69,7 @@ We detect triangles in a graph using a depth-first search (DFS) and a coloring s
 
 ## Install Aegypti's Library and its Dependencies with:
 
-```
+```bash
 pip install aegypti
 ```
 
@@ -81,14 +81,14 @@ pip install aegypti
 
 1. Go to the package directory to use the benchmarks:
 
-```
+```bash
 git clone https://github.com/frankvegadelgado/finlay.git
 cd finlay
 ```
 
 2. Execute the script:
 
-```
+```bash
 triangle -i .\benchmarks\testMatrix1.txt
 ```
 
@@ -102,18 +102,49 @@ testMatrix1.txt: Triangle Found (4, 0, 2)
 
 which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt` contains a triangle combining the coordinates `(4, 0, 2)`.
 
+## Finding All Triangles - Runtime $O(n + m)$
+
+The `-a` flag enables the discovery of all triangles within the graph.
+
+**Example:**
+
+```bash
+triangle -i .\benchmarks\testMatrix2.txt -a
+```
+
+**Output:**
+
+```
+testMatrix2.txt: Triangles Found (3, 4), (2, 8), (1, 8), (3, 10), (0, 3), (0, 2), (0, 1)
+```
+
+When multiple triangles exist, the output provides a list of their vertices.
+
+**Vertex Representation:**
+
+Each vertex pair in the list represents a triangle, possibly with repetitions. The remaining vertex for each triangle can be determined by referring to the adjacency matrix.
+
+### Runtime Analysis (Find All Triangles)
+
+The runtime complexity remains **O(n + m)**, where:
+
+- **n** represents the number of nodes in the graph.
+- **m** represents the number of edges in the graph.
+
+This is because the algorithm primarily relies on a Depth-First Search (DFS) traversal of the graph.
+
 # Command Options
 
 In the batch console, running the command:
 
-```
+```bash
 triangle -h
 ```
 
 will display the following help output:
 
 ```
-usage: triangle [-h] -i INPUTFILE [-l]
+usage: triangle [-h] -i INPUTFILE [-a] [-l]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
@@ -121,6 +152,7 @@ options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         Input file path
+  -a, --all             Enable find all triangles
   -l, --log             Enable file logging
 ```
 
@@ -131,9 +163,9 @@ where it is described all the possible options.
 A command-line tool, `test_triangle`, has been developed for testing randomly and large sparse matrices. It accepts the following options:
 
 ```
-usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-l]
+usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-w] [-l]
 
-The Finlay Testing application.
+The Finlay Testing Application.
 
 options:
   -h, --help            show this help message and exit
@@ -143,10 +175,12 @@ options:
                         An integer specifying the number of random matrix tests.
   -s SPARSITY, --sparsity SPARSITY
                         Sparsity of the matrix (0.0 for dense, close to 1.0 for very sparse).
+  -a, --all             Enable find all triangles
+  -w, --write           Enable write random matrix to file
   -l, --log             Enable file logging
 ```
 
-This tool is designed to perform tests on randomly generated square matrices of varying sparsity. The options allow users to control the matrix dimensions, the number of tests to run, and the matrix sparsity. File logging can also be enabled.
+This tool is designed to perform tests on randomly generated square matrices of varying sparsity. The options allow users to control the matrix dimensions, the number of tests to run, and the matrix sparsity. In additon, the random matrix can be written to the directory from which the command is run. File logging can also be enabled.
 
 # Code
 
@@ -156,6 +190,7 @@ This tool is designed to perform tests on randomly generated square matrices of 
 
 ```diff
 + We propose an O(n + m) algorithm to solve the Triangle-Free Problem.
++ We can also identify all triangles defined by two vertices in O(n + m) time.
 + This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
 ```
 
