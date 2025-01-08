@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.0.9"
+VERSION = "0.1.0"
 
 NAME = "aegypti"
 

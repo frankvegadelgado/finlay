@@ -47,7 +47,7 @@ This represents a 5x5 matrix where each line corresponds to a row, and '1' indic
 
 _Example Solution:_
 
-Triangle Found (4, 0, 2): In Rows 2 & 4 and Columns 0 & 2
+Triangle Found `(0, 2, 4)`: In Rows `2` & `4` and Columns `0` & `2`
 
 ---
 
@@ -55,13 +55,13 @@ Triangle Found (4, 0, 2): In Rows 2 & 4 and Columns 0 & 2
 
 ## The algorithm explanation:
 
-We detect triangles in a graph using a depth-first search (DFS) and a coloring scheme. During the DFS traversal, each visited node assigns unique, consecutive integer colors to its uncolored neighbors. A triangle exists if two adjacent nodes share two colored neighbors, and the colors assigned to these shared neighbors differ by exactly two.
+We detect triangles in a graph using a Breadth-First Search (BFS) and a coloring scheme. During the BFS traversal, each visited node assigns unique, consecutive integer colors to its uncolored neighbors. A triangle exists if two adjacent nodes share two colored neighbors, and the colors assigned to these shared neighbors are the same.
 
 ## Runtime Analysis:
 
-1. _Depth-First Search (DFS)_: A standard depth-first search (DFS) on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has a time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots \mid$ represents the cardinality (e.g., $n = \mid V \mid$ and $m = \mid E \mid$). This is because in the worst case, we visit every vertex and explore every edge.
-2. _Coloring and Checking for Color Difference:_ In the Depth-First Search (DFS), each node performs either color assignment or a constant-time check of color differences with its neighbors. Because this operation is executed for every vertex during the DFS traversal, the overall computational complexity remains equivalent to the standard DFS algorithm's worst-case running time.
-3. _Overall Runtime:_ The combined depth-first search, coloring, and checking process has a time complexity of $O(\mid V \mid + \mid E \mid)$.
+1. _Breadth-First Search (BFS)_: A standard Breadth-First Search (BFS) on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has a time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots \mid$ represents the cardinality (e.g., $n = \mid V \mid$ and $m = \mid E \mid$). This is because in the worst case, we visit every vertex and explore every edge.
+2. _Coloring and Checking for Color Difference:_ In the Breadth-First Search (BFS), each node performs either color assignment or a constant-time check of color differences with its neighbors. Because this operation is executed for every vertex during the BFS traversal, the overall computational complexity remains equivalent to the standard BFS algorithm's worst-case running time.
+3. _Overall Runtime:_ The combined breadth-first search, coloring, and checking process has a time complexity of $O(\mid V \mid + \mid E \mid)$.
 
 # Compile and Environment
 
@@ -97,10 +97,42 @@ utilizing the `triangle` command provided by Aegypti's Library to execute the Bo
 ## The console output will display:
 
 ```
-testMatrix1.txt: Triangle Found (4, 0, 2)
+testMatrix1.txt: Triangle Found ('0', '2', '4')
 ```
 
-which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt` contains a triangle combining the coordinates `(4, 0, 2)`.
+which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt` contains a triangle combining the coordinates `(0, 2, 4)`.
+
+## Finding and Counting All Triangles
+
+The `-a` flag enables the discovery of all triangles within the graph.
+
+**Example:**
+
+```bash
+triangle -i .\benchmarks\testMatrix2.txt -a
+```
+
+**Output:**
+
+```
+testMatrix2.txt: Triangles Found ('0', '3', '10'), ('3', '4', '8'), ('3', '4','10'), ('0', '1', '5'), ('1', '3', '8'), ('0', '1', '8'), ('1', '3', '10'), ('0','1', '10'), ('0', '1', '7'), ('0', '2', '8'), ('0', '1', '3'), ('2', '3', '8'),('0', '2', '3'), ('0', '2', '10'), ('2', '3', '10'), ('0', '3', '8')
+```
+
+When multiple triangles exist, the output provides a list of their vertices.
+
+Similarly, the `-c` flag counts all triangles in the graph.
+
+**Example:**
+
+```bash
+triangle -i .\benchmarks\testMatrix2.txt -c
+```
+
+**Output:**
+
+```
+testMatrix2.txt: Triangles Count 16
+```
 
 # Command Options
 
@@ -113,7 +145,7 @@ triangle -h
 This will output:
 
 ```
-usage: triangle [-h] -i INPUTFILE [-b] [-v] [-l] [--version]
+usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
@@ -121,7 +153,9 @@ options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
+  -a, --all             identify all triangles
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
+  -c, --count           count the total amount of triangles
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
@@ -134,7 +168,7 @@ This output describes all available options.
 A command-line tool, `test_triangle`, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:
 
 ```
-usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-w] [-v] [-l] [--version]
+usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application.
 
@@ -146,7 +180,9 @@ options:
                         an integer specifying the number of tests to run
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
+  -a, --all             identify all triangles
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
+  -c, --count           count the total amount of triangles
   -w, --write           write the generated random matrix to a file in the current directory
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
@@ -165,7 +201,8 @@ It generates random square matrices with configurable dimensions (`-d`), sparsit
 
 ```diff
 + We propose an O(n + m) algorithm to solve the Triangle-Free Problem.
-+ We can also identify all triangles defined by two vertices in O(n + m) time.
++ We can identify and count all triangles by considering pairs of connected vertices in O(n + m) time.
++ These pairs represent the minimum set of edges needed to generate all triangles, as each such edge can serve as the base of a triangle.
 + This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
 ```
 
