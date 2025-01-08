@@ -228,37 +228,6 @@ cd finlay
       <code>finlay\benchmarks\testMatrix1.txt</code> contains a triangle
       combining the coordinates <code>(4, 0, 2)</code>.
     </p>
-    <h2>Finding All Triangles - Runtime $O(n + m)$</h2>
-    <p>
-      The <code>-a</code> flag enables the discovery of all triangles within the
-      graph.
-    </p>
-    <p><strong>Example:</strong></p>
-    <pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2.txt -a
-</code></pre>
-    <p><strong>Output:</strong></p>
-    <pre><code>testMatrix2.txt: Triangles Found (3, 4), (2, 8), (1, 8), (3, 10), (0, 3), (0, 2), (0, 1)
-</code></pre>
-    <p>
-      When multiple triangles exist, the output provides a list of their
-      vertices.
-    </p>
-    <p><strong>Vertex Representation:</strong></p>
-    <p>
-      Each vertex pair in the list represents a triangle, possibly with
-      repetitions. The remaining vertex for each triangle can be determined by
-      referring to the adjacency matrix.
-    </p>
-    <h3>Runtime Analysis (Find All Triangles)</h3>
-    <p>The runtime complexity remains <strong>O(n + m)</strong>, where:</p>
-    <ul>
-      <li><strong>n</strong> represents the number of nodes in the graph.</li>
-      <li><strong>m</strong> represents the number of edges in the graph.</li>
-    </ul>
-    <p>
-      This is because the algorithm primarily relies on a Depth-First Search
-      (DFS) traversal of the graph.
-    </p>
     <h1>Command Options</h1>
     <p>
       To display the help message and available options, run the following
@@ -267,7 +236,7 @@ cd finlay
     <pre><code class="language-bash">triangle -h
 </code></pre>
     <p>This will output:</p>
-    <pre><code>usage: triangle [-h] -i INPUTFILE [-a] [-b] [-l] [--version]
+    <pre><code>usage: triangle [-h] -i INPUTFILE [-b] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
@@ -275,8 +244,8 @@ options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
-  -a, --all             identify all triangles, represented by pairs of vertices
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
+  -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 </code></pre>
@@ -287,7 +256,7 @@ options:
       testing algorithms on randomly generated, large sparse matrices. It
       accepts the following options:
     </p>
-    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-w] [-l] [--version]
+    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application.
 
@@ -299,9 +268,9 @@ options:
                         an integer specifying the number of tests to run
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
-  -a, --all             identify all triangles, represented by pairs of vertices
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
   -w, --write           write the generated random matrix to a file in the current directory
+  -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 </code></pre>
@@ -317,8 +286,9 @@ options:
       (<code>-n</code>). While a comparison with a brute-force matrix
       multiplication approach is available, it's recommended to avoid this for
       large datasets due to performance limitations. Additionally, the generated
-      matrix can be written to the current directory (<code>-w</code>), and file
-      logging can be enabled (<code>-l</code>) to record the test results.
+      matrix can be written to the current directory (<code>-w</code>), and
+      verbose output or file logging can be enabled with the (<code>-v</code>)
+      or (<code>-l</code>) flag, respectively, to record test results.
     </p>
     <h1>Code</h1>
     <ul>

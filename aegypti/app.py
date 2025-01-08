@@ -15,16 +15,15 @@ def main():
     # Define the parameters
     helper = argparse.ArgumentParser(prog="triangle", description='Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.')
     helper.add_argument('-i', '--inputFile', type=str, help='input file path', required=True)
-    helper.add_argument('-a', '--all', action='store_true', help='identify all triangles, represented by pairs of vertices')
     helper.add_argument('-b', '--bruteForce', action='store_true', help='enable comparison with a brute-force approach using matrix multiplication')
+    helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.0.8')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.0.9')
 
     # Initialize the parameters
     args = helper.parse_args()
     filepath = args.inputFile
-    logger = applogger.Logger(applogger.FileLogger() if (args.log) else applogger.ConsoleLogger())
-    all_triangles = args.all
+    logger = applogger.Logger(applogger.FileLogger() if (args.log) else applogger.ConsoleLogger(args.verbose))
     brute_force = args.bruteForce
 
     # Read and parse a dimacs file
@@ -39,13 +38,12 @@ def main():
     logger.info("A solution with a time complexity of O(n + m) started")
     started = time.time()
     
-    result = algorithm.find_all_triangles(sparse_matrix) if all_triangles else algorithm.is_triangle_free(sparse_matrix)
+    result = algorithm.is_triangle_free(sparse_matrix)
 
-    answer =  algorithm.string_all_results_format(result) if all_triangles else algorithm.string_result_format(result)
-    
     logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
     
     # Output the smart solution
+    answer =  algorithm.string_result_format(result)
     output = f"{parser.get_file_name(filepath)}: {answer}" 
     if (args.log):
         logger.info(output)
@@ -56,11 +54,12 @@ def main():
         logger.info("A solution with a time complexity of at least O(m^(2.372)) started")
         started = time.time()
         
-        answer = algorithm.string_simple_format(algorithm.is_triangle_free_brute_force(sparse_matrix))
-        
+        result = algorithm.is_triangle_free_brute_force(sparse_matrix)
+
         logger.info(f"A solution with a time complexity of at least O(m^(2.372)) done in: {(time.time() - started) * 1000.0} milliseconds")
     
         # Output the naive solution
+        answer =  algorithm.string_simple_format(result)
         output = f"{parser.get_file_name(filepath)}: {answer}" 
         if (args.log):
             logger.info(output)

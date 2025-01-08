@@ -102,37 +102,6 @@ testMatrix1.txt: Triangle Found (4, 0, 2)
 
 which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt` contains a triangle combining the coordinates `(4, 0, 2)`.
 
-## Finding All Triangles - Runtime $O(n + m)$
-
-The `-a` flag enables the discovery of all triangles within the graph.
-
-**Example:**
-
-```bash
-triangle -i .\benchmarks\testMatrix2.txt -a
-```
-
-**Output:**
-
-```
-testMatrix2.txt: Triangles Found (3, 4), (2, 8), (1, 8), (3, 10), (0, 3), (0, 2), (0, 1)
-```
-
-When multiple triangles exist, the output provides a list of their vertices.
-
-**Vertex Representation:**
-
-Each vertex pair in the list represents a triangle, possibly with repetitions. The remaining vertex for each triangle can be determined by referring to the adjacency matrix.
-
-### Runtime Analysis (Find All Triangles)
-
-The runtime complexity remains **O(n + m)**, where:
-
-- **n** represents the number of nodes in the graph.
-- **m** represents the number of edges in the graph.
-
-This is because the algorithm primarily relies on a Depth-First Search (DFS) traversal of the graph.
-
 # Command Options
 
 To display the help message and available options, run the following command in your terminal:
@@ -144,7 +113,7 @@ triangle -h
 This will output:
 
 ```
-usage: triangle [-h] -i INPUTFILE [-a] [-b] [-l] [--version]
+usage: triangle [-h] -i INPUTFILE [-b] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
@@ -152,8 +121,8 @@ options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
-  -a, --all             identify all triangles, represented by pairs of vertices
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
+  -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 ```
@@ -165,7 +134,7 @@ This output describes all available options.
 A command-line tool, `test_triangle`, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:
 
 ```
-usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-w] [-l] [--version]
+usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application.
 
@@ -177,16 +146,16 @@ options:
                         an integer specifying the number of tests to run
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
-  -a, --all             identify all triangles, represented by pairs of vertices
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
   -w, --write           write the generated random matrix to a file in the current directory
+  -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 ```
 
 **This tool is designed to benchmark algorithms for sparse matrix operations.**
 
-It generates random square matrices with configurable dimensions (`-d`), sparsity levels (`-s`), and number of tests (`-n`). While a comparison with a brute-force matrix multiplication approach is available, it's recommended to avoid this for large datasets due to performance limitations. Additionally, the generated matrix can be written to the current directory (`-w`), and file logging can be enabled (`-l`) to record the test results.
+It generates random square matrices with configurable dimensions (`-d`), sparsity levels (`-s`), and number of tests (`-n`). While a comparison with a brute-force matrix multiplication approach is available, it's recommended to avoid this for large datasets due to performance limitations. Additionally, the generated matrix can be written to the current directory (`-w`), and verbose output or file logging can be enabled with the (`-v`) or (`-l`) flag, respectively, to record test results.
 
 # Code
 
