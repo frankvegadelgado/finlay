@@ -51,14 +51,13 @@ def is_triangle_free(adjacency_matrix):
 
                 i = j = 0
                 while i < len(current_row_indices) and j < len(neighbor_row_indices):
-                    if current_row_indices[i] == neighbor_row_indices[j]:
-                        minimum = min(current_node, neighbor, current_row_indices[i])
-                        maximum = max(current_node, neighbor, current_row_indices[i])
-                        betweenness = {current_node, neighbor, current_row_indices[i]} - {minimum, maximum}
-                        if betweenness:
-                          return (str(minimum), str(next(iter(betweenness))), str(maximum))
-                        i += 1
-                        j += 1
+                    if current_row_indices[i] == neighbor_row_indices[j]: 
+                        if (current_row_indices[i] != current_node and 
+                            current_row_indices[i] != neighbor):
+                            return (str(current_node), str(neighbor), str(current_row_indices[i]))
+                        else:
+                            i += 1
+                            j += 1
                     elif current_row_indices[i] < neighbor_row_indices[j]:
                         i += 1
                     else:
