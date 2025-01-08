@@ -113,13 +113,11 @@ def main():
     helper.add_argument('-d', '--dimension', type=int, help="an integer specifying the dimensions of the square matrices", required=True)
     helper.add_argument('-n', '--num_tests', type=int, default=5, help="an integer specifying the number of tests to run")
     helper.add_argument('-s', '--sparsity', type=restricted_float, default=0.95, help="sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)")
-    helper.add_argument('-a', '--all', action='store_true', help='identify all triangles')
     helper.add_argument('-b', '--bruteForce', action='store_true', help='enable comparison with a brute-force approach using matrix multiplication')
-    helper.add_argument('-c', '--count', action='store_true', help='count the total amount of triangles')
     helper.add_argument('-w', '--write', action='store_true', help='write the generated random matrix to a file in the current directory')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.1.0')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.1.1')
 
     # Initialize the parameters
     args = helper.parse_args()
@@ -128,8 +126,6 @@ def main():
     sparsity = args.sparsity
     logger = applogger.Logger(applogger.FileLogger() if (args.log) else applogger.ConsoleLogger(args.verbose))
     hash_string = generate_short_hash(6 + math.ceil(math.log2(num_tests))) if args.write else None
-    count_triangles = args.count
-    all_triangles = args.all
     brute_force = args.bruteForce
 
     # Perform the tests    
@@ -150,12 +146,10 @@ def main():
         logger.info("A solution with a time complexity of O(n + m) started")
         started = time.time()
         
-        result = algorithm.find_triangle_coordinates(sparse_matrix, not all_triangles and not count_triangles)
+        result = algorithm.is_triangle_free(sparse_matrix)
 
         logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
 
-        if result and count_triangles and not all_triangles:
-            result = len(result)        
         answer =  algorithm.string_complex_format(result)
         output = f"Algorithm Smart Test {i + 1}: {answer}" 
         if (args.log):
@@ -167,14 +161,11 @@ def main():
             logger.info("A solution with a time complexity of at least O(m^(2.372)) started")
             started = time.time()
             
-            result = algorithm.find_triangle_coordinates_brute_force(sparse_matrix) if all_triangles or count_triangles else algorithm.is_triangle_free_brute_force(sparse_matrix)
+            result = algorithm.is_triangle_free_brute_force(sparse_matrix)
 
             logger.info(f"A solution with a time complexity of at least O(m^(2.372)) done in: {(time.time() - started) * 1000.0} milliseconds")
-            if result and count_triangles and not all_triangles:
-                result = len(result)        
-
-            answer = algorithm.string_complex_format(result) if all_triangles or count_triangles else algorithm.string_simple_format(result)
-        
+            
+            answer = algorithm.string_simple_format(result)
             output = f"Algorithm Naive Test {i + 1}: {answer}" 
             if (args.log):
                 logger.info(output)

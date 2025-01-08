@@ -102,38 +102,6 @@ testMatrix1.txt: Triangle Found ('0', '2', '4')
 
 which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt` contains a triangle combining the coordinates `(0, 2, 4)`.
 
-## Finding and Counting All Triangles
-
-The `-a` flag enables the discovery of all triangles within the graph.
-
-**Example:**
-
-```bash
-triangle -i .\benchmarks\testMatrix2.txt -a
-```
-
-**Output:**
-
-```
-testMatrix2.txt: Triangles Found ('0', '3', '10'), ('3', '4', '8'), ('3', '4','10'), ('0', '1', '5'), ('1', '3', '8'), ('0', '1', '8'), ('1', '3', '10'), ('0','1', '10'), ('0', '1', '7'), ('0', '2', '8'), ('0', '1', '3'), ('2', '3', '8'),('0', '2', '3'), ('0', '2', '10'), ('2', '3', '10'), ('0', '3', '8')
-```
-
-When multiple triangles exist, the output provides a list of their vertices.
-
-Similarly, the `-c` flag counts all triangles in the graph.
-
-**Example:**
-
-```bash
-triangle -i .\benchmarks\testMatrix2.txt -c
-```
-
-**Output:**
-
-```
-testMatrix2.txt: Triangles Count 16
-```
-
 # Command Options
 
 To display the help message and available options, run the following command in your terminal:
@@ -145,7 +113,7 @@ triangle -h
 This will output:
 
 ```
-usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
+usage: triangle [-h] -i INPUTFILE [-b] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
@@ -153,9 +121,7 @@ options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
-  -a, --all             identify all triangles
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
-  -c, --count           count the total amount of triangles
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
@@ -168,7 +134,7 @@ This output describes all available options.
 A command-line tool, `test_triangle`, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:
 
 ```
-usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
+usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application.
 
@@ -180,9 +146,7 @@ options:
                         an integer specifying the number of tests to run
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
-  -a, --all             identify all triangles
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
-  -c, --count           count the total amount of triangles
   -w, --write           write the generated random matrix to a file in the current directory
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
@@ -201,8 +165,6 @@ It generates random square matrices with configurable dimensions (`-d`), sparsit
 
 ```diff
 + We propose an O(n + m) algorithm to solve the Triangle-Free Problem.
-+ We can identify and count all triangles by considering pairs of connected vertices in O(n + m) time.
-+ These pairs represent the minimum set of edges needed to generate all triangles, as each such edge can serve as the base of a triangle.
 + This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
 ```
 

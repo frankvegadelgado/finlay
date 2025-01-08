@@ -5,6 +5,95 @@ import numpy as np
 import scipy.sparse as sparse
 from collections import deque
 
+def is_triangle_free(adjacency_matrix):
+  """
+  Checks if a graph represented by a sparse adjacency matrix is triangle-free using matrix multiplication.
+
+  A graph triangle is a set of three vertices that are all 
+  adjacent to each other (i.e., a complete subgraph of size 3).
+
+  Args:
+      adjacency_matrix: A SciPy sparse matrix (e.g., csc_matrix) representing the adjacency matrix.
+  Returns:
+      None if the graph is triangle-free, otherwise a triangle vertices.
+  """
+  
+  if not sparse.issparse(adjacency_matrix):
+      raise TypeError("Input must be a SciPy sparse matrix.")
+  
+  n = adjacency_matrix.shape[0]
+  if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
+      raise ValueError("Adjacency matrix must be square.")
+
+  colors = {}
+  queue = deque()
+  
+  for i in range(n):
+    if i not in colors:
+      queue.append((i, 1))
+      colors[i] = 1
+
+      while queue:
+        current_node, current_color = queue.popleft()
+        current_row = adjacency_matrix.getrow(current_node)
+        neighbors = current_row.nonzero()[1]
+        for neighbor in neighbors:
+          
+          if neighbor not in colors:
+
+            queue.append((neighbor, current_color + 1))
+            colors[neighbor] = current_color + 1
+        
+          elif current_color == colors[neighbor]:
+            
+                current_row_indices = adjacency_matrix.getrow(current_node).indices
+                neighbor_row_indices = adjacency_matrix.getrow(neighbor).indices
+
+                i = j = 0
+                while i < len(current_row_indices) and j < len(neighbor_row_indices):
+                    if current_row_indices[i] == neighbor_row_indices[j]:
+                        minimum = min(current_node, neighbor, current_row_indices[i])
+                        maximum = max(current_node, neighbor, current_row_indices[i])
+                        betweenness = {current_node, neighbor, current_row_indices[i]} - {minimum, maximum}
+                        if betweenness:
+                          return (str(minimum), str(next(iter(betweenness))), str(maximum))
+                        i += 1
+                        j += 1
+                    elif current_row_indices[i] < neighbor_row_indices[j]:
+                        i += 1
+                    else:
+                        j += 1
+  
+  return None
+
+def is_triangle_free_brute_force(adj_matrix):
+    """
+    Checks if a graph represented by a sparse adjacency matrix is triangle-free using matrix multiplication.
+
+    Args:
+        adj_matrix: A SciPy sparse matrix (e.g., csc_matrix) representing the adjacency matrix.
+
+    Returns:
+        True if the graph is triangle-free, False otherwise.
+        Raises ValueError if the input matrix is not square.
+        Raises TypeError if the input is not a sparse matrix.
+    """
+
+    if not sparse.issparse(adj_matrix):
+        raise TypeError("Input must be a SciPy sparse matrix.")
+
+    rows, cols = adj_matrix.shape
+    if rows != cols:
+        raise ValueError("Adjacency matrix must be square.")
+
+    # Calculate A^3 (matrix multiplication of A with itself three times)
+    adj_matrix_cubed = adj_matrix @ adj_matrix @ adj_matrix #more efficient than matrix power
+
+    # Check the diagonal of A^3. A graph has a triangle if and only if A^3[i][i] > 0 for some i.
+    # Because A^3[i][i] represents the number of paths of length 3 from vertex i back to itself.
+    # Efficiently get the diagonal of a sparse matrix
+    diagonal = adj_matrix_cubed.diagonal()
+    return np.all(diagonal == 0)
 
 def generate_triangles_from_edges(adjacency_matrix, triangles):
     """
@@ -53,77 +142,6 @@ def generate_triangles_from_edges(adjacency_matrix, triangles):
             else:
                 j += 1
     return visited
-
-def find_triangle_coordinates(adjacency_matrix, single_triangle=True):
-  """
-  Finds the coordinates of triangles in a graph represented by an adjacency matrix.
-  
-  A graph triangle is a set of three vertices that are all 
-  adjacent to each other (i.e., a complete subgraph of size 3).
-
-  Args:
-      adjacency_matrix: A SciPy sparse matrix (e.g., csc_matrix) representing the adjacency matrix.
-      single_triangle: A boolean value, True if we should return only one triangle, False otherwise.
-  Returns:
-      None if the graph is triangle-free, otherwise either a single triangle or a set of tuples representing the vertices of each triangle.
-  """
-  
-  if not sparse.issparse(adjacency_matrix):
-      raise TypeError("Input must be a SciPy sparse matrix.")
-  
-  n = adjacency_matrix.shape[0]
-  if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
-      raise ValueError("Adjacency matrix must be square.")
-
-  colors = {}
-  queue = deque()
-  triangles = set()
-
-  for i in range(n):
-    if i not in colors:
-      queue.append((i, 1))
-      colors[i] = 1
-
-      while queue:
-        current_node, current_color = queue.popleft()
-        current_row = adjacency_matrix.getrow(current_node)
-        neighbors = current_row.nonzero()[1]
-        for neighbor in neighbors:
-          
-          if neighbor not in colors:
-
-            queue.append((neighbor, current_color + 1))
-            colors[neighbor] = current_color + 1
-        
-          elif current_color == colors[neighbor]:
-            
-            if single_triangle:
-                current_row_indices = adjacency_matrix.getrow(current_node).indices
-                neighbor_row_indices = adjacency_matrix.getrow(neighbor).indices
-
-                i = j = 0
-                while i < len(current_row_indices) and j < len(neighbor_row_indices):
-                    if current_row_indices[i] == neighbor_row_indices[j]:
-                        minimum = min(current_node, neighbor, current_row_indices[i])
-                        maximum = max(current_node, neighbor, current_row_indices[i])
-                        betweenness = set([current_node, neighbor, current_row_indices[i]]) - {minimum, maximum}
-                        if betweenness:
-                          new_triangle = (str(minimum), str(next(iter(betweenness))), str(maximum))
-                          triangles.add(new_triangle)
-                          return triangles
-                        i += 1
-                        j += 1
-                    elif current_row_indices[i] < neighbor_row_indices[j]:
-                        i += 1
-                    else:
-                        j += 1
-            else:
-              triangles.add((min(current_node, neighbor), max(current_node, neighbor)))
-  
-  if triangles:          
-    return generate_triangles_from_edges(adjacency_matrix, triangles)
-  else:
-    return None
 
 def is_triangle_free_brute_force(adj_matrix):
     """
@@ -195,23 +213,19 @@ def string_simple_format(is_free):
   """
   return "Triangle Free" if is_free  else "Triangle Found"
 
-def string_complex_format(triangles):
+def string_complex_format(triangle):
   """
   Returns a string indicating all the triangles found in a graph.
 
   Args:
-    triangles: A list value, 
+    triangle: A tuple value, 
     None if the graph is triangle-free,
-    an integer representing the total number of solutions, 
-    a list of triangle vertices otherwise.
+    a tuples of triangle vertices otherwise.
   
   Returns:
-    "Triangle Free" if triangle is None, "Triangles Found (a, b), (c, d), ...." otherwise.
+    "Triangle Free" if triangle is None, "Triangles Found (a, b, c)" otherwise.
   """
-  if triangles:
-      if isinstance(triangles, int):
-        return f"Triangles Count {triangles}"
-      else:   
-        return f"Triangle{"s" if len(triangles) > 1 else ""} Found {', '.join(map(str, triangles))}"
+  if triangle:
+      return f"Triangle Found {triangle}"
   else:
      return "Triangle Free"
