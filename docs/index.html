@@ -231,6 +231,27 @@ cd finlay
       <code>finlay\benchmarks\testMatrix1.txt</code> contains a triangle
       combining the coordinates <code>(0, 2, 4)</code>.
     </p>
+    <h1>Partial Feedback Edge Set Problem - Runtime $O(n + m)$</h1>
+    <p>
+      The <code>-c</code> flag enables counting the size of the approximate
+      minimum edge cover of all triangles. This is related to the Partial
+      Feedback Edge Set problem, which is NP-complete
+      <a href="https://dl.acm.org/doi/10.1145/800133.804355">Yannakakis, 1978</a
+      >.
+    </p>
+    <p><strong>Example:</strong></p>
+    <pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2.txt -c
+</code></pre>
+    <p><strong>Output:</strong></p>
+    <pre><code>testMatrix2.txt: Cover Size 10
+</code></pre>
+    <h2>Runtime Analysis:</h2>
+    <p>
+      To prove that a graph is triangle-free, we utilize the same algorithmic
+      approach as in the previous scenario. Consequently, establishing an
+      $O(m+n)$ time complexity for triangle-free graph detection would suffice,
+      as this algorithm is shared between both cases.
+    </p>
     <h1>Command Options</h1>
     <p>
       To display the help message and available options, run the following
@@ -239,7 +260,7 @@ cd finlay
     <pre><code class="language-bash">triangle -h
 </code></pre>
     <p>This will output:</p>
-    <pre><code>usage: triangle [-h] -i INPUTFILE [-b] [-v] [-l] [--version]
+    <pre><code>usage: triangle [-h] -i INPUTFILE [-b] [-v] [-l] [-c] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
 
@@ -250,6 +271,9 @@ options:
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
+  -c, --coverTriangle   Enable counting the size of the approximate minimum edge cover of all triangles. This is related to
+                        the Partial Feedback Edge Set problem, which is NP-complete (Yannakakis, 1978,
+                        doi:10.1145/800133.804355).
   --version             show program's version number and exit
 </code></pre>
     <p>This output describes all available options.</p>
@@ -259,7 +283,7 @@ options:
       testing algorithms on randomly generated, large sparse matrices. It
       accepts the following options:
     </p>
-    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-w] [-v] [-l] [--version]
+    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-w] [-v] [-l] [-c] [--version]
 
 The Finlay Testing Application.
 
@@ -275,6 +299,9 @@ options:
   -w, --write           write the generated random matrix to a file in the current directory
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
+  -c, --coverTriangle   Enable counting the size of the approximate minimum edge cover of all triangles. This is related to
+                        the Partial Feedback Edge Set problem, which is NP-complete (Yannakakis, 1978,
+                        doi:10.1145/800133.804355).
   --version             show program's version number and exit
 </code></pre>
     <p>
