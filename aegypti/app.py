@@ -21,7 +21,7 @@ def main():
     helper.add_argument('-c', '--count', action='store_true', help='count the total amount of triangles')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.1.3')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.1.4')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -70,6 +70,7 @@ def main():
             logger.info(f"A solution with a time complexity of at least O(m^(1.407)) done in: {(time.time() - started) * 1000.0} milliseconds")
         
         answer = utils.string_complex_format(result, count_triangles) if count_triangles or all_triangles else utils.string_simple_format(result)
+        output = f"{filename}: {answer}"
         if (args.log):
             logger.info(output)
         print(output)
