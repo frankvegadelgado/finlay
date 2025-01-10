@@ -60,7 +60,7 @@ Triangle detection in a graph is performed using a Depth-First Search (DFS) comb
 ## Runtime Analysis:
 
 1. _Depth-First Search (DFS)_: A standard Depth-First Search (DFS) on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has a time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots \mid$ represents the cardinality (e.g., $n = \mid V \mid$ and $m = \mid E \mid$). This is because in the worst case, we visit every vertex and explore every edge.
-2. _Coloring and Checking for Color Behavior:_ In the Depth-First Search (DFS), each node performs either color assignment or a constant-time check of color behavior with its neighbors. Because this operation is executed for every vertex during the DFS traversal, the overall computational complexity remains equivalent to the standard DFS algorithm's worst-case running time.
+2. _Coloring and Checking for Color Behavior:_ During the Depth-First Search (DFS), each node performs either color assignment or a constant-time check of its neighbors' colors. Since this operation is executed for each vertex during the DFS traversal, the overall computational complexity remains $O(\mid V \mid + \mid E \mid)$, equivalent to the standard DFS algorithm's worst-case running time.
 3. _Overall Runtime:_ The combined Depth-First Search (DFS), coloring, and checking process has a time complexity of $O(\mid V \mid + \mid E \mid)$.
 
 # Compile and Environment

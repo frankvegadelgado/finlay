@@ -184,12 +184,12 @@
         explore every edge.
       </li>
       <li>
-        <em>Coloring and Checking for Color Behavior:</em> In the Depth-First
-        Search (DFS), each node performs either color assignment or a
-        constant-time check of color behavior with its neighbors. Because this
-        operation is executed for every vertex during the DFS traversal, the
-        overall computational complexity remains equivalent to the standard DFS
-        algorithm's worst-case running time.
+        <em>Coloring and Checking for Color Behavior:</em> During the
+        Depth-First Search (DFS), each node performs either color assignment or
+        a constant-time check of its neighbors' colors. Since this operation is
+        executed for each vertex during the DFS traversal, the overall
+        computational complexity remains $O(\mid V \mid + \mid E \mid)$,
+        equivalent to the standard DFS algorithm's worst-case running time.
       </li>
       <li>
         <em>Overall Runtime:</em> The combined Depth-First Search (DFS),
