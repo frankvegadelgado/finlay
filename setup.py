@@ -8,8 +8,7 @@ NAME = "aegypti"
 
 INSTALL_REQUIRES = [
     "numpy>=2.2.1",
-    "scipy>=1.15.0",
-    "networkx>=3.4.2"   
+    "scipy>=1.15.0"  
 ]
 
 setuptools.setup(

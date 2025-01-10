@@ -76,8 +76,8 @@ def random_matrix_tests(matrix_shape, sparsity=0.9):
 
     # Generate a sparse matrix using random indices and data
     num_elements = int(size * (1 - sparsity))  # Number of non-zero elements
-    row_indices = np.random.randint(0, rows, size=num_elements)
-    col_indices = np.random.randint(0, cols, size=num_elements)
+    row_indices = np.random.randint(0, rows, size=num_elements, dtype=np.int64)
+    col_indices = np.random.randint(0, cols, size=num_elements, dtype=np.int64)
     data = np.ones(num_elements, dtype=np.int8)
 
     sparse_matrix = sparse.csc_matrix((data, (row_indices, col_indices)), shape=(rows, cols))
@@ -136,64 +136,37 @@ def generate_triangles_from_edges(adjacency_matrix, triangles):
                 j += 1
     return visited
 
-def find_triangle_coordinates_brute_force(adjacency_matrix):
-    """
-    Finds the coordinates of all triangles in a given SciPy sparse matrix.
-
-    Args:
-        adjacency_matrix: A SciPy sparse matrix (e.g., csr_matrix).
-    
-    Returns:
-        A list of tuples, where each tuple represents the coordinates of a triangle.
-        A triangle is defined by three non-zero entries forming a closed loop.
-    """
-
-    if not sparse.isspmatrix(adjacency_matrix):
-        raise TypeError("Input must be a SciPy sparse matrix.")
-    
-    rows, cols = adjacency_matrix.shape
-    if rows != cols:
-        raise ValueError("Input matrix must be square.")
-    
-    n = adjacency_matrix.shape[0]
-    visited = set()
-    for i in range(n-2):
-        for j in range(i + 1, n-1):
-            if adjacency_matrix[i, j]:  # Check if edge (i, j) exists
-                for k in range(j + 1, n):
-                    if adjacency_matrix[i, k] and adjacency_matrix[j, k]:  # Check if edges (i, k) and (j, k) exist
-                         visited.add((str(i), str(j), str(k)))
-    return visited
-
-def string_simple_format(found, covering=False):
+def string_simple_format(is_free):
   """
   Returns a string indicating whether a graph is triangle-free.
 
   Args:
-    found: A Boolean value, True if the solution was found, False otherwise.
-    covering: True if the solution is an Independent Edge Triangle Cover  
+    is_free: A Boolean value, True if the graph is triangle-free, False otherwise.
   Returns:
     - "Triangle Free" if triangle is True, "Triangle Found" otherwise.
-    - "Independent Edge Triangle Cover Free" if triangle is True, "Independent Edge Triangle Cover Found" otherwise.
   """
-  return f"{"Independent Edge Triangle Cover" if covering else "Triangle"} Free" if found  else f"{"Independent Edge Triangle Cover" if covering else "Triangle"} Found"
+  return "Triangle Free" if is_free  else "Triangle Found"
 
-def string_complex_format(triangle):
+def string_complex_format(result, count_result=False):
   """
-  Returns a string indicating all the triangles found in a graph.
-
-  Args:
-    triangle: A tuple value, 
-    None if the graph is triangle-free,
-    a tuples of triangle vertices otherwise.
+  Returns a string indicating whether the graph is triangle-free.
   
+  Args:
+    result: None if the graph is triangle-free, the triangle vertices otherwise.
+    count_result: Count the number of triangles found (default is False).
+
   Returns:
-    "Triangle Free" if triangle is None, "Triangles Found (a, b, c)" otherwise.
+    - "Triangle Free" if triangle is None, "Triangle{s} Found {a, b, c}, ...." otherwise.
   """
-  if triangle:
-      if isinstance(triangle, int):
-        return f"Minimum Independent Edge Triangle Cover Size {triangle}"
-      return f"Triangle Found {triangle}"
+  if result:
+      if isinstance(result, list):
+        if count_result:
+           return f"Triangles Count {len(result)}"
+        else:
+            formatted_string = f"{' ; '.join(f'({", ".join(f"'{x}'" for x in sorted(fs))})' for fs in result)}"
+            return f"Triangles Found {formatted_string}"
+      formatted_string = f'({", ".join(f"'{x}'" for x in sorted(result))})'
+      return f"Triangle Found {formatted_string}"
   else:
      return "Triangle Free"
 
@@ -233,47 +206,3 @@ def iterative_dfs(graph, start):
       stack.extend(neighbors)
 
   return traversal_order
-
-def create_sets_from_dict(d):
-    """
-    Creates two sets from a dictionary where values are only 0 or 1.
-
-    Args:
-        d: The input dictionary.
-
-    Returns:
-        A tuple of two sets:
-            - The first set contains keys with value 1.
-            - The second set contains keys with value 0.
-    """
-
-    set_with_1 = set()
-    set_with_0 = set()
-
-    for key, value in d.items():
-        if value == 1:
-            set_with_1.add(key)
-        elif value == 0:
-            set_with_0.add(key)
-        else:
-            raise ValueError("Dictionary values must be 0 or 1.")
-
-    return set_with_1, set_with_0
-
-def evaluate(D, i, j, p, k):
-    """
-    Evaluates a value from a 2D matrix-like structure D at the specified indices.
-
-    Args:
-        D: The 2D matrix-like structure.
-        i, j: The row and column indices of the element to evaluate.
-        p, k: The maximum row and column indices of D.
-
-    Returns:
-        The value at the specified index if it's within bounds, False otherwise.
-    """
-
-    if 0 <= i <= p and 0 <= j <= k:
-        return D[(i, j)]
-    else:
-        return False

@@ -93,9 +93,9 @@ def create_sparse_matrix_from_file(file):
         cols = max(cols, len(line)) # Update the number of columns if needed.
         for j, char in enumerate(line):
             if char == '1':
-                data.append(1)
-                row_indices.append(i)
-                col_indices.append(j)
+                data.append(np.int8(1))
+                row_indices.append(np.int64(i))
+                col_indices.append(np.int64(j))
         rows += 1
 
     matrix = sparse.csc_matrix((data, (row_indices, col_indices)), shape=(rows, cols))
