@@ -44,7 +44,7 @@
     ></script>
   </head>
   <body>
-    <h1>Triangle-Free Solver</h1>
+    <h1>Triangle Solver</h1>
     <p>
       <img
         src="finlay.jpg"
@@ -54,8 +54,8 @@
     <p>
       This work builds upon
       <a
-        href="https://www.researchgate.net/publication/387698746_The_Triangle_Finding_Problem"
-        >The Triangle Finding Problem</a
+        href="https://www.researchgate.net/publication/387698746_The_Triangle_Complexity_Problems"
+        >The Triangle Complexity Problems</a
       >.
     </p>
     <h1>Triangle-Free Problem</h1>
@@ -163,38 +163,37 @@
       Triangle Found <code>(0, 2, 4)</code>: In Rows <code>2</code> &amp;
       <code>4</code> and Columns <code>0</code> &amp; <code>2</code>
     </p>
-    <hr />
     <h1>Our Algorithm - Runtime $O(n + m)$</h1>
     <h2>The algorithm explanation:</h2>
     <p>
-      We detect triangles in a graph using a Breadth-First Search (BFS) and a
-      coloring scheme. During the BFS traversal, each visited node assigns
-      unique, consecutive integer colors to its uncolored neighbors. A triangle
-      exists if two adjacent nodes share two colored neighbors, and the colors
-      assigned to these shared neighbors are the same.
+      We detect triangles in a graph using a Depth-First Search (DFS) and a
+      coloring scheme. During the DFS traversal, each visited node assigns
+      unique integer colors to its uncolored neighbors. A triangle exists if two
+      adjacent nodes have two colored neighbors such that these colors assigned
+      to these shared neighbors determine a triangle.
     </p>
     <h2>Runtime Analysis:</h2>
     <ol>
       <li>
-        <em>Breadth-First Search (BFS)</em>: A standard Breadth-First Search
-        (BFS) on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has
-        a time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots
+        <em>Depth-First Search (DFS)</em>: A standard Depth-First Search (DFS)
+        on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has a
+        time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots
         \mid$ represents the cardinality (e.g., $n = \mid V \mid$ and $m = \mid
         E \mid$). This is because in the worst case, we visit every vertex and
         explore every edge.
       </li>
       <li>
-        <em>Coloring and Checking for Color Difference:</em> In the
-        Breadth-First Search (BFS), each node performs either color assignment
-        or a constant-time check of color differences with its neighbors.
-        Because this operation is executed for every vertex during the BFS
-        traversal, the overall computational complexity remains equivalent to
-        the standard BFS algorithm's worst-case running time.
+        <em>Coloring and Checking for Color Behavior:</em> In the Depth-First
+        Search (DFS), each node performs either color assignment or a
+        constant-time check of color behavior with its neighbors. Because this
+        operation is executed for every vertex during the DFS traversal, the
+        overall computational complexity remains equivalent to the standard DFS
+        algorithm's worst-case running time.
       </li>
       <li>
-        <em>Overall Runtime:</em> The combined breadth-first search, coloring,
-        and checking process has a time complexity of $O(\mid V \mid + \mid E
-        \mid)$.
+        <em>Overall Runtime:</em> The combined Depth-First Search (DFS),
+        coloring, and checking process has a time complexity of $O(\mid V \mid +
+        \mid E \mid)$.
       </li>
     </ol>
     <h1>Compile and Environment</h1>
@@ -202,9 +201,7 @@
     <h2>Install Aegypti's Library and its Dependencies with:</h2>
     <pre><code class="language-bash">pip install aegypti
 </code></pre>
-    <hr />
     <h1>Execute</h1>
-    <hr />
     <ol>
       <li>Go to the package directory to use the benchmarks:</li>
     </ol>
@@ -231,27 +228,137 @@ cd finlay
       <code>finlay\benchmarks\testMatrix1.txt</code> contains a triangle
       combining the coordinates <code>(0, 2, 4)</code>.
     </p>
-    <h1>Partial Feedback Edge Set Problem - Runtime $O(n + m)$</h1>
+    <hr />
+    <h1>Independent Edge Triangle Cover Problem</h1>
+    <h2>Definition:</h2>
     <p>
-      The <code>-c</code> flag enables counting the size of the approximate
-      minimum edge cover of all triangles. This is related to the Partial
-      Feedback Edge Set problem, which is NP-complete
-      <a href="https://dl.acm.org/doi/10.1145/800133.804355">Yannakakis, 1978</a
-      >.
+      Given an undirected graph $G = (V, E)$, find a subset of edges $E'
+      \subseteq E$ such that:
+    </p>
+    <ol>
+      <li>
+        <p>
+          Triangle Cover: For every cycle of length 3 (triangle) in $G$, at
+          least one edge of that triangle is in $E'$.
+        </p>
+      </li>
+      <li>
+        <p>Independence: No two edges in $E'$ belong to the same triangle.</p>
+      </li>
+    </ol>
+    <h2>NP-hardness</h2>
+    <ol>
+      <li>The Monotone 1-in-3 SAT Problem</li>
+    </ol>
+    <ul>
+      <li>
+        The Monotone 1-in-3 SAT problem deals with Boolean formulas in
+        Conjunctive Normal Form (CNF) where each clause consists of exactly
+        three variables, and all variables are unnegated (monotone). The
+        objective is to determine if a truth assignment exists for the variables
+        such that precisely one variable in every clause evaluates to
+        <code>true</code>. This specific truth assignment, if it exists, is
+        referred to as a valid satisfying truth assignment for the given
+        instance of the Monotone 1-in-3 SAT problem. This problem is NP-complete
+        (See reference:
+        <a href="https://doi.org/10.1145/800133.804350">Schaefer, 1978</a>)
+      </li>
+    </ul>
+    <ol start="2">
+      <li>Constructing the Graph:</li>
+    </ol>
+    <ul>
+      <li>
+        For each variable $x$ in the Monotone 1-in-3 SAT formula $\phi$, create
+        a corresponding node labeled $x$. For each clause $(x \vee y \vee z)$ in
+        $\phi$, introduce three edges: $(x, y)$, $(y, z)$, and $(x, z)$. These
+        edges collectively form a triangle within the graph.
+      </li>
+    </ul>
+    <ol start="3">
+      <li>Satisfying a Clause:</li>
+    </ol>
+    <ul>
+      <li>
+        An edge within a triangle is considered <code>covered</code> if it is
+        selected. A clause is satisfied if and only if exactly one edge within
+        its corresponding triangle is covered.
+      </li>
+    </ul>
+    <ol start="4">
+      <li>Variable Assignment:</li>
+    </ol>
+    <ul>
+      <li>
+        If the edge $(y, z)$ from the clause $(x \vee y \vee z)$ is selected, it
+        implies that variable $x$ is assigned the value <code>true</code> in the
+        satisfying truth assignment.
+      </li>
+    </ul>
+    <ol start="5">
+      <li>Relating Solutions:</li>
+    </ol>
+    <ul>
+      <li>
+        <p>
+          We establish a bijection between valid satisfying truth assignments
+          for $\phi$ and Independent Edge Triangle Covers in the corresponding
+          graph $G$.
+        </p>
+        <ul>
+          <li>
+            From Monotone 1-in-3 SAT to Independent Edge Triangle Cover:
+            <ul>
+              <li>
+                Given a valid satisfying truth assignment for $\phi$, let $x$ be
+                a variable assigned <code>True</code>.
+              </li>
+              <li>
+                Since each clause must have exactly one true variable, the node
+                $x$ in $G$ will not be incident to any selected edge.
+              </li>
+              <li>
+                For every clause $(x \vee y \vee z)$ in $\phi$, include the edge
+                $(y, z)$ in the Independent Edge Triangle Cover $E'$.
+              </li>
+              <li>
+                Each triangle in $G$ shares exactly one edge with $E'$, ensuring
+                that at least one edge in every triangle is covered.
+              </li>
+              <li>
+                This directly corresponds to having exactly one true variable
+                per clause in $\phi$.
+              </li>
+              <li>
+                Since no two edges in $E'$ belong to the same triangle, the
+                cover is independent.
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <ol start="6">
+      <li>
+        <p>Conclusion:</p>
+        <p>
+          We have shown a polynomial-time reduction from Monotone 1-in-3 SAT to
+          Independent Edge Triangle Cover. Since Monotone 1-in-3 SAT is
+          NP-complete, Independent Edge Triangle Cover is also NP-hard.
+        </p>
+      </li>
+    </ol>
+    <h1>Execute</h1>
+    <p>
+      The <code>-f</code> flag enables finding an independent edge triangle
+      cover.
     </p>
     <p><strong>Example:</strong></p>
-    <pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2.txt -c
+    <pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2.txt -f
 </code></pre>
     <p><strong>Output:</strong></p>
-    <pre><code>testMatrix2.txt: Cover Size 10
+    <pre><code>testMatrix2.txt: Independent Edge Triangle Cover Found
 </code></pre>
-    <h2>Runtime Analysis:</h2>
-    <p>
-      To prove that a graph is triangle-free, we utilize the same algorithmic
-      approach as in the previous scenario. Consequently, establishing an
-      $O(m+n)$ time complexity for triangle-free graph detection would suffice,
-      as this algorithm is shared between both cases.
-    </p>
     <h1>Command Options</h1>
     <p>
       To display the help message and available options, run the following
@@ -260,20 +367,23 @@ cd finlay
     <pre><code class="language-bash">triangle -h
 </code></pre>
     <p>This will output:</p>
-    <pre><code>usage: triangle [-h] -i INPUTFILE [-b] [-v] [-l] [-c] [--version]
+    <pre><code>usage: triangle [-h] -i INPUTFILE [-b] [-c] [-f] [-v] [-l] [--version]
 
-Solve the Triangle-Free Problem for an undirected graph represented by a Boolean adjacency matrix given in a file.
+Determine whether an undirected graph, represented by a {0, 1}-adjacency matrix read from a file, is triangle-free or
+contains an independent edge triangle cover.
 
 options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
+  -c, --coverBruteForce
+                        enable finding an independent edge triangle cover (brute force)
+  -f, --findTriangle    Enable finding an independent edge triangle cover (polynomial-time solution). This problem is NP-
+                        complete (See documentation: https://pypi.org/project/aegypti/). This algorithm constitutes a proof
+                        that P and NP are equivalent.
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
-  -c, --coverTriangle   Enable counting the size of the approximate minimum edge cover of all triangles. This is related to
-                        the Partial Feedback Edge Set problem, which is NP-complete (Yannakakis, 1978,
-                        doi:10.1145/800133.804355).
   --version             show program's version number and exit
 </code></pre>
     <p>This output describes all available options.</p>
@@ -283,7 +393,7 @@ options:
       testing algorithms on randomly generated, large sparse matrices. It
       accepts the following options:
     </p>
-    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-w] [-v] [-l] [-c] [--version]
+    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-c] [-f] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application.
 
@@ -296,12 +406,14 @@ options:
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
   -b, --bruteForce      enable comparison with a brute-force approach using matrix multiplication
+  -c, --coverBruteForce
+                        enable finding an independent edge triangle cover (brute force)
+  -f, --findTriangle    Enable finding an independent edge triangle cover (polynomial-time solution). This problem is NP-
+                        complete (See documentation: https://pypi.org/project/aegypti/). This algorithm constitutes a proof
+                        that P and NP are equivalent.
   -w, --write           write the generated random matrix to a file in the current directory
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
-  -c, --coverTriangle   Enable counting the size of the approximate minimum edge cover of all triangles. This is related to
-                        the Partial Feedback Edge Set problem, which is NP-complete (Yannakakis, 1978,
-                        doi:10.1145/800133.804355).
   --version             show program's version number and exit
 </code></pre>
     <p>
@@ -314,8 +426,9 @@ options:
       It generates random square matrices with configurable dimensions
       (<code>-d</code>), sparsity levels (<code>-s</code>), and number of tests
       (<code>-n</code>). While a comparison with a brute-force matrix
-      multiplication approach is available, it's recommended to avoid this for
-      large datasets due to performance limitations. Additionally, the generated
+      multiplication approach and the exponential finding of an independent edge
+      triangle cover are available, it's recommended to avoid these for large
+      datasets due to performance limitations. Additionally, the generated
       matrix can be written to the current directory (<code>-w</code>), and
       verbose output or file logging can be enabled with the (<code>-v</code>)
       or (<code>-l</code>) flag, respectively, to record test results.
@@ -327,6 +440,8 @@ options:
     <h1>Complexity</h1>
     <pre><code class="language-diff">+ We propose an O(n + m) algorithm to solve the Triangle-Free Problem.
 + This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
++ We present a polynomial-time algorithm for finding an Independent Edge Triangle Cover.
++ If we can solve the Independent Edge Triangle Cover problem in polynomial time, and the Independent Edge Triangle Cover problem is NP-complete, then P = NP.
 </code></pre>
     <h1>License</h1>
     <ul>

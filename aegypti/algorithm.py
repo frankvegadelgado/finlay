@@ -1,13 +1,13 @@
-# Created on 01/09/2025
+# Created on 01/10/2025
 # Author: Frank Vega
 
 import numpy as np
 import scipy.sparse as sparse
-from collections import deque
 
 def is_triangle_free(adjacency_matrix):
   """
   Checks if a graph represented by a sparse adjacency matrix is triangle-free using matrix multiplication.
+  Approach with O(n + m) time complexity.
 
   A graph triangle is a set of three vertices that are all 
   adjacent to each other (i.e., a complete subgraph of size 3).
@@ -24,43 +24,26 @@ def is_triangle_free(adjacency_matrix):
   n = adjacency_matrix.shape[0]
   if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
       raise ValueError("Adjacency matrix must be square.")
-
+    
   colors = {}
-  queue = deque()
+  stack = []
   for i in range(n):
     if i not in colors:
-      queue.append((i, 1))
-      colors[i] = 1
-
-      while queue:
-        current_node, current_color = queue.popleft()
+      stack = [(i, i)]
+      
+      while stack:
+        current_node, parent = stack.pop()
+        current_color = n * parent + current_node
+        colors[current_node] = current_color
         current_row = adjacency_matrix.getrow(current_node)
         neighbors = current_row.nonzero()[1]
         for neighbor in neighbors:
           
-          if neighbor not in colors:
+          if neighbor in colors and adjacency_matrix[current_color // n, colors[neighbor] % n]:           
+            return (str(current_color // n), str(current_color % n), str(colors[neighbor] % n))
 
-            queue.append((neighbor, current_color + 1))
-            colors[neighbor] = current_color + 1
-        
-          elif current_color == colors[neighbor]:           
-            current_row_indices = adjacency_matrix.getrow(current_node).indices
-            neighbor_row_indices = adjacency_matrix.getrow(neighbor).indices
-
-            i = j = 0
-            while i < len(current_row_indices) and j < len(neighbor_row_indices):
-                if current_row_indices[i] == neighbor_row_indices[j]: 
-                    if (current_row_indices[i] != current_node and 
-                        current_row_indices[i] != neighbor):
-                        return (str(current_node), str(neighbor), str(current_row_indices[i]))
-                    else:
-                        i += 1
-                        j += 1
-                elif current_row_indices[i] < neighbor_row_indices[j]:
-                    i += 1
-                else:
-                    j += 1
-
+        stack.extend([(node, current_node) for node in neighbors if node not in colors])
+            
   return None
 
 def is_triangle_free_brute_force(adj_matrix):

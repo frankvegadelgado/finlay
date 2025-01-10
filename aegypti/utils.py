@@ -1,12 +1,10 @@
-# Created on 01/09/2025
+# Created on 01/10/2025
 # Author: Frank Vega
 
 import scipy.sparse as sparse
-import networkx as nx
 import numpy as np
 import random
 import string
-
 
 def generate_short_hash(length=6):
     """Generates a short random alphanumeric hash string.
@@ -138,124 +136,6 @@ def generate_triangles_from_edges(adjacency_matrix, triangles):
                 j += 1
     return visited
 
-def edges_to_sparse_matrix(edges, num_vertices=None, is_directed=False):
-    """
-    Converts a set of edges to a SciPy sparse matrix.
-
-    Args:
-        edges: A list or set of tuples/lists representing edges.
-        num_vertices: The total number of vertices (optional, inferred if None).
-        is_directed: Whether the graph is directed (default: False).
-
-    Returns:
-        A SciPy CSR sparse matrix.
-    """
-
-    if not edges: #Handle empty edge case
-        if num_vertices is None:
-            raise ValueError("Number of vertices must be specified if edges are empty")
-        return sparse.csr_matrix((num_vertices, num_vertices))
-
-    rows = []
-    cols = []
-    data = []
-
-    for u, v in edges:
-        rows.append(u)
-        cols.append(v)
-        data.append(1)  # Assuming unweighted graph
-
-        if not is_directed:
-            rows.append(v)
-            cols.append(u)
-            data.append(1)
-
-    if num_vertices is None:
-        num_vertices = max(max(row, col) for row, col in zip(rows, cols)) + 1
-    
-    return sparse.csr_matrix((data, (rows, cols)), shape=(num_vertices, num_vertices))
-
-def sparse_matrix_to_edges(adj_matrix, is_directed=False):
-    """
-    Converts a SciPy sparse adjacency matrix to a set of edges.
-
-    Args:
-        adj_matrix: A SciPy sparse adjacency matrix.
-        is_directed: Whether the matrix represents a directed graph (default: False).
-
-    Returns:
-        A set of tuples representing the edges.
-    """
-
-    edges = set()
-    rows, cols = adj_matrix.nonzero()
-
-    for i, j in zip(rows, cols):
-        edges.add((i, j))
-        if not is_directed:
-            edges.add((j, i))
-
-    return edges
-
-def sparse_matrix_to_edges_efficient(adj_matrix, is_directed=False):
-    """
-    Converts a SciPy sparse adjacency matrix to a set of edges efficiently.
-
-    Args:
-        adj_matrix: A SciPy sparse adjacency matrix.
-        is_directed: Whether the matrix represents a directed graph (default: False).
-
-    Returns:
-        A set of tuples representing the edges.
-    """
-
-    edges = set()
-    rows, cols = adj_matrix.nonzero()
-    if is_directed:
-        for i, j in zip(rows, cols):
-            edges.add((i, j))
-    else:
-        for i, j in zip(rows, cols):
-            if i <= j: # Avoid duplicates in undirected graphs
-                edges.add((i, j))
-    return edges
-
-def nx_to_sparse(graph, format='csr'):
-    """
-    Converts a NetworkX graph to a SciPy sparse adjacency matrix.
-
-    Args:
-        graph: The NetworkX graph.
-        format: The desired sparse matrix format (e.g., 'csr', 'csc', 'coo', 'lil', 'dok'). Default is 'csr'.
-
-    Returns:
-        A SciPy sparse adjacency matrix in the specified format, or None if the graph is empty.
-    Raises:
-        ValueError: If the specified format is invalid.
-    """
-
-    if not graph:
-        return None
-
-    adj_matrix = nx.to_scipy_sparse_array(graph, format=format)
-    return adj_matrix
-
-
-def nx_to_sparse_alternative(graph):
-    """
-    Converts a NetworkX graph to a SciPy sparse adjacency matrix using an alternative method.
-
-    Args:
-        graph: The NetworkX graph.
-
-    Returns:
-        A SciPy CSR sparse adjacency matrix, or None if the graph is empty.
-    """
-    if not graph:
-        return None
-    adj_matrix = nx.adjacency_matrix(graph)
-    return adj_matrix
-
 def find_triangle_coordinates_brute_force(adjacency_matrix):
     """
     Finds the coordinates of all triangles in a given SciPy sparse matrix.
@@ -285,17 +165,18 @@ def find_triangle_coordinates_brute_force(adjacency_matrix):
                          visited.add((str(i), str(j), str(k)))
     return visited
 
-def string_simple_format(is_free):
+def string_simple_format(found, covering=False):
   """
   Returns a string indicating whether a graph is triangle-free.
 
   Args:
-    is_free: An Boolean value, True if the graph is triangle-free, False otherwise.
-
+    found: A Boolean value, True if the solution was found, False otherwise.
+    covering: True if the solution is an Independent Edge Triangle Cover  
   Returns:
-    "Triangle Free" if triangle is True, "Triangle Found" otherwise.
+    - "Triangle Free" if triangle is True, "Triangle Found" otherwise.
+    - "Independent Edge Triangle Cover Free" if triangle is True, "Independent Edge Triangle Cover Found" otherwise.
   """
-  return "Triangle Free" if is_free  else "Triangle Found"
+  return f"{"Independent Edge Triangle Cover" if covering else "Triangle"} Free" if found  else f"{"Independent Edge Triangle Cover" if covering else "Triangle"} Found"
 
 def string_complex_format(triangle):
   """
@@ -311,7 +192,88 @@ def string_complex_format(triangle):
   """
   if triangle:
       if isinstance(triangle, int):
-        return f"Cover Size {triangle}"
+        return f"Minimum Independent Edge Triangle Cover Size {triangle}"
       return f"Triangle Found {triangle}"
   else:
      return "Triangle Free"
+
+def iterative_dfs(graph, start):
+  """
+  Performs Depth-First Search (DFS) iteratively on a graph.
+
+  Args:
+      graph: A dictionary representing the graph where keys are nodes
+             and values are lists of their neighbors.
+      start: The starting node for the DFS traversal.
+
+  Returns:
+      A list containing the nodes visited in DFS order.
+      Returns an empty list if the graph or start node is invalid.
+  """
+
+  if not graph or start not in graph:
+    return []
+
+  visited = set()  # Keep track of visited nodes
+  stack = [start]  # Use a stack for iterative DFS
+  traversal_order = []
+
+  while stack:
+    node = stack.pop()
+
+    if node not in visited:
+      visited.add(node)
+      traversal_order.append(node)
+
+      # Important: Reverse the order of neighbors before adding to the stack
+      # This ensures that the left-most neighbors are explored first,
+      # mimicking the recursive DFS behavior.
+      neighbors = list(graph[node]) #Create a copy to avoid modifying the original graph
+      neighbors.reverse()
+      stack.extend(neighbors)
+
+  return traversal_order
+
+def create_sets_from_dict(d):
+    """
+    Creates two sets from a dictionary where values are only 0 or 1.
+
+    Args:
+        d: The input dictionary.
+
+    Returns:
+        A tuple of two sets:
+            - The first set contains keys with value 1.
+            - The second set contains keys with value 0.
+    """
+
+    set_with_1 = set()
+    set_with_0 = set()
+
+    for key, value in d.items():
+        if value == 1:
+            set_with_1.add(key)
+        elif value == 0:
+            set_with_0.add(key)
+        else:
+            raise ValueError("Dictionary values must be 0 or 1.")
+
+    return set_with_1, set_with_0
+
+def evaluate(D, i, j, p, k):
+    """
+    Evaluates a value from a 2D matrix-like structure D at the specified indices.
+
+    Args:
+        D: The 2D matrix-like structure.
+        i, j: The row and column indices of the element to evaluate.
+        p, k: The maximum row and column indices of D.
+
+    Returns:
+        The value at the specified index if it's within bounds, False otherwise.
+    """
+
+    if 0 <= i <= p and 0 <= j <= k:
+        return D[(i, j)]
+    else:
+        return False
