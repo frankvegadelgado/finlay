@@ -1,6 +1,6 @@
 # Triangle-Free Solver
 
-![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](https://misiones.cubaminrex.cu/sites/default/files/styles/750_ancho/public/imagenes/editoronu/articulos/carlos-j-finlay_0.jpg)
+![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
 This work builds upon [The Triangle Finding Problem](https://www.researchgate.net/publication/387698746_The_Triangle_Finding_Problem).
 
