@@ -1,10 +1,72 @@
-# Created on 01/10/2025
+# Created on 01/11/2025
 # Author: Frank Vega
 
 import scipy.sparse as sparse
 import numpy as np
 import random
 import string
+import os
+
+def get_file_name(filepath):
+    """
+    Gets the file name from an absolute path.
+
+    Args:
+        filepath: The absolute path to the file.
+
+    Returns:
+        The file name, or None if no file is found.
+    """
+
+    return os.path.basename(filepath)
+    
+def get_extension_without_dot(filepath):
+    """
+    Gets the file extension without the dot from an absolute path.
+
+    Args:
+        filepath: The absolute path to the file.
+
+    Returns:
+        The file extension without the dot, or None if no extension is found.
+    """
+
+    filename = get_file_name(filepath)
+    _, ext = os.path.splitext(filename)
+    return ext[1:] if ext else None
+
+def has_one_on_diagonal(adjacency_matrix):
+    """
+    Checks if there is a 1 on the diagonal of a SciPy sparse matrix.
+
+    Args:
+      adjacency_matrix: A SciPy sparse matrix (e.g., csc_matrix) representing the adjacency matrix.
+
+    Returns:
+        True if there is a 1 on the diagonal, False otherwise.
+    """
+    diagonal = adjacency_matrix.diagonal()
+    return np.any(diagonal == 1)
+
+def is_symmetric(matrix):
+    """Checks if a SciPy sparse matrix is symmetric.
+
+    Args:
+        matrix: A SciPy sparse matrix.
+
+    Returns:
+        bool: True if the matrix is symmetric, False otherwise.
+        Raises TypeError: if the input is not a sparse matrix.
+    """
+    if not sparse.issparse(matrix):
+        raise TypeError("Input must be a SciPy sparse matrix.")
+
+    rows, cols = matrix.shape
+    if rows != cols:
+        return False  # Non-square matrices cannot be symmetric
+
+    # Efficiently check for symmetry
+    return (matrix != matrix.T).nnz == 0
 
 def generate_short_hash(length=6):
     """Generates a short random alphanumeric hash string.
@@ -88,54 +150,6 @@ def random_matrix_tests(matrix_shape, sparsity=0.9):
 
     return symmetric_matrix
 
-def generate_triangles_from_edges(adjacency_matrix, triangles):
-    """
-    Optimized version: Generate triangles given a list of edge pairs.
-    Avoids redundant set creation.
-
-    Args:
-        adjacency_matrix: A SciPy sparse adjacency matrix.
-        triangles: A list of tuples, where each tuple (u, v) represents an edge.
-
-    Returns:
-        All triangles formed using at least on side in the given edges.
-        Raises TypeError if inputs are not of the correct type.
-        Raises ValueError if the input matrix is not square or vertex indices are out of range.
-    """
-    if not sparse.isspmatrix(adjacency_matrix):
-        raise TypeError("adjacency_matrix must be a SciPy sparse matrix.")
-    if not all(isinstance(edge, tuple) and len(edge) == 2 for edge in triangles):
-        raise TypeError("Each element in triangles must be a 2-tuple.")
-
-    rows, cols = adjacency_matrix.shape
-    if rows != cols:
-        raise ValueError("Input matrix must be square.")
-
-    visited = set()
-    for current_node, neighbor in triangles:
-        if not (0 <= current_node < adjacency_matrix.shape[0] and 0 <= neighbor < adjacency_matrix.shape[0]):
-            raise ValueError("Vertex indices in triangles are out of range.")
-        current_row_indices = adjacency_matrix.getrow(current_node).indices
-        neighbor_row_indices = adjacency_matrix.getrow(neighbor).indices
-
-        i = j = 0
-        while i < len(current_row_indices) and j < len(neighbor_row_indices):
-            if current_row_indices[i] == neighbor_row_indices[j]:
-                minimum = min(current_node, neighbor, current_row_indices[i])
-                maximum = max(current_node, neighbor, current_row_indices[i])
-                betweenness = set([current_node, neighbor, current_row_indices[i]]) - {minimum, maximum}
-                if betweenness:
-                  new_triangle = (str(minimum), str(next(iter(betweenness))), str(maximum))
-                  if new_triangle not in visited:
-                    visited.add(new_triangle)
-                i += 1
-                j += 1
-            elif current_row_indices[i] < neighbor_row_indices[j]:
-                i += 1
-            else:
-                j += 1
-    return visited
-
 def string_simple_format(is_free):
   """
   Returns a string indicating whether a graph is triangle-free.
@@ -159,14 +173,11 @@ def string_complex_format(result, count_result=False):
     - "Triangle Free" if triangle is None, "Triangle{s} Found {a, b, c}, ...." otherwise.
   """
   if result:
-      if isinstance(result, list):
-        if count_result:
-           return f"Triangles Count {len(result)}"
-        else:
-            formatted_string = f"{' ; '.join(f'({", ".join(f"'{x}'" for x in sorted(fs))})' for fs in result)}"
-            return f"Triangles Found {formatted_string}"
-      formatted_string = f'({", ".join(f"'{x}'" for x in sorted(result))})'
-      return f"Triangle Found {formatted_string}"
+    if count_result:
+        return f"Triangles Count {len(result)}"
+    else:
+        formatted_string = f"{' ; '.join(f'({", ".join(f"'{x}'" for x in sorted(fs))})' for fs in result)}"
+        return f"Triangle{"s" if len(result) > 1 else ""} Found {formatted_string}"
   else:
      return "Triangle Free"
 

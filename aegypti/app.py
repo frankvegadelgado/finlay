@@ -1,6 +1,6 @@
 #                       Triangle Solver
 #                          Frank Vega
-#                      Juanary 10th, 2025
+#                      Juanary 11th, 2025
 
 import argparse
 import time
@@ -21,7 +21,7 @@ def main():
     helper.add_argument('-c', '--count', action='store_true', help='count the total amount of triangles')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.1.5')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.1.6')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -36,14 +36,14 @@ def main():
     started = time.time()
     
     sparse_matrix = parser.read(filepath)
-    filename = parser.get_file_name(filepath)
+    filename = utils.get_file_name(filepath)
     logger.info(f"Parsing the Input File done in: {(time.time() - started) * 1000.0} milliseconds")
     
     # A solution with a time complexity of O(n + m)
     logger.info("A solution with a time complexity of O(n + m) started")
     started = time.time()
     
-    result = algorithm.find_triangle_coordinates(sparse_matrix) if count_triangles or all_triangles else algorithm.is_triangle_free(sparse_matrix)
+    result = algorithm.find_triangle_coordinates(sparse_matrix, not (count_triangles or all_triangles))
 
     logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
 
