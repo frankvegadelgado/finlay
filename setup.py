@@ -8,7 +8,7 @@ NAME = "aegypti"
 
 INSTALL_REQUIRES = [
     "numpy>=2.2.1",
-    "scipy>=1.15.0"  
+    "scipy>=1.15.0",  
 ]
 
 setuptools.setup(
@@ -18,20 +18,24 @@ setuptools.setup(
     url="https://github.com/frankvegadelgado/finlay",
     project_urls={
         "Source Code": "https://github.com/frankvegadelgado/finlay",
+        "Documentation Research": "https://www.researchgate.net/publication/387698746_The_Triangle_Finding_Problem",
     },
     author="Frank Vega",
     author_email="vega.frank@gmail.com",
     license="MIT License",
     classifiers=[
-        "Development Status :: 3 - Alpha",
-        "Environment :: Console",
-        "Environment :: Web Environment",
-        "Intended Audience :: Developers",
-        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Software Development",
+        "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3.10",
+        "Environment :: Console",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: Science/Research",
+        "Natural Language :: English",
     ],
-    # Snowpark requires Python 3.8
     python_requires=">=3.8",
     # Requirements
     install_requires=INSTALL_REQUIRES,
