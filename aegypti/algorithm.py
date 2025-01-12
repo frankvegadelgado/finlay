@@ -4,7 +4,7 @@
 import numpy as np
 import scipy.sparse as sparse
 
-def find_triangle_coordinates(adjacency_matrix, first_triangle=False):
+def find_triangle_coordinates(adjacency_matrix, first_triangle=True):
   """
     Finds the coordinates of all triangles in a given SciPy sparse matrix.
 

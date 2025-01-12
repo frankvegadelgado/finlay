@@ -1,4 +1,4 @@
-# Triangle-Free Solver
+# Aegypti: Triangle-Free Solver
 
 ![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
