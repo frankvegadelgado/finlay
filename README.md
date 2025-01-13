@@ -65,7 +65,7 @@ Triangle detection in a graph is performed using a Depth-First Search (DFS) comb
 
 # Compile and Environment
 
-## Install Python >=3.8.
+## Install Python >=3.12.
 
 ## Install Aegypti's Library and its Dependencies with:
 

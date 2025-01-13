@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.1.7"
+VERSION = "0.1.8"
 
 NAME = "aegypti"
 
@@ -18,7 +18,7 @@ setuptools.setup(
     url="https://github.com/frankvegadelgado/finlay",
     project_urls={
         "Source Code": "https://github.com/frankvegadelgado/finlay",
-        "Documentation Research": "https://www.researchgate.net/publication/387698746_The_Triangle_Finding_Problem",
+        "Documentation": "https://www.researchgate.net/publication/387698746_The_Triangle_Finding_Problem",
     },
     author="Frank Vega",
     author_email="vega.frank@gmail.com",
@@ -28,7 +28,7 @@ setuptools.setup(
         "Topic :: Software Development",
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.12",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
@@ -36,7 +36,7 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.12",
     # Requirements
     install_requires=INSTALL_REQUIRES,
     packages=["aegypti"],
