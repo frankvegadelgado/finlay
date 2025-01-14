@@ -1,4 +1,4 @@
-# Created on 01/11/2025
+# Modified on 01/14/2025
 # Author: Frank Vega
 
 import scipy.sparse as sparse
@@ -176,7 +176,7 @@ def string_complex_format(result, count_result=False):
     if count_result:
         return f"Triangles Count {len(result)}"
     else:
-        formatted_string = f"{' ; '.join(f'({", ".join(f"'{x}'" for x in sorted(fs))})' for fs in result)}"
+        formatted_string = f"{'; '.join(f'({", ".join(f"{x}" for x in sorted(fs))})' for fs in result)}"
         return f"Triangle{"s" if len(result) > 1 else ""} Found {formatted_string}"
   else:
      return "Triangle Free"
@@ -217,3 +217,9 @@ def iterative_dfs(graph, start):
       stack.extend(neighbors)
 
   return traversal_order
+
+def println(output, logger, file_logging=False):
+    """ Log and Print the Final Output Message """
+    if (file_logging):
+        logger.info(output)
+    print(output)

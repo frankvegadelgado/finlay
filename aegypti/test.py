@@ -1,4 +1,4 @@
-# Created on 01/11/2024
+# Modified on 01/14/2025
 # Author: Frank Vega
 
 import time
@@ -34,7 +34,7 @@ def main():
     helper.add_argument('-w', '--write', action='store_true', help='write the generated random matrix to a file in the current directory')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.1.8')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.1.9')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -71,9 +71,7 @@ def main():
 
         answer = utils.string_complex_format(result, count_triangles)
         output = f"Algorithm Smart Test {i + 1}: {answer}" 
-        if (args.log):
-            logger.info(output)
-        print(output)
+        utils.println(output, logger, args.log)
 
         # A Solution with brute force
         if brute_force:
@@ -92,22 +90,16 @@ def main():
             
             answer = utils.string_complex_format(result, count_triangles) if count_triangles or all_triangles else utils.string_simple_format(result)
             output = f"Algorithm Naive Test {i + 1}: {answer}" 
-            if (args.log):
-                logger.info(output)
-            print(output)
+            utils.println(output, logger, args.log)
         
 
         if args.write:
             output = f"Saving Matrix Test {i + 1}" 
-            if (args.log):
-                logger.info(output)
-            print(output)
+            utils.println(output, logger, args.log)
 
             filename = f"sparse_matrix_{i + 1}_{hash_string}.txt"
             parser.save_sparse_matrix_to_file(sparse_matrix, filename)
             output = f"Matrix Test {i + 1} written to file {filename}." 
-            if (args.log):
-                logger.info(output)
-            print(output)
+            utils.println(output, logger, args.log)
 if __name__ == "__main__":
   main()      

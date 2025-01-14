@@ -93,10 +93,10 @@ utilizing the `triangle` command provided by Aegypti's Library to execute the Bo
 ## The console output will display:
 
 ```
-testMatrix1.txt: Triangle Found ('0', '2', '4')
+testMatrix1.txt: Triangle Found (0, 2, 4)
 ```
 
-which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt` contains a triangle combining the coordinates `(0, 2, 4)`.
+which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt` contains a triangle combining the nodes `(0, 2, 4)`.
 
 ---
 
@@ -113,7 +113,7 @@ triangle -i .\benchmarks\testMatrix2.txt -a
 **Output:**
 
 ```
-testMatrix2.txt: Triangles Found ('0', '2', '8') ; ('0', '1', '10') ; ('0', '2', '3') ; ('0', '1', '7') ; ('0', '2', '10') ; ('1', '3', '10') ; ('2', '3', '10') ; ('1', '3', '8') ; ('0', '3', '10') ; ('3', '4', '10') ; ('0', '3', '8') ; ('0', '1', '8') ; ('2', '3', '8') ; ('0', '1', '5') ; ('3', '4', '8') ; ('0', '1', '3'
+testMatrix2.txt: Triangles Found (0, 2, 8); (0, 1, 10); (0, 2, 3); (0, 1, 7); (0, 2, 10); (1, 3, 10); (2, 3, 10); (1, 3, 8); (0, 3, 10); (3, 4, 10); (0, 3, 8); (0, 1, 8); (2, 3, 8); (0, 1, 5); (3, 4, 8); (0, 1, 3)
 ```
 
 When multiple triangles exist, the output provides a list of their vertices.

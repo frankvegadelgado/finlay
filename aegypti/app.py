@@ -1,6 +1,6 @@
 #                       Triangle Solver
 #                          Frank Vega
-#                      Juanary 11th, 2025
+#                      Juanary 14th, 2025
 
 import argparse
 import time
@@ -21,7 +21,7 @@ def main():
     helper.add_argument('-c', '--count', action='store_true', help='count the total amount of triangles')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.1.8')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.1.9')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -50,9 +50,7 @@ def main():
     # Output the smart solution
     answer = utils.string_complex_format(result, count_triangles)
     output = f"{filename}: {answer}" 
-    if (args.log):
-        logger.info(output)
-    print(output)
+    utils.println(output, logger, args.log)
 
     # A Solution with brute force
     if brute_force:
@@ -71,9 +69,7 @@ def main():
         
         answer = utils.string_complex_format(result, count_triangles) if count_triangles or all_triangles else utils.string_simple_format(result)
         output = f"{filename}: {answer}"
-        if (args.log):
-            logger.info(output)
-        print(output)
+        utils.println(output, logger, args.log)
         
 
         
