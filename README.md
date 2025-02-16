@@ -157,7 +157,7 @@ This will output:
 ```
 usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
 
-Solve the Triangle-Free Problem for an undirected graph represented by a Boolean Adjacency Matrix given in a File.
+Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.
 
 options:
   -h, --help            show this help message and exit
@@ -180,7 +180,7 @@ A command-line tool, `test_triangle`, has been developed for testing algorithms 
 ```
 usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
 
-The Finlay Testing Application.
+The Finlay Testing Application using randomly generated, large sparse matrices.
 
 options:
   -h, --help            show this help message and exit

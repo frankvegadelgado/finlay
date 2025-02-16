@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.2.0"
+VERSION = "0.2.1"
 
 NAME = "aegypti"
 
@@ -14,7 +14,7 @@ INSTALL_REQUIRES = [
 setuptools.setup(
     name=NAME,
     version=VERSION,
-    description="Solve the Triangle-Free Problem for an undirected graph represented by a Boolean Adjacency Matrix given in a File.",
+    description="Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.",
     url="https://github.com/frankvegadelgado/finlay",
     project_urls={
         "Source Code": "https://github.com/frankvegadelgado/finlay",
