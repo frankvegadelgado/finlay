@@ -34,7 +34,7 @@ def main():
     helper.add_argument('-w', '--write', action='store_true', help='write the generated random matrix to a file in the current directory')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.1.9')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.2.0')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -97,7 +97,7 @@ def main():
             output = f"Saving Matrix Test {i + 1}" 
             utils.println(output, logger, args.log)
 
-            filename = f"sparse_matrix_{i + 1}_{hash_string}.txt"
+            filename = f"sparse_matrix_{i + 1}_{hash_string}"
             parser.save_sparse_matrix_to_file(sparse_matrix, filename)
             output = f"Matrix Test {i + 1} written to file {filename}." 
             utils.println(output, logger, args.log)

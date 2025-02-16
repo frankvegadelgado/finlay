@@ -2,7 +2,7 @@
 
 ![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
-This work builds upon [The Triangle Finding Problem](https://www.researchgate.net/publication/387698746_The_Triangle_Finding_Problem).
+This work builds upon [The Triangle Finding Problem](https://hal.science/hal-04887444).
 
 ---
 
@@ -27,29 +27,35 @@ Answer: True / False
 
 ### Example Instance: 5 x 5 matrix
 
-|        | c0    | c1  | c2    | c3  | c4  |
+|        | c1    | c2  | c3    | c4  | c5  |
 | ------ | ----- | --- | ----- | --- | --- |
-| **r0** | 0     | 0   | 1     | 0   | 1   |
-| **r1** | 0     | 0   | 0     | 1   | 0   |
-| **r2** | **1** | 0   | 0     | 0   | 1   |
-| **r3** | 0     | 1   | 0     | 0   | 0   |
-| **r4** | **1** | 0   | **1** | 0   | 0   |
+| **r1** | 0     | 0   | 1     | 0   | 1   |
+| **r2** | 0     | 0   | 0     | 1   | 0   |
+| **r3** | **1** | 0   | 0     | 0   | 1   |
+| **r4** | 0     | 1   | 0     | 0   | 0   |
+| **r5** | **1** | 0   | **1** | 0   | 0   |
 
-A matrix is represented in a text file using the following string representation:
+The input for undirected graph is typically provided in [DIMACS](http://dimacs.rutgers.edu/Challenges) format. In this way, the previous adjacency matrix is represented in a text file using the following string representation:
 
 ```
-00101
-00010
-10001
-01000
-10100
+p edge 5 4
+e 1 3
+e 1 5
+e 2 4
+e 3 5
 ```
 
-This represents a 5x5 matrix where each line corresponds to a row, and '1' indicates a connection or presence of an element, while '0' indicates its absence.
+This represents a 5x5 matrix in DIMACS format such that each edge $(v,w)$ appears exactly once in the input file and is not repeated as $(w,v)$. In this format, every edge appears in the form of
+
+```
+e W V
+```
+
+where the fields W and V specify the endpoints of the edge while the lower-case character `e` signifies that this is an edge descriptor line.
 
 _Example Solution:_
 
-Triangle Found `(0, 2, 4)`: In Rows `2` & `4` and Columns `0` & `2`
+Triangle Found `(1, 3, 5)`: In Rows `3` & `5` and Columns `1` & `3`
 
 # Our Algorithm - Runtime $O(n + m)$
 
@@ -65,7 +71,7 @@ Triangle detection in a graph is performed using a Depth-First Search (DFS) comb
 
 # Compile and Environment
 
-## Install Python >=3.12.
+## Install Python >=3.10.
 
 ## Install Aegypti's Library and its Dependencies with:
 
@@ -85,18 +91,18 @@ cd finlay
 2. Execute the script:
 
 ```bash
-triangle -i .\benchmarks\testMatrix1.txt
+triangle -i .\benchmarks\testMatrix1
 ```
 
-utilizing the `triangle` command provided by Aegypti's Library to execute the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt`. The file `testMatrix1.txt` represents the example described herein. We also support .xz, .lzma, .bz2, and .bzip2 compressed .txt files.
+utilizing the `triangle` command provided by Aegypti's Library to execute the Boolean adjacency matrix `finlay\benchmarks\testMatrix1`. The file `testMatrix1` represents the example described herein. We also support .xz, .lzma, .bz2, and .bzip2 compressed text files.
 
 ## The console output will display:
 
 ```
-testMatrix1.txt: Triangle Found (0, 2, 4)
+testMatrix1: Triangle Found (1, 3, 5)
 ```
 
-which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1.txt` contains a triangle combining the nodes `(0, 2, 4)`.
+which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1` contains a triangle combining the nodes `(1, 3, 5)`.
 
 ---
 
@@ -107,13 +113,13 @@ The `-a` flag enables the discovery of all triangles within the graph.
 **Example:**
 
 ```bash
-triangle -i .\benchmarks\testMatrix2.txt -a
+triangle -i .\benchmarks\testMatrix2 -a
 ```
 
 **Output:**
 
 ```
-testMatrix2.txt: Triangles Found (0, 2, 8); (0, 1, 10); (0, 2, 3); (0, 1, 7); (0, 2, 10); (1, 3, 10); (2, 3, 10); (1, 3, 8); (0, 3, 10); (3, 4, 10); (0, 3, 8); (0, 1, 8); (2, 3, 8); (0, 1, 5); (3, 4, 8); (0, 1, 3)
+testMatrix2: Triangles Found (1, 3, 9); (1, 2, 11); (1, 3, 4); (1, 2, 8); (1, 3, 11); (2, 4, 11); (3, 4, 11); (2, 4, 9); (1, 4, 11); (4, 5, 11); (1, 4, 9); (1, 2, 9); (3, 4, 9); (1, 2, 6); (4, 5, 9); (1, 2, 4)
 ```
 
 When multiple triangles exist, the output provides a list of their vertices.
@@ -123,13 +129,13 @@ Similarly, the `-c` flag counts all triangles in the graph.
 **Example:**
 
 ```bash
-triangle -i .\benchmarks\testMatrix2.txt -c
+triangle -i .\benchmarks\testMatrix2 -c
 ```
 
 **Output:**
 
 ```
-testMatrix2.txt: Triangles Count 16
+testMatrix2: Triangles Count 16
 ```
 
 ## Runtime Analysis:

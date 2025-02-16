@@ -144,8 +144,10 @@ def random_matrix_tests(matrix_shape, sparsity=0.9):
 
     sparse_matrix = sparse.csc_matrix((data, (row_indices, col_indices)), shape=(rows, cols))
 
+    # Convert sparse_matrix to a symmetric matrix
     symmetric_matrix = make_symmetric(sparse_matrix)  
 
+    # Set diagonal to 0
     symmetric_matrix.setdiag(0)
 
     return symmetric_matrix
@@ -176,7 +178,7 @@ def string_complex_format(result, count_result=False):
     if count_result:
         return f"Triangles Count {len(result)}"
     else:
-        formatted_string = f"{'; '.join(f'({", ".join(f"{x}" for x in sorted(fs))})' for fs in result)}"
+        formatted_string = f"{'; '.join(f'({", ".join(f"{x+1}" for x in sorted(fs))})' for fs in result)}"
         return f"Triangle{"s" if len(result) > 1 else ""} Found {formatted_string}"
   else:
      return "Triangle Free"
