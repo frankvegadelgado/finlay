@@ -1,14 +1,13 @@
 # Modified on 01/14/2025
 # Author: Frank Vega
 
-from . import utils
 
 import numpy as np
 from scipy import sparse
 import networkx as nx
 def find_triangle_coordinates(adjacency_matrix, first_triangle=True):
     """
-    Finds the coordinates of all triangles in a given SciPy sparse matrix.
+    Finds the coordinates of all triangles in a given SciPy symmetric sparse matrix.
 
     Args:
         adjacency_matrix: A SciPy sparse matrix (e.g., csr_matrix).
@@ -22,10 +21,6 @@ def find_triangle_coordinates(adjacency_matrix, first_triangle=True):
     # Validate input matrix type
     if not sparse.issparse(adjacency_matrix):
         raise TypeError("Input must be a SciPy sparse matrix.")
-    
-    # Validate input symmetry 
-    if not utils.is_symmetric(adjacency_matrix):
-        raise ValueError("Adjacency matrix must be symmetric.")
     
     # Validate matrix is square
     n = adjacency_matrix.shape[0]

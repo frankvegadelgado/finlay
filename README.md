@@ -2,7 +2,7 @@
 
 ![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
-This work builds upon [The Triangle Finding Problem](https://hal.science/hal-04887444).
+This work builds upon [New Insights and Developments on the Triangle Finding Problem](https://www.researchgate.net/publication/389433321_New_Insights_and_Developments_on_the_Triangle_Finding_Problem).
 
 ---
 
@@ -57,17 +57,72 @@ _Example Solution:_
 
 Triangle Found `(1, 3, 5)`: In Rows `3` & `5` and Columns `1` & `3`
 
-# Our Algorithm - Runtime $O(n + m)$
+# Triangle Detection Algorithm Overview
 
-## The algorithm explanation:
+## Algorithm Description
 
-Triangle detection in a graph is performed using a Depth-First Search (DFS) combined with a coloring scheme. As the DFS traverses the graph, each visited node colors its uncolored neighbors with unique integers. A triangle is identified when two adjacent nodes share two colored neighbors whose colors form a triangle.
+The algorithm detects triangles in an undirected graph represented by an adjacency matrix. It uses Depth-First Search (DFS) to traverse the graph and checks for triangles by examining back edges during traversal. The algorithm assumes the input graph is undirected and does not perform symmetry validation.
 
-## Runtime Analysis:
+### Key Steps:
 
-1. _Depth-First Search (DFS)_: A standard Depth-First Search (DFS) on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has a time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots \mid$ represents the cardinality (e.g., $n = \mid V \mid$ and $m = \mid E \mid$). This is because in the worst case, we visit every vertex and explore every edge.
-2. _Coloring and Checking for Color Behavior:_ During the Depth-First Search (DFS), each node performs either color assignment or a constant-time check of its neighbors' colors. Since this operation is executed for each vertex during the DFS traversal, the overall computational complexity remains $O(\mid V \mid + \mid E \mid)$, equivalent to the standard DFS algorithm's worst-case running time.
-3. _Overall Runtime:_ The combined Depth-First Search (DFS), coloring, and checking process has a time complexity of $O(\mid V \mid + \mid E \mid)$.
+1. **Input Validation**:
+
+   - Check if the input is a sparse matrix: $O(1)$.
+   - Check if the matrix is square: $O(1)$.
+
+2. **Graph Conversion**:
+
+   - Convert the sparse adjacency matrix to a NetworkX graph: $O(m)$, where $m$ is the number of edges.
+
+3. **DFS Traversal**:
+
+   - Perform DFS to visit all nodes and edges: $O(n + m)$, where $n$ is the number of nodes.
+   - During traversal, check for triangles by examining back edges: $O(1)$ per edge.
+
+4. **Triangle Storage**:
+   - Store detected triangles as frozensets: $O(t)$, where $t$ is the number of triangles.
+
+---
+
+## Runtime Analysis
+
+The runtime of the algorithm depends on the following components:
+
+- **Input Validation**: $O(1)$.
+- **Graph Conversion**: $O(m)$.
+- **DFS Traversal**: $O(n + m)$.
+- **Triangle Storage**: $O(t)$.
+
+### Overall Runtime:
+
+The worst-case runtime of the algorithm is:
+$$O(n + m + t).$$
+
+### Special Case: Triangle-Free Graphs
+
+In the case of triangle-free graphs, $t = 0$, and the runtime simplifies to:
+$$O(n + m).$$
+
+---
+
+## Space Complexity
+
+The space complexity is determined by:
+
+- Storing the adjacency matrix: $O(n^2)$ for dense graphs, $O(m)$ for sparse graphs.
+- Storing visited nodes: $O(n)$.
+- Storing triangles: $O(t)$.
+
+### Overall Space Complexity:
+
+- For **dense graphs**: $O(n^2 + t)$.
+- For **sparse graphs**: $O(m + t)$.
+
+---
+
+## Conclusion
+
+This algorithm efficiently solves the Triangle Finding Problem with a runtime of $O(n + m + t)$. For sparse graphs, the runtime is $O(n + t)$, and for dense graphs, it is $O(n^2 + t)$. In the case of triangle-free graphs, the runtime further simplifies to $O(n + m)$. The space complexity scales with the size of the graph and the number of triangles detected.
 
 # Compile and Environment
 

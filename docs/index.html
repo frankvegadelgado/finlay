@@ -53,7 +53,9 @@
     </p>
     <p>
       This work builds upon
-      <a href="https://hal.science/hal-04887444">The Triangle Finding Problem</a
+      <a
+        href="https://www.researchgate.net/publication/389433321_New_Insights_and_Developments_on_the_Triangle_Finding_Problem"
+        >New Insights and Developments on the Triangle Finding Problem</a
       >.
     </p>
     <hr />
@@ -171,39 +173,97 @@ e 3 5
       Triangle Found <code>(1, 3, 5)</code>: In Rows <code>3</code> &amp;
       <code>5</code> and Columns <code>1</code> &amp; <code>3</code>
     </p>
-    <h1>Our Algorithm - Runtime $O(n + m)$</h1>
-    <h2>The algorithm explanation:</h2>
+    <h1>Triangle Detection Algorithm Overview</h1>
+    <h2>Algorithm Description</h2>
     <p>
-      Triangle detection in a graph is performed using a Depth-First Search
-      (DFS) combined with a coloring scheme. As the DFS traverses the graph,
-      each visited node colors its uncolored neighbors with unique integers. A
-      triangle is identified when two adjacent nodes share two colored neighbors
-      whose colors form a triangle.
+      The algorithm detects triangles in an undirected graph represented by an
+      adjacency matrix. It uses Depth-First Search (DFS) to traverse the graph
+      and checks for triangles by examining back edges during traversal. The
+      algorithm assumes the input graph is undirected and does not perform
+      symmetry validation.
     </p>
-    <h2>Runtime Analysis:</h2>
+    <h3>Key Steps:</h3>
     <ol>
       <li>
-        <em>Depth-First Search (DFS)</em>: A standard Depth-First Search (DFS)
-        on a graph with $\mid V \mid$ vertices and $\mid E \mid$ edges has a
-        time complexity of $O(\mid V \mid + \mid E \mid)$, where $\mid \ldots
-        \mid$ represents the cardinality (e.g., $n = \mid V \mid$ and $m = \mid
-        E \mid$). This is because in the worst case, we visit every vertex and
-        explore every edge.
+        <p><strong>Input Validation</strong>:</p>
+        <ul>
+          <li>Check if the input is a sparse matrix: $O(1)$.</li>
+          <li>Check if the matrix is square: $O(1)$.</li>
+        </ul>
       </li>
       <li>
-        <em>Coloring and Checking for Color Behavior:</em> During the
-        Depth-First Search (DFS), each node performs either color assignment or
-        a constant-time check of its neighbors' colors. Since this operation is
-        executed for each vertex during the DFS traversal, the overall
-        computational complexity remains $O(\mid V \mid + \mid E \mid)$,
-        equivalent to the standard DFS algorithm's worst-case running time.
+        <p><strong>Graph Conversion</strong>:</p>
+        <ul>
+          <li>
+            Convert the sparse adjacency matrix to a NetworkX graph: $O(m)$,
+            where $m$ is the number of edges.
+          </li>
+        </ul>
       </li>
       <li>
-        <em>Overall Runtime:</em> The combined Depth-First Search (DFS),
-        coloring, and checking process has a time complexity of $O(\mid V \mid +
-        \mid E \mid)$.
+        <p><strong>DFS Traversal</strong>:</p>
+        <ul>
+          <li>
+            Perform DFS to visit all nodes and edges: $O(n + m)$, where $n$ is
+            the number of nodes.
+          </li>
+          <li>
+            During traversal, check for triangles by examining back edges:
+            $O(1)$ per edge.
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p><strong>Triangle Storage</strong>:</p>
+        <ul>
+          <li>
+            Store detected triangles as frozensets: $O(t)$, where $t$ is the
+            number of triangles.
+          </li>
+        </ul>
       </li>
     </ol>
+    <hr />
+    <h2>Runtime Analysis</h2>
+    <p>The runtime of the algorithm depends on the following components:</p>
+    <ul>
+      <li><strong>Input Validation</strong>: $O(1)$.</li>
+      <li><strong>Graph Conversion</strong>: $O(m)$.</li>
+      <li><strong>DFS Traversal</strong>: $O(n + m)$.</li>
+      <li><strong>Triangle Storage</strong>: $O(t)$.</li>
+    </ul>
+    <h3>Overall Runtime:</h3>
+    <p>The worst-case runtime of the algorithm is: $$O(n + m + t).$$</p>
+    <h3>Special Case: Triangle-Free Graphs</h3>
+    <p>
+      In the case of triangle-free graphs, $t = 0$, and the runtime simplifies
+      to: $$O(n + m).$$
+    </p>
+    <hr />
+    <h2>Space Complexity</h2>
+    <p>The space complexity is determined by:</p>
+    <ul>
+      <li>
+        Storing the adjacency matrix: $O(n^2)$ for dense graphs, $O(m)$ for
+        sparse graphs.
+      </li>
+      <li>Storing visited nodes: $O(n)$.</li>
+      <li>Storing triangles: $O(t)$.</li>
+    </ul>
+    <h3>Overall Space Complexity:</h3>
+    <ul>
+      <li>For <strong>dense graphs</strong>: $O(n^2 + t)$.</li>
+      <li>For <strong>sparse graphs</strong>: $O(m + t)$.</li>
+    </ul>
+    <hr />
+    <h2>Conclusion</h2>
+    <p>
+      This algorithm efficiently solves the Triangle Finding Problem with a
+      runtime of $O(n + m + t)$. For sparse graphs, the runtime is $O(n + t)$,
+      and for dense graphs, it is $O(n^2 + t)$. In the case of triangle-free
+      graphs, the runtime further simplifies to $O(n + m)$. The space complexity
+      scales with the size of the graph and the number of triangles detected.
+    </p>
     <h1>Compile and Environment</h1>
     <h2>Install Python &gt;=3.10.</h2>
     <h2>Install Aegypti's Library and its Dependencies with:</h2>
