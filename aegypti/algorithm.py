@@ -1,11 +1,13 @@
 # Modified on 01/14/2025
 # Author: Frank Vega
 
-import numpy as np
-import scipy.sparse as sparse
+from . import utils
 
+import numpy as np
+from scipy import sparse
+import networkx as nx
 def find_triangle_coordinates(adjacency_matrix, first_triangle=True):
-  """
+    """
     Finds the coordinates of all triangles in a given SciPy sparse matrix.
 
     Args:
@@ -14,43 +16,58 @@ def find_triangle_coordinates(adjacency_matrix, first_triangle=True):
 
     Returns:
         A list of sets, where each set represents the coordinates of a triangle.
-        A triangle is defined by three non-negative entries forming a closed loop.
+        A triangle is defined by three non-negative integer entries forming a closed loop.
         Returns None if no triangles are found.
-        Raises ValueError if the input matrix is not square.
-        Raises TypeError if the input is not a sparse matrix.
-  """
-  
-  if not sparse.issparse(adjacency_matrix):
-      raise TypeError("Input must be a SciPy sparse matrix.")
-  
-  n = np.int64(adjacency_matrix.shape[0])
-  if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
-      raise ValueError("Adjacency matrix must be square.")
+    """
+    # Validate input matrix type
+    if not sparse.issparse(adjacency_matrix):
+        raise TypeError("Input must be a SciPy sparse matrix.")
     
-  colors = {}
-  stack = []
-  triangles = set()
-  for i in range(n):
-    if i not in colors:
-      stack = [(np.int64(i), np.int64(i))]
-      
-      while stack:
-        current_node, parent = stack.pop()
-        current_color = n * parent + current_node
-        colors[current_node] = current_color
-        current_row = adjacency_matrix.getrow(current_node)
-        neighbors = current_row.nonzero()[1]
-        for neighbor in neighbors:
-          
-          if neighbor in colors and adjacency_matrix[current_color // n, colors[neighbor] % n]:           
-            u, v, w = (current_color // n), (current_color % n), (colors[neighbor] % n)
-            triangles.add(frozenset({u, v, w}))
-            if first_triangle:
-              return list(triangles)
-
-        stack.extend([(node, current_node) for node in neighbors if node not in colors])
+    # Validate input symmetry 
+    if not utils.is_symmetric(adjacency_matrix):
+        raise ValueError("Adjacency matrix must be symmetric.")
+    
+    # Validate matrix is square
+    n = adjacency_matrix.shape[0]
+    if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
+        raise ValueError("Adjacency matrix must be square.")
+    
+    # Convert the sparse matrix to a NetworkX graph
+    graph = nx.from_scipy_sparse_array(adjacency_matrix)
+    
+    # Initialize data structures
+    visited = {}  # Tracks visited nodes
+    triangles = set()  # Stores unique triangles as frozensets
+    
+    # Iterate over all nodes
+    for i in range(n):
+        if i not in visited:
+            stack = [(i, i)]  # (current_node, parent_node)
             
-  return list(triangles) if triangles else None
+            # Perform DFS to find triangles
+            while stack:
+                current_node, parent = stack.pop()
+                visited[current_node] = True
+                
+                # Check for triangles
+                for neighbor in graph.neighbors(current_node):
+                    if neighbor in visited:
+                        # Check if the neighbor and parent form a triangle with current_node
+                        if graph.has_edge(parent, neighbor):
+                            u, v, w = parent, current_node, neighbor
+                            nodes = frozenset({u, v, w})
+                            # Check whether it is a triangle or not
+                            if len(nodes) == 3:
+                                triangles.add(nodes)
+                                if first_triangle:
+                                    return list(triangles)
+
+                    # Add unvisited neighbors to the stack
+                    if neighbor not in visited:
+                        stack.append((neighbor, current_node))
+    
+    # Return results
+    return list(triangles) if triangles else None
 
 def find_triangle_coordinates_brute_force(adjacency_matrix):
     """

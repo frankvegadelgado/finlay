@@ -138,8 +138,8 @@ def random_matrix_tests(matrix_shape, sparsity=0.9):
 
     # Generate a sparse matrix using random indices and data
     num_elements = int(size * (1 - sparsity))  # Number of non-zero elements
-    row_indices = np.random.randint(0, rows, size=num_elements, dtype=np.int64)
-    col_indices = np.random.randint(0, cols, size=num_elements, dtype=np.int64)
+    row_indices = np.random.randint(0, rows, size=num_elements, dtype=np.int32)
+    col_indices = np.random.randint(0, cols, size=num_elements, dtype=np.int32)
     data = np.ones(num_elements, dtype=np.int8)
 
     sparse_matrix = sparse.csc_matrix((data, (row_indices, col_indices)), shape=(rows, cols))
@@ -225,3 +225,26 @@ def println(output, logger, file_logging=False):
     if (file_logging):
         logger.info(output)
     print(output)
+
+def sparse_matrix_to_edges(adj_matrix, is_directed=False):
+    """
+    Converts a SciPy sparse adjacency matrix to a set of edges.
+
+    Args:
+        adj_matrix: A SciPy sparse adjacency matrix.
+        is_directed: Whether the matrix represents a directed graph (default: False).
+
+    Returns:
+        A set of tuples representing the edges.
+    """
+
+    edges = set()
+    rows, cols = adj_matrix.nonzero()
+    if is_directed:
+        for i, j in zip(rows, cols):
+            edges.add((i, j))
+    else:
+        for i, j in zip(rows, cols):
+            if i <= j: # Avoid duplicates in undirected graphs
+                edges.add((i, j))
+    return edges
