@@ -19,7 +19,7 @@ setuptools.setup(
     url="https://github.com/frankvegadelgado/finlay",
     project_urls={
         "Source Code": "https://github.com/frankvegadelgado/finlay",
-        "Documentation Research": "https://hal.science/hal-04887444",
+        "Documentation Research": "https://www.researchgate.net/publication/389433321_New_Insights_and_Developments_on_the_Triangle_Finding_Problem",
     },
     author="Frank Vega",
     author_email="vega.frank@gmail.com",
