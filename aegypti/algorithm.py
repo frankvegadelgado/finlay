@@ -4,13 +4,12 @@
 
 import numpy as np
 from scipy import sparse
-import networkx as nx
-def find_triangle_coordinates(adjacency_matrix, first_triangle=True):
+def find_triangle_coordinates(graph, first_triangle=True):
     """
-    Finds the coordinates of all triangles in a given SciPy symmetric sparse matrix.
+    Finds the coordinates of all triangles in a given undirected NetworkX graph.
 
     Args:
-        adjacency_matrix: A SciPy sparse matrix (e.g., csr_matrix).
+        graph: An undirected NetworkX graph.
         first_triangle: A boolean indicating whether to return only the first found triangle.
 
     Returns:
@@ -18,38 +17,25 @@ def find_triangle_coordinates(adjacency_matrix, first_triangle=True):
         A triangle is defined by three non-negative integer entries forming a closed loop.
         Returns None if no triangles are found.
     """
-    # Validate input matrix type
-    if not sparse.issparse(adjacency_matrix):
-        raise TypeError("Input must be a SciPy sparse matrix.")
-    
-    # Validate matrix is square
-    n = adjacency_matrix.shape[0]
-    if adjacency_matrix.shape[0] != adjacency_matrix.shape[1]:
-        raise ValueError("Adjacency matrix must be square.")
-    
-    # Convert the sparse matrix to a NetworkX graph
-    graph = nx.from_scipy_sparse_array(adjacency_matrix)
-    
     # Initialize data structures
     visited = {}  # Tracks visited nodes
     triangles = set()  # Stores unique triangles as frozensets
-    
+    n = graph.number_of_nodes() # Number of nodes
     # Iterate over all nodes
     for i in range(n):
         if i not in visited:
             stack = [(i, i)]  # (current_node, parent_node)
-            
+
             # Perform DFS to find triangles
             while stack:
                 current_node, parent = stack.pop()
                 visited[current_node] = True
-                
+
                 # Check for triangles
                 for neighbor in graph.neighbors(current_node):
+                    u, v, w = parent, current_node, neighbor
                     if neighbor in visited:
-                        # Check if the neighbor and parent form a triangle with current_node
                         if graph.has_edge(parent, neighbor):
-                            u, v, w = parent, current_node, neighbor
                             nodes = frozenset({u, v, w})
                             # Check whether it is a triangle or not
                             if len(nodes) == 3:
@@ -60,8 +46,7 @@ def find_triangle_coordinates(adjacency_matrix, first_triangle=True):
                     # Add unvisited neighbors to the stack
                     if neighbor not in visited:
                         stack.append((neighbor, current_node))
-    
-    # Return results
+
     return list(triangles) if triangles else None
 
 def find_triangle_coordinates_brute_force(adjacency_matrix):
