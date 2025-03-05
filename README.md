@@ -61,25 +61,16 @@ Triangle Found `(1, 3, 5)`: In Rows `3` & `5` and Columns `1` & `3`
 
 ## Algorithm Description
 
-The algorithm detects triangles in an undirected graph represented by an adjacency matrix. It uses Depth-First Search (DFS) to traverse the graph and checks for triangles by examining back edges during traversal. The algorithm assumes the input graph is undirected and does not perform symmetry validation.
+The algorithm detects triangles in an undirected graph. It uses Depth-First Search (DFS) to traverse the graph and checks for triangles by examining back edges during traversal.
 
 ### Key Steps:
 
-1. **Input Validation**:
-
-   - Check if the input is a sparse matrix: $O(1)$.
-   - Check if the matrix is square: $O(1)$.
-
-2. **Graph Conversion**:
-
-   - Convert the sparse adjacency matrix to a NetworkX graph: $O(m)$, where $m$ is the number of edges.
-
-3. **DFS Traversal**:
+1. **DFS Traversal**:
 
    - Perform DFS to visit all nodes and edges: $O(n + m)$, where $n$ is the number of nodes.
    - During traversal, check for triangles by examining back edges: $O(1)$ per edge.
 
-4. **Triangle Storage**:
+2. **Triangle Storage**:
    - Store detected triangles as frozensets: $O(t)$, where $t$ is the number of triangles.
 
 ---
@@ -88,8 +79,6 @@ The algorithm detects triangles in an undirected graph represented by an adjacen
 
 The runtime of the algorithm depends on the following components:
 
-- **Input Validation**: $O(1)$.
-- **Graph Conversion**: $O(m)$.
 - **DFS Traversal**: $O(n + m)$.
 - **Triangle Storage**: $O(t)$.
 
@@ -105,24 +94,9 @@ $$O(n + m).$$
 
 ---
 
-## Space Complexity
-
-The space complexity is determined by:
-
-- Storing the adjacency matrix: $O(n^2)$ for dense graphs, $O(m)$ for sparse graphs.
-- Storing visited nodes: $O(n)$.
-- Storing triangles: $O(t)$.
-
-### Overall Space Complexity:
-
-- For **dense graphs**: $O(n^2 + t)$.
-- For **sparse graphs**: $O(m + t)$.
-
----
-
 ## Conclusion
 
-This algorithm efficiently solves the Triangle Finding Problem with a runtime of $O(n + m + t)$. For sparse graphs, the runtime is $O(n + t)$, and for dense graphs, it is $O(n^2 + t)$. In the case of triangle-free graphs, the runtime further simplifies to $O(n + m)$. The space complexity scales with the size of the graph and the number of triangles detected.
+This algorithm efficiently solves the Triangle Finding Problem with a runtime of $O(n + m + t)$. In the case of triangle-free graphs, the runtime further simplifies to $O(n + m)$.
 
 # Compile and Environment
 
