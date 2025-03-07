@@ -4,6 +4,7 @@
 
 import numpy as np
 from scipy import sparse
+import networkx as nx
 def find_triangle_coordinates(graph, first_triangle=True):
     """
     Finds the coordinates of all triangles in a given undirected NetworkX graph.
@@ -17,6 +18,11 @@ def find_triangle_coordinates(graph, first_triangle=True):
         A triangle is defined by three non-negative integer entries forming a closed loop.
         Returns None if no triangles are found.
     """
+    # Validate input graph
+    if not isinstance(graph, nx.Graph):
+        raise ValueError("Input must be an undirected NetworkX Graph.")
+    if graph.is_directed():
+        raise ValueError("Input graph must be undirected.")
     # Initialize data structures
     visited = {}  # Tracks visited nodes
     triangles = set()  # Stores unique triangles as frozensets
