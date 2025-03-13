@@ -25,9 +25,8 @@ def find_triangle_coordinates(graph, first_triangle=True):
     # Initialize data structures
     visited = {}  # Tracks visited nodes
     triangles = set()  # Stores unique triangles as frozensets
-    n = graph.number_of_nodes() # Number of nodes
     # Iterate over all nodes
-    for i in range(n):
+    for i in graph.nodes():
         if i not in visited:
             stack = [(i, i)]  # (current_node, parent_node)
 

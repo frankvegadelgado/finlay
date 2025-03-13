@@ -2,7 +2,7 @@
 
 ![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
-This work builds upon [New Insights and Developments on the Triangle Finding Problem](https://www.researchgate.net/publication/389433321_New_Insights_and_Developments_on_the_Triangle_Finding_Problem).
+This work builds upon [New Insights and Developments on the Triangle Finding Problem](https://hal.science/hal-04972402).
 
 ---
 

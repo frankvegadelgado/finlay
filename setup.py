@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.2.7"
+VERSION = "0.2.8"
 
 NAME = "aegypti"
 
@@ -19,7 +19,7 @@ setuptools.setup(
     url="https://github.com/frankvegadelgado/finlay",
     project_urls={
         "Source Code": "https://github.com/frankvegadelgado/finlay",
-        "Documentation Research": "https://www.researchgate.net/publication/389433321_New_Insights_and_Developments_on_the_Triangle_Finding_Problem",
+        "Documentation Research": "https://hal.science/hal-04972402",
     },
     author="Frank Vega",
     author_email="vega.frank@gmail.com",
