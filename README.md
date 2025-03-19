@@ -2,7 +2,7 @@
 
 ![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
-This work builds upon [New Insights and Developments on the Triangle Finding Problem](https://hal.science/hal-04972402).
+This work builds upon [The Aegypti Algorithm](https://dev.to/frank_vega_987689489099bf/the-aegypti-algorithm-1g75).
 
 ---
 
