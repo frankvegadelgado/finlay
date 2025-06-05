@@ -22,7 +22,7 @@ def main():
     helper.add_argument('-c', '--count', action='store_true', help='count the total amount of triangles')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.2.9')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.3.0')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -38,7 +38,7 @@ def main():
     
     sparse_matrix = parser.read(filepath)
     # Convert the sparse matrix to a NetworkX graph
-    graph = nx.from_scipy_sparse_array(sparse_matrix)
+    graph = utils.sparse_matrix_to_graph(sparse_matrix)
     filename = utils.get_file_name(filepath)
     logger.info(f"Parsing the Input File done in: {(time.time() - started) * 1000.0} milliseconds")
     

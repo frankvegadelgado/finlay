@@ -135,7 +135,7 @@ which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1` 
 
 ---
 
-## Find and Count All Triangles - Runtime $O(n + m)$
+## Find and Count All Triangles - Runtime $O(n + m + t)$
 
 The `-a` flag enables the discovery of all triangles within the graph.
 

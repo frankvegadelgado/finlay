@@ -6,7 +6,7 @@ import numpy as np
 import random
 import string
 import os
-
+import networkx as nx
 def get_file_name(filepath):
     """
     Gets the file name from an absolute path.
@@ -248,3 +248,30 @@ def sparse_matrix_to_edges(adj_matrix, is_directed=False):
             if i <= j: # Avoid duplicates in undirected graphs
                 edges.add((i, j))
     return edges
+
+def sparse_matrix_to_graph(adj_matrix, is_directed=False):
+    """
+    Converts a SciPy sparse adjacency matrix to a NetworkX graph.
+
+    Args:
+        adj_matrix: A SciPy sparse adjacency matrix.
+        is_directed: Whether the matrix represents a directed graph (default: False).
+
+    Returns:
+        A NetworkX graph.
+    """
+
+    
+    rows, cols = adj_matrix.nonzero()
+    if is_directed:
+        graph = nx.DiGraph()
+        for i, j in zip(rows, cols):
+            if not graph.has_edge(i, j): # Avoid duplicates in undirected graphs
+                graph.add_edge(i, j)
+    else:
+        graph = nx.Graph()
+        for i, j in zip(rows, cols):
+            if i < j: # Avoid duplicates in undirected graphs
+                graph.add_edge(i, j)
+    
+    return graph
