@@ -178,7 +178,10 @@ def string_complex_format(result, count_result=False):
     if count_result:
         return f"Triangles Count {len(result)}"
     else:
-        formatted_string = f"{'; '.join(f'({", ".join(f"{x+1}" for x in sorted(fs))})' for fs in result)}"
+        formatted_string = "; ".join(
+            f"({', '.join(str(x + 1) for x in sorted(fs))})"
+            for fs in result
+        )
         return f"Triangle{"s" if len(result) > 1 else ""} Found {formatted_string}"
   else:
      return "Triangle Free"
