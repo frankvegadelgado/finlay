@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.3.1"
+VERSION = "0.3.2"
 
 NAME = "aegypti"
 
@@ -29,7 +29,7 @@ setuptools.setup(
         "Topic :: Software Development",
         "Development Status :: 5 - Production/Stable",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.12",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
@@ -37,7 +37,7 @@ setuptools.setup(
         "Intended Audience :: Science/Research",
         "Natural Language :: English",
     ],
-    python_requires=">=3.10",
+    python_requires=">=3.12",
     # Requirements
     install_requires=INSTALL_REQUIRES,
     packages=["aegypti"],

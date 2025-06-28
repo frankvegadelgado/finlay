@@ -100,7 +100,7 @@ This algorithm efficiently solves the Triangle Finding Problem with a runtime of
 
 # Compile and Environment
 
-## Install Python >=3.10.
+## Install Python >=3.12.
 
 ## Install Aegypti's Library and its Dependencies with:
 
