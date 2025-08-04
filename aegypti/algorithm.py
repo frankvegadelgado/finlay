@@ -46,9 +46,8 @@ def find_triangle_coordinates(graph, first_triangle=True):
                                 triangles.add(nodes)
                                 if first_triangle:
                                     return list(triangles)
-
-                    # Add unvisited neighbors to the stack
-                    if neighbor not in visited:
+                    else:
+                        # Add unvisited neighbors to the stack
                         stack.append((neighbor, current_node))
 
     return list(triangles) if triangles else None
