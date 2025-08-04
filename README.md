@@ -84,8 +84,7 @@ The runtime of the algorithm depends on the following components:
 
 ### Overall Runtime:
 
-The worst-case runtime of the algorithm is:
-$$O(n + m + t).$$
+The algorithm's worst-case runtime is $O(n + m + t)$ when detecting all triangles, and $O(n + m)$ otherwise.
 
 ### Special Case: Triangle-Free Graphs
 
