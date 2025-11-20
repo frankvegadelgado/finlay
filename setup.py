@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.3.3"
+VERSION = "0.3.4"
 
 NAME = "aegypti"
 
@@ -19,7 +19,7 @@ setuptools.setup(
     url="https://github.com/frankvegadelgado/finlay",
     project_urls={
         "Source Code": "https://github.com/frankvegadelgado/finlay",
-        "Documentation Research": "https://dev.to/frank_vega_987689489099bf/the-aegypti-algorithm-1g75",
+        "Documentation Research": "https://dev.to/frank_vega_987689489099bf/the-aegypti-algorithm-52i9",
     },
     author="Frank Vega",
     author_email="vega.frank@gmail.com",

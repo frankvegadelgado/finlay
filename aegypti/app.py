@@ -22,7 +22,7 @@ def main():
     helper.add_argument('-c', '--count', action='store_true', help='count the total amount of triangles')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.3.3')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.3.4')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -42,17 +42,17 @@ def main():
     filename = utils.get_file_name(filepath)
     logger.info(f"Parsing the Input File done in: {(time.time() - started) * 1000.0} milliseconds")
     
-    # A solution with a time complexity of O(n + m)
-    logger.info("A solution with a time complexity of O(n + m) started")
+    # A solution with a fast running-time complexity
+    logger.info("A solution with a fast running-time complexity started")
     started = time.time()
     
     result = algorithm.find_triangle_coordinates(graph, not (count_triangles or all_triangles))
 
-    logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
+    logger.info(f"A solution with a fast running-time complexity done in: {(time.time() - started) * 1000.0} milliseconds")
 
     # Output the smart solution
     answer = utils.string_complex_format(result, count_triangles)
-    output = f"{filename}: {answer}" 
+    output = f"Smart Algorithm for {filename}: {answer}" 
     utils.println(output, logger, args.log)
 
     # A Solution with brute force
@@ -71,7 +71,7 @@ def main():
             logger.info(f"A solution with a time complexity of at least O(m^(1.407)) done in: {(time.time() - started) * 1000.0} milliseconds")
         
         answer = utils.string_complex_format(result, count_triangles) if count_triangles or all_triangles else utils.string_simple_format(result)
-        output = f"{filename}: {answer}"
+        output = f"Naive Algorithm for {filename}: {answer}"
         utils.println(output, logger, args.log)
         
 

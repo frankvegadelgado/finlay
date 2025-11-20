@@ -54,7 +54,7 @@
     <p>
       This work builds upon
       <a
-        href="https://dev.to/frank_vega_987689489099bf/the-aegypti-algorithm-1g75"
+        href="https://dev.to/frank_vega_987689489099bf/the-aegypti-algorithm-52i9"
         >The Aegypti Algorithm</a
       >.
     </p>
@@ -173,62 +173,6 @@ e 3 5
       Triangle Found <code>(1, 3, 5)</code>: In Rows <code>3</code> &amp;
       <code>5</code> and Columns <code>1</code> &amp; <code>3</code>
     </p>
-    <h1>Triangle Detection Algorithm Overview</h1>
-    <h2>Algorithm Description</h2>
-    <p>
-      The algorithm detects triangles in an undirected graph. It uses
-      Depth-First Search (DFS) to traverse the graph and checks for triangles by
-      examining back edges during traversal.
-    </p>
-    <h3>Key Steps:</h3>
-    <ol>
-      <li>
-        <p><strong>DFS Traversal</strong>:</p>
-        <ul>
-          <li>
-            Perform DFS to visit all nodes and edges: $O(n + m)$, where $n$ is
-            the number of nodes.
-          </li>
-          <li>
-            During traversal, check for triangles by examining back edges:
-            $O(1)$ per edge.
-          </li>
-        </ul>
-      </li>
-      <li>
-        <p><strong>Triangle Storage</strong>:</p>
-        <ul>
-          <li>
-            Store detected triangles as frozensets: $O(t)$, where $t$ is the
-            number of triangles.
-          </li>
-        </ul>
-      </li>
-    </ol>
-    <hr />
-    <h2>Runtime Analysis</h2>
-    <p>The runtime of the algorithm depends on the following components:</p>
-    <ul>
-      <li><strong>DFS Traversal</strong>: $O(n + m)$.</li>
-      <li><strong>Triangle Storage</strong>: $O(t)$.</li>
-    </ul>
-    <h3>Overall Runtime:</h3>
-    <p>
-      The algorithm's worst-case runtime is $O(n + m + t)$ when detecting all
-      triangles, and $O(n + m)$ otherwise.
-    </p>
-    <h3>Special Case: Triangle-Free Graphs</h3>
-    <p>
-      In the case of triangle-free graphs, $t = 0$, and the runtime simplifies
-      to: $$O(n + m).$$
-    </p>
-    <hr />
-    <h2>Conclusion</h2>
-    <p>
-      This algorithm efficiently solves the Triangle Finding Problem with a
-      runtime of $O(n + m + t)$. In the case of triangle-free graphs, the
-      runtime further simplifies to $O(n + m)$.
-    </p>
     <h1>Compile and Environment</h1>
     <h2>Install Python &gt;=3.12.</h2>
     <h2>Install Aegypti's Library and its Dependencies with:</h2>
@@ -254,7 +198,7 @@ cd finlay
       support .xz, .lzma, .bz2, and .bzip2 compressed text files.
     </p>
     <h2>The console output will display:</h2>
-    <pre><code>testMatrix1: Triangle Found (1, 3, 5)
+    <pre><code>Smart Algorithm for testMatrix1: Triangle Found (1, 3, 5)
 </code></pre>
     <p>
       which implies that the Boolean adjacency matrix
@@ -271,7 +215,7 @@ cd finlay
     <pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2 -a
 </code></pre>
     <p><strong>Output:</strong></p>
-    <pre><code>testMatrix2: Triangles Found (1, 3, 9); (1, 2, 11); (1, 3, 4); (1, 2, 8); (1, 3, 11); (2, 4, 11); (3, 4, 11); (2, 4, 9); (1, 4, 11); (4, 5, 11); (1, 4, 9); (1, 2, 9); (3, 4, 9); (1, 2, 6); (4, 5, 9); (1, 2, 4)
+    <pre><code>Smart Algorithm for testMatrix2: Triangles Found (1, 3, 9); (1, 2, 11); (1, 3, 4); (1, 2, 8); (1, 3, 11); (2, 4, 11); (3, 4, 11); (2, 4, 9); (1, 4, 11); (4, 5, 11); (1, 4, 9); (1, 2, 9); (3, 4, 9); (1, 2, 6); (4, 5, 9); (1, 2, 4)
 </code></pre>
     <p>
       When multiple triangles exist, the output provides a list of their
@@ -284,7 +228,7 @@ cd finlay
     <pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2 -c
 </code></pre>
     <p><strong>Output:</strong></p>
-    <pre><code>testMatrix2: Triangles Count 16
+    <pre><code>Smart Algorithm for testMatrix2: Triangles Count 16
 </code></pre>
     <h2>Runtime Analysis:</h2>
     <p>We employ the same algorithm used to solve the triangle-free problem.</p>
@@ -297,7 +241,7 @@ cd finlay
     <pre><code class="language-bash">triangle -h
 </code></pre>
     <p>This will output:</p>
-    <pre><code>usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
+    <pre><code class="language-bash">usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.
 
@@ -319,7 +263,7 @@ options:
       testing algorithms on randomly generated, large sparse matrices. It
       accepts the following options:
     </p>
-    <pre><code>usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
+    <pre><code class="language-bash">usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application using randomly generated, large sparse matrices.
 
@@ -360,12 +304,6 @@ options:
     <ul>
       <li>Python code by <strong>Frank Vega</strong>.</li>
     </ul>
-    <hr />
-    <h1>Complexity</h1>
-    <pre><code class="language-diff">+ We propose an O(n + m) algorithm to solve the Triangle-Free Problem.
-+ The algorithm for the Triangle-Free Problem can be adapted to identify and count all triangles in O(n + m + t) time, where t is the number of triangles.
-+ This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
-</code></pre>
     <hr />
     <h1>License</h1>
     <ul>

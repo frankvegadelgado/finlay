@@ -2,7 +2,7 @@
 
 ![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
-This work builds upon [The Aegypti Algorithm](https://dev.to/frank_vega_987689489099bf/the-aegypti-algorithm-1g75).
+This work builds upon [The Aegypti Algorithm](https://dev.to/frank_vega_987689489099bf/the-aegypti-algorithm-52i9).
 
 ---
 
@@ -57,46 +57,6 @@ _Example Solution:_
 
 Triangle Found `(1, 3, 5)`: In Rows `3` & `5` and Columns `1` & `3`
 
-# Triangle Detection Algorithm Overview
-
-## Algorithm Description
-
-The algorithm detects triangles in an undirected graph. It uses Depth-First Search (DFS) to traverse the graph and checks for triangles by examining back edges during traversal.
-
-### Key Steps:
-
-1. **DFS Traversal**:
-
-   - Perform DFS to visit all nodes and edges: $O(n + m)$, where $n$ is the number of nodes.
-   - During traversal, check for triangles by examining back edges: $O(1)$ per edge.
-
-2. **Triangle Storage**:
-   - Store detected triangles as frozensets: $O(t)$, where $t$ is the number of triangles.
-
----
-
-## Runtime Analysis
-
-The runtime of the algorithm depends on the following components:
-
-- **DFS Traversal**: $O(n + m)$.
-- **Triangle Storage**: $O(t)$.
-
-### Overall Runtime:
-
-The algorithm's worst-case runtime is $O(n + m + t)$ when detecting all triangles, and $O(n + m)$ otherwise.
-
-### Special Case: Triangle-Free Graphs
-
-In the case of triangle-free graphs, $t = 0$, and the runtime simplifies to:
-$$O(n + m).$$
-
----
-
-## Conclusion
-
-This algorithm efficiently solves the Triangle Finding Problem with a runtime of $O(n + m + t)$. In the case of triangle-free graphs, the runtime further simplifies to $O(n + m)$.
-
 # Compile and Environment
 
 ## Install Python >=3.12.
@@ -127,7 +87,7 @@ utilizing the `triangle` command provided by Aegypti's Library to execute the Bo
 ## The console output will display:
 
 ```
-testMatrix1: Triangle Found (1, 3, 5)
+Smart Algorithm for testMatrix1: Triangle Found (1, 3, 5)
 ```
 
 which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1` contains a triangle combining the nodes `(1, 3, 5)`.
@@ -147,7 +107,7 @@ triangle -i .\benchmarks\testMatrix2 -a
 **Output:**
 
 ```
-testMatrix2: Triangles Found (1, 3, 9); (1, 2, 11); (1, 3, 4); (1, 2, 8); (1, 3, 11); (2, 4, 11); (3, 4, 11); (2, 4, 9); (1, 4, 11); (4, 5, 11); (1, 4, 9); (1, 2, 9); (3, 4, 9); (1, 2, 6); (4, 5, 9); (1, 2, 4)
+Smart Algorithm for testMatrix2: Triangles Found (1, 3, 9); (1, 2, 11); (1, 3, 4); (1, 2, 8); (1, 3, 11); (2, 4, 11); (3, 4, 11); (2, 4, 9); (1, 4, 11); (4, 5, 11); (1, 4, 9); (1, 2, 9); (3, 4, 9); (1, 2, 6); (4, 5, 9); (1, 2, 4)
 ```
 
 When multiple triangles exist, the output provides a list of their vertices.
@@ -163,7 +123,7 @@ triangle -i .\benchmarks\testMatrix2 -c
 **Output:**
 
 ```
-testMatrix2: Triangles Count 16
+Smart Algorithm for testMatrix2: Triangles Count 16
 ```
 
 ## Runtime Analysis:
@@ -182,7 +142,7 @@ triangle -h
 
 This will output:
 
-```
+```bash
 usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.
@@ -205,7 +165,7 @@ This output describes all available options.
 
 A command-line tool, `test_triangle`, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:
 
-```
+```bash
 usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application using randomly generated, large sparse matrices.
@@ -236,16 +196,6 @@ It generates random square matrices with configurable dimensions (`-d`), sparsit
 # Code
 
 - Python code by **Frank Vega**.
-
----
-
-# Complexity
-
-```diff
-+ We propose an O(n + m) algorithm to solve the Triangle-Free Problem.
-+ The algorithm for the Triangle-Free Problem can be adapted to identify and count all triangles in O(n + m + t) time, where t is the number of triangles.
-+ This algorithm provides multiple of applications to other computational problems in combinatorial optimization and computational geometry.
-```
 
 ---
 

@@ -34,7 +34,7 @@ def main():
     helper.add_argument('-w', '--write', action='store_true', help='write the generated random matrix to a file in the current directory')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.3.3')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.3.4')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -62,16 +62,16 @@ def main():
         logger.info(f"Number of non-zero elements: {sparse_matrix.nnz}")
         logger.info(f"Sparsity: {1 - (sparse_matrix.nnz / (sparse_matrix.shape[0] * sparse_matrix.shape[1]))}")
         
-        # A Solution with O(n + m) Time Complexity
-        logger.info("A solution with a time complexity of O(n + m) started")
+        # A Solution with a fast running-time complexity
+        logger.info("A solution with a fast running-time complexity started")
         started = time.time()
         
         result = algorithm.find_triangle_coordinates(graph, not (count_triangles or all_triangles))
 
-        logger.info(f"A solution with a time complexity of O(n + m) done in: {(time.time() - started) * 1000.0} milliseconds")
+        logger.info(f"A solution with a fast running-time complexity done in: {(time.time() - started) * 1000.0} milliseconds")
 
         answer = utils.string_complex_format(result, count_triangles)
-        output = f"Algorithm Smart Test {i + 1}: {answer}" 
+        output = f"Smart Algorithm for Test {i + 1}: {answer}" 
         utils.println(output, logger, args.log)
 
         # A Solution with brute force
@@ -90,7 +90,7 @@ def main():
                 logger.info(f"A solution with a time complexity of at least O(m^(1.407)) done in: {(time.time() - started) * 1000.0} milliseconds")
             
             answer = utils.string_complex_format(result, count_triangles) if count_triangles or all_triangles else utils.string_simple_format(result)
-            output = f"Algorithm Naive Test {i + 1}: {answer}" 
+            output = f"Naive Algorithm for Test {i + 1}: {answer}" 
             utils.println(output, logger, args.log)
         
 
