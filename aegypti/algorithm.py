@@ -38,7 +38,7 @@ def find_triangle_coordinates(graph, first_triangle=True):
     triangles = []                                                      # Will collect all found triangles
 
     density = nx.density(graph)                                         # Graph density to choose the faster algorithm
-    nodes = sorted(graph.nodes(), key=graph.degree, reverse=True)      # Process higher degree nodes first for speed
+    nodes = sorted(graph.nodes(), key=lambda n: (graph.degree(n), n))   # Process lower degree nodes first for speed
 
     # ------------------------- SPARSE GRAPH PATH (density < 0.1) -------------------------
     if density < 0.1:
