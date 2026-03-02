@@ -161,6 +161,35 @@ options:
 
 This output describes all available options.
 
+## Batch Execution
+
+Batch execution allows you to solve multiple graphs within a directory consecutively.
+
+To view available command-line options for the `batch_triangle` command, use the following in your terminal or command prompt:
+
+```bash
+batch_triangle -h
+```
+
+This will display the following help information:
+
+```bash
+usage: batch_triangle [-h] -i INPUTDIRECTORY [-a] [-b] [-c] [-v] [-l] [--version]
+
+Solve the Triangle-Free Problem for all undirected graphs encoded in DIMACS format and stored in a directory.
+
+options:
+  -h, --help            show this help message and exit
+  -i INPUTDIRECTORY, --inputDirectory INPUTDIRECTORY
+                        Input directory path
+  -a, --all             identify all triangles
+  -b, --bruteForce      compare with a brute-force approach using matrix multiplication
+  -c, --count           count the total amount of triangles
+  -v, --verbose         anable verbose output
+  -l, --log             enable file logging
+  --version             show program's version number and exit
+  ```
+
 ## The Finlay Testing Application
 
 A command-line tool, `test_triangle`, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:

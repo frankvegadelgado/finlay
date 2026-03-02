@@ -7,6 +7,23 @@ import random
 import string
 import os
 import networkx as nx
+
+def get_file_names(directory):
+  """
+  Gets a list of all file names within a specified directory.
+
+  Args:
+    directory: The path to the directory.
+
+  Returns:
+    A list of file names within the directory.
+  """
+  try:
+    return [f for f in os.listdir(directory) if not os.path.isdir(os.path.join(directory, f))]
+  except FileNotFoundError:
+    print(f"Directory '{directory}' not found.")
+    return []
+
 def get_file_name(filepath):
     """
     Gets the file name from an absolute path.

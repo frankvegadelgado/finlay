@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.3.6"
+VERSION = "0.3.7"
 
 NAME = "aegypti"
 
@@ -46,7 +46,8 @@ setuptools.setup(
     entry_points={
         'console_scripts': [
             'triangle = aegypti.app:main',
-            'test_triangle = aegypti.test:main'
+            'test_triangle = aegypti.test:main',
+            'batch_triangle = aegypti.batch:main'
         ]
     }
 )
