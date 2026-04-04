@@ -1,79 +1,89 @@
-#                       Triangle Solver
+#                   Approximate Clique Solver
 #                          Frank Vega
-#                      Juanary 14th, 2025
+#                       April 4th, 2026
 
 import argparse
 import time
-import networkx as nx
-
+import math
 from . import algorithm
 from . import parser
 from . import applogger
 from . import utils
 
+def solution(inputFile, verbose=False, log=False, count=False, bruteForce=False, approximation=False):
+    """Finds the approximate clique.
 
-def solution(inputFile, verbose=False, log=False, count=False, bruteForce=False, all=False):
+    Args:
+        inputFile: Input file path.
+        verbose: Enable verbose output.
+        log: Enable file logging.
+        count: Measure the size of the clique.
+        bruteForce: Enable brute force approach.
+        approximation: Enable an approximate approach within a ratio of at most polynomial.
+    """
     
-    # Initialize the parameters
-    filepath = inputFile
     logger = applogger.Logger(applogger.FileLogger() if (log) else applogger.ConsoleLogger(verbose))
-    count_triangles = count
-    all_triangles = all
-    brute_force = bruteForce
-
     # Read and parse a dimacs file
     logger.info(f"Parsing the Input File started")
     started = time.time()
     
-    sparse_matrix = parser.read(filepath)
-    # Convert the sparse matrix to a NetworkX graph
-    graph = utils.sparse_matrix_to_graph(sparse_matrix)
-    filename = utils.get_file_name(filepath)
+    graph = parser.read(inputFile)
+    filename = utils.get_file_name(inputFile)
     logger.info(f"Parsing the Input File done in: {(time.time() - started) * 1000.0} milliseconds")
     
-    # A solution with a fast running-time complexity
-    logger.info("A solution with a fast running-time complexity started")
-    started = time.time()
-    
-    result = algorithm.find_triangle_coordinates(graph, not (count_triangles or all_triangles))
-
-    logger.info(f"A solution with a fast running-time complexity done in: {(time.time() - started) * 1000.0} milliseconds")
-
-    # Output the smart solution
-    answer = utils.string_complex_format(result, count_triangles)
-    output = f"Smart Algorithm for {filename}: {answer}" 
-    utils.println(output, logger, log)
-
-    # A Solution with brute force
-    if brute_force:
-        if count_triangles or all_triangles:
-            logger.info("A solution with a time complexity of at least O(n^(3)) started")
-        else:    
-            logger.info("A solution with a time complexity of at least O(m^(1.407)) started")
+    if approximation:
+        logger.info("An approximate Solution with a polynomial-approximation ratio started")
         started = time.time()
         
-        result = algorithm.find_triangle_coordinates_brute_force(sparse_matrix) if count_triangles or all_triangles else algorithm.is_triangle_free_brute_force(sparse_matrix)
+        approximate_result = algorithm.find_clique_approximation(graph)
 
-        if count_triangles or all_triangles:
-            logger.info(f"A solution with a time complexity of at least O(n^(3)) done in: {(time.time() - started) * 1000.0} milliseconds")
-        else:
-            logger.info(f"A solution with a time complexity of at least O(m^(1.407)) done in: {(time.time() - started) * 1000.0} milliseconds")
+        logger.info(f"An approximate Solution with a polynomial-approximation ratio done in: {(time.time() - started) * 1000.0} milliseconds")
         
-        answer = utils.string_complex_format(result, count_triangles) if count_triangles or all_triangles else utils.string_simple_format(result)
-        output = f"Naive Algorithm for {filename}: {answer}"
+        answer = utils.string_result_format(approximate_result, count)
+        output = f"{filename}: (approximation) {answer}"
+        utils.println(output, logger, log)
+
+    if bruteForce:
+        logger.info("A solution with an exponential-time complexity started")
+        started = time.time()
+        
+        brute_force_result = algorithm.find_clique_brute_force(graph)
+
+        logger.info(f"A solution with an exponential-time complexity done in: {(time.time() - started) * 1000.0} milliseconds")
+        
+        answer = utils.string_result_format(brute_force_result, count)
+        output = f"{filename}: (Brute Force) {answer}"
         utils.println(output, logger, log)
         
+    logger.info("Our Algorithm with an approximate solution started")
+    started = time.time()
+    
+    novel_result = algorithm.find_clique(graph)
+
+    logger.info(f"Our Algorithm with an approximate solution done in: {(time.time() - started) * 1000.0} milliseconds")
+
+    answer = utils.string_result_format(novel_result, count)
+    output = f"{filename}: {answer}"
+    utils.println(output, logger, log)
+    if novel_result and (bruteForce or approximation):
+        if bruteForce:    
+            output = f"Exact Ratio (Aegypti/Optimal): {len(brute_force_result)/len(novel_result)}"
+        elif approximation:
+            log = math.log(graph.number_of_nodes())
+            output = f"Upper Bound for Ratio (Aegypti/Optimal): {(graph.number_of_nodes()/(log*log)) * len(approximate_result)/len(novel_result)}"
+        utils.println(output, logger, log)
+          
 def main():
     
     # Define the parameters
-    helper = argparse.ArgumentParser(prog="triangle", description='Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.')
+    helper = argparse.ArgumentParser(prog="clique", description='Compute the Approximate Clique for undirected graph encoded in DIMACS format.')
     helper.add_argument('-i', '--inputFile', type=str, help='input file path', required=True)
-    helper.add_argument('-a', '--all', action='store_true', help='identify all triangles')
-    helper.add_argument('-b', '--bruteForce', action='store_true', help='compare with a brute-force approach using matrix multiplication')
-    helper.add_argument('-c', '--count', action='store_true', help='count the total amount of triangles')
+    helper.add_argument('-a', '--approximation', action='store_true', help='enable comparison with a polynomial-time approximation approach within a polynomial factor')
+    helper.add_argument('-b', '--bruteForce', action='store_true', help='enable comparison with the exponential-time brute-force approach')
+    helper.add_argument('-c', '--count', action='store_true', help='calculate the size of the clique')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.3.7')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.3.8')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -82,7 +92,8 @@ def main():
                log=args.log,
                count=args.count,
                bruteForce=args.bruteForce,
-               all=args.all)
-        
+               approximation=args.approximation)
+  
+
 if __name__ == "__main__":
     main()

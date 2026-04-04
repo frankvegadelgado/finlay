@@ -2,26 +2,23 @@ import lzma
 import bz2
 import numpy as np
 import scipy.sparse as sparse
+import networkx as nx
 
 from . import utils
 
 def create_sparse_matrix_from_file(file):
-    """Creates a sparse matrix from a file containing a DIMACS representation.
+    """Creates a sparse matrix from a file containing a DIMACS format representation.
 
     Args:
         file: A file-like object (e.g., an opened file) containing the matrix data.
 
     Returns:
-        A SciPy CSC sparse matrix if the input is valid (symmetric and no 1s on the diagonal).
+        A NetworkX Graph.
 
     Raises:
-        ValueError: If the input matrix is not in the correct DIMACS format.
+        ValueError: If the input matrix is not the correct DIMACS format.
     """
-    data = []
-    row_indices = []
-    col_indices = []
-    dimension = 0
-    visited = {}
+    graph = nx.Graph()
     for i, line in enumerate(file):
         line = line.strip()  # Remove newline characters
         parts = line.split(' ')
@@ -36,22 +33,10 @@ def create_sparse_matrix_from_file(file):
             edge = [np.int32(parts[-1]), np.int32(parts[-2])]
             if min(edge[0], edge[1]) <= 0:
                 raise ValueError(f"The input file is not in the correct DIMACS format at line {i}")
-            elif (edge[0], edge[1]) not in visited and (edge[1], edge[0]) not in visited:
-                data.append(np.int8(1))
-                row_indices.append(edge[0] - 1)
-                col_indices.append(edge[1] - 1)
-                dimension = max(dimension, edge[0], edge[1])
-                visited[(edge[0], edge[1])], visited[(edge[1], edge[0])] = True, True
-
-    sparse_matrix = sparse.csc_matrix((data, (row_indices, col_indices)), shape=(dimension, dimension))
+            else:
+                graph.add_edge(edge[0] - 1, edge[1] - 1)
     
-    # Convert sparse_matrix to a symmetric matrix
-    symmetric_matrix = utils.make_symmetric(sparse_matrix)  
-
-    # Set diagonal to 0
-    symmetric_matrix.setdiag(0)
-
-    return symmetric_matrix
+    return graph
 
 def save_sparse_matrix_to_file(matrix, filename):
     """
@@ -68,7 +53,7 @@ def save_sparse_matrix_to_file(matrix, filename):
         for i, j in zip(rows, cols):
             if i < j:
                 f.write(f"e {i + 1} {j + 1}" + "\n")
-
+    
 
 def read(filepath):
     """Reads a file and returns its lines in an array format.
@@ -77,7 +62,7 @@ def read(filepath):
         filepath: The path to the file.
 
     Returns:
-        An n x n matrix of ones and zeros
+        A NetworkX Graph.
 
     Raises:
         FileNotFoundError: If the file is not found.

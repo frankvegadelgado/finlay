@@ -1,4 +1,4 @@
-# Modified on 01/14/2025
+# Created on 04/04/2026
 # Author: Frank Vega
 
 import scipy.sparse as sparse
@@ -64,26 +64,6 @@ def has_one_on_diagonal(adjacency_matrix):
     """
     diagonal = adjacency_matrix.diagonal()
     return np.any(diagonal == 1)
-
-def is_symmetric(matrix):
-    """Checks if a SciPy sparse matrix is symmetric.
-
-    Args:
-        matrix: A SciPy sparse matrix.
-
-    Returns:
-        bool: True if the matrix is symmetric, False otherwise.
-        Raises TypeError: if the input is not a sparse matrix.
-    """
-    if not sparse.issparse(matrix):
-        raise TypeError("Input must be a SciPy sparse matrix.")
-
-    rows, cols = matrix.shape
-    if rows != cols:
-        return False  # Non-square matrices cannot be symmetric
-
-    # Efficiently check for symmetry
-    return (matrix != matrix.T).nnz == 0
 
 def generate_short_hash(length=6):
     """Generates a short random alphanumeric hash string.
@@ -169,105 +149,31 @@ def random_matrix_tests(matrix_shape, sparsity=0.9):
 
     return symmetric_matrix
 
-def string_simple_format(is_free):
+def string_result_format(result, count_result=False):
   """
-  Returns a string indicating whether a graph is triangle-free.
-
-  Args:
-    is_free: A Boolean value, True if the graph is triangle-free, False otherwise.
-  Returns:
-    - "Triangle Free" if triangle is True, "Triangle Found" otherwise.
-  """
-  return "Triangle Free" if is_free  else "Triangle Found"
-
-def string_complex_format(result, count_result=False):
-  """
-  Returns a string indicating whether the graph is triangle-free.
+  Returns a string indicating the clique.
   
   Args:
-    result: None if the graph is triangle-free, the triangle vertices otherwise.
-    count_result: Count the number of triangles found (default is False).
+    result: None if the graph is empty, the clique otherwise.
+    count_result: Count the number of nodes in the clique (default is False).
 
   Returns:
-    - "Triangle Free" if triangle is None, "Triangle{s} Found {a, b, c}, ...." otherwise.
+    - "Empty Graph" if result is None, "Clique Found a, b, c, ...." otherwise.
   """
   if result:
     if count_result:
-        return f"Triangles Count {len(result)}"
+        return f"Clique Size {len(result)}"
     else:
-        formatted_string = "; ".join(
-            f"({', '.join(str(x + 1) for x in sorted(fs))})"
-            for fs in result
-        )
-        return f"Triangle{"s" if len(result) > 1 else ""} Found {formatted_string}"
+        formatted_string = f'{", ".join(f"{x + 1}" for x in result)}'
+        return f"Clique Found {formatted_string}"
   else:
-     return "Triangle Free"
-
-def iterative_dfs(graph, start):
-  """
-  Performs Depth-First Search (DFS) iteratively on a graph.
-
-  Args:
-      graph: A dictionary representing the graph where keys are nodes
-             and values are lists of their neighbors.
-      start: The starting node for the DFS traversal.
-
-  Returns:
-      A list containing the nodes visited in DFS order.
-      Returns an empty list if the graph or start node is invalid.
-  """
-
-  if not graph or start not in graph:
-    return []
-
-  visited = set()  # Keep track of visited nodes
-  stack = [start]  # Use a stack for iterative DFS
-  traversal_order = []
-
-  while stack:
-    node = stack.pop()
-
-    if node not in visited:
-      visited.add(node)
-      traversal_order.append(node)
-
-      # Important: Reverse the order of neighbors before adding to the stack
-      # This ensures that the left-most neighbors are explored first,
-      # mimicking the recursive DFS behavior.
-      neighbors = list(graph[node]) #Create a copy to avoid modifying the original graph
-      neighbors.reverse()
-      stack.extend(neighbors)
-
-  return traversal_order
+     return "Empty Graph"
 
 def println(output, logger, file_logging=False):
     """ Log and Print the Final Output Message """
     if (file_logging):
         logger.info(output)
     print(output)
-
-def sparse_matrix_to_edges(adj_matrix, is_directed=False):
-    """
-    Converts a SciPy sparse adjacency matrix to a set of edges.
-
-    Args:
-        adj_matrix: A SciPy sparse adjacency matrix.
-        is_directed: Whether the matrix represents a directed graph (default: False).
-
-    Returns:
-        A set of tuples representing the edges.
-    """
-
-    edges = set()
-    rows, cols = adj_matrix.nonzero()
-    if is_directed:
-        for i, j in zip(rows, cols):
-            edges.add((i, j))
-    else:
-        for i, j in zip(rows, cols):
-            if i <= j: # Avoid duplicates in undirected graphs
-                edges.add((i, j))
-    return edges
 
 def sparse_matrix_to_graph(adj_matrix, is_directed=False):
     """
@@ -295,3 +201,67 @@ def sparse_matrix_to_graph(adj_matrix, is_directed=False):
                 graph.add_edge(i, j)
     
     return graph
+
+def is_vertex_redundant(graph, vertex, vertex_set):
+    """
+    Check if a vertex does not cover any edge that a set of vertices does not already cover.
+
+    Parameters:
+    - graph: A NetworkX graph.
+    - vertex: The vertex to check.
+    - vertex_set: A set of vertices.
+
+    Returns:
+    - True if the vertex does not cover any additional edge, False otherwise.
+    """
+    # Get all edges covered by the vertex set
+    edges_covered_by_set = set()
+    for v in vertex_set:
+        edges_covered_by_set.update(graph.edges(v))
+
+    # Get all edges covered by the vertex
+    edges_covered_by_vertex = set(graph.edges(vertex))
+
+    # Check if the edges covered by the vertex are a subset of the edges covered by the set
+    return edges_covered_by_vertex.issubset(edges_covered_by_set)
+
+def is_vertex_cover(graph, vertex_cover):
+    """
+    Verifies if a given set of vertices is a valid clique for the graph.
+
+    Args:
+        graph (nx.Graph): The input graph.
+        vertex_cover (set): A set of vertices to check.
+
+    Returns:
+        bool: True if the set is a valid clique, False otherwise.
+    """
+    for u, v in graph.edges():
+        if u not in vertex_cover and v not in vertex_cover:
+            return False
+    return True
+
+def is_independent_set(G, subset):
+    """
+    Checks if a subset of nodes forms an independent set in the graph.
+    """
+    for u in subset:
+        for v in subset:
+            if u != v and G.has_edge(u, v):
+                return False
+    return True
+
+def compute_weight(G, nodes):
+    """Compute the total weight of a set of nodes."""
+    return sum(G.nodes[node]['weight'] for node in nodes)
+
+
+def is_clique(G, subset):
+    """
+    Checks if a subset of nodes forms a clique in the graph.
+    """
+    for u in subset:
+        for v in subset:
+            if u != v and not G.has_edge(u, v):
+                return False
+    return True

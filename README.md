@@ -1,4 +1,4 @@
-# Aegypti: Triangle-Free Solver
+# Aegypti: Approximate Clique Solver
 
 ![Honoring the Memory of Carlos Juan Finlay (Pioneer in the research of yellow fever)](docs/finlay.jpg)
 
@@ -6,34 +6,83 @@ This work builds upon [The Aegypti Algorithm](https://dev.to/frank_vega_98768948
 
 ---
 
-# Triangle-Free Problem
+# The Maximum Clique Problem: Overview
 
-The Triangle-Free problem is a fundamental decision problem in graph theory. Given an undirected graph, the problem asks whether it's possible to determine if the graph contains no triangles (cycles of length 3). In other words, it checks if there exists a configuration where no three vertices are connected by edges that form a closed triangle.
+## **Description**
 
-This problem is important for various reasons:
+The **Maximum Clique Problem (MCP)** is a classic NP-hard problem in graph theory and computer science. Given an undirected graph $G = (V, E)$, a **clique** is a subset of vertices $C \subseteq V$ where every two distinct vertices are connected by an edge. The goal of MCP is to find the largest possible clique in $G$.
 
-- **Graph Analysis:** It's a basic building block for more complex graph algorithms and has applications in social network analysis, web graph analysis, and other domains.
-- **Computational Complexity:** It serves as a benchmark problem in the study of efficient algorithms for graph properties. While the naive approach has a time complexity of $O(n^3)$, there are more efficient algorithms with subcubic complexity.
+### **Key Definitions**
 
-Understanding the Triangle-Free problem is essential for anyone working with graphs and graph algorithms.
+- **Clique**: A complete subgraph (all possible edges exist between vertices).
+- **Maximum Clique**: The largest clique in the graph.
+- **Clique Number ($\omega(G)$)**: The size of the maximum clique in $G$.
+
+## **Theoretical Background**
+
+- MCP is **NP-Hard**, meaning no known polynomial-time algorithm solves all cases unless $P = NP$.
+- It is closely related to other problems like the **Independent Set Problem** (complement graph) and **Graph Coloring**.
+- Decision version: "Does a clique of size $k$ exist?" is **NP-Complete**.
+
+## **Approaches to Solve MCP**
+
+### **Exact Algorithms**
+
+1. **Brute Force**: Check all possible subsets (exponential time $O(2^n)$).
+2. **Branch and Bound**: Prune search space by eliminating branches where clique size cannot exceed the current maximum.
+3. **Integer Programming (IP)**: Formulate as an optimization problem with binary variables and constraints.
+4. **Bron-Kerbosch Algorithm**: A recursive backtracking method for listing all maximal cliques.
+
+### **Heuristic & Approximation Methods**
+
+1. **Greedy Algorithms**: Iteratively add vertices with the highest degree or most connections to the current clique.
+2. **Local Search**: Improve existing solutions via vertex swaps or perturbations.
+3. **Metaheuristics**:
+   - **Genetic Algorithms**: Evolve candidate solutions via selection, crossover, and mutation.
+   - **Simulated Annealing**: Probabilistic technique inspired by thermodynamics.
+   - **Tabu Search**: Avoid revisiting solutions using a "tabu list."
+
+### **Advanced Techniques**
+
+- **Reduction Rules**: Simplify the graph by removing vertices that cannot be part of the maximum clique.
+- **Parallel & GPU Computing**: Speed up exhaustive searches using parallel processing.
+- **Machine Learning**: Learn graph features to guide heuristic choices (emerging area).
+
+## **Applications**
+
+1. **Social Network Analysis**: Identifying tightly connected groups (communities).
+2. **Bioinformatics**: Protein interaction networks, gene regulatory networks.
+3. **Computer Vision**: Object recognition, pattern matching.
+4. **Wireless Networks**: Resource allocation, interference modeling.
+5. **Combinatorial Optimization**: Scheduling, coding theory, cryptography.
+
+## **Challenges & Open Problems**
+
+- Scalability for large graphs (millions of vertices).
+- Improving approximation guarantees (best-known is $O(n / \log^2 n)$).
+- Hybrid approaches combining exact and heuristic methods.
+
+## **Conclusion**
+
+The Maximum Clique Problem remains a fundamental challenge in computational complexity with broad practical implications. While exact methods are limited to small graphs, heuristic and hybrid approaches enable solutions for real-world applications.
+
+---
 
 ## Problem Statement
 
 Input: A Boolean Adjacency Matrix $M$.
 
-Question: Does $M$ contain no triangles?
-
-Answer: True / False
+Answer: Find a Maximum Clique.
 
 ### Example Instance: 5 x 5 matrix
 
-|        | c1    | c2  | c3    | c4  | c5  |
-| ------ | ----- | --- | ----- | --- | --- |
-| **r1** | 0     | 0   | 1     | 0   | 1   |
-| **r2** | 0     | 0   | 0     | 1   | 0   |
-| **r3** | **1** | 0   | 0     | 0   | 1   |
-| **r4** | 0     | 1   | 0     | 0   | 0   |
-| **r5** | **1** | 0   | **1** | 0   | 0   |
+|        | c1  | c2  | c3  | c4  | c5  |
+| ------ | --- | --- | --- | --- | --- |
+| **r1** | 0   | 0   | 1   | 0   | 1   |
+| **r2** | 0   | 0   | 0   | 1   | 0   |
+| **r3** | 1   | 0   | 0   | 0   | 1   |
+| **r4** | 0   | 1   | 0   | 0   | 0   |
+| **r5** | 1   | 0   | 1   | 0   | 0   |
 
 The input for undirected graph is typically provided in [DIMACS](http://dimacs.rutgers.edu/Challenges) format. In this way, the previous adjacency matrix is represented in a text file using the following string representation:
 
@@ -55,149 +104,133 @@ where the fields W and V specify the endpoints of the edge while the lower-case 
 
 _Example Solution:_
 
-Triangle Found `(1, 3, 5)`: In Rows `3` & `5` and Columns `1` & `3`
+Clique Found `1, 3, 5`: Nodes `1`, `3`, and `5` constitute an optimal solution.
+
+---
 
 # Compile and Environment
 
-## Install Python >=3.12.
+## Prerequisites
 
-## Install Aegypti's Library and its Dependencies with:
+- Python ≥ 3.12
+
+## Installation
 
 ```bash
 pip install aegypti
 ```
 
-# Execute
+## Execution
 
-1. Go to the package directory to use the benchmarks:
+1. Clone the repository:
 
-```bash
-git clone https://github.com/frankvegadelgado/finlay.git
-cd finlay
-```
+   ```bash
+   git clone https://github.com/frankvegadelgado/aegypti.git
+   cd aegypti
+   ```
 
-2. Execute the script:
+2. Run the script:
 
-```bash
-triangle -i .\benchmarks\testMatrix1
-```
+   ```bash
+   clique -i ./benchmarks/testMatrix1
+   ```
 
-utilizing the `triangle` command provided by Aegypti's Library to execute the Boolean adjacency matrix `finlay\benchmarks\testMatrix1`. The file `testMatrix1` represents the example described herein. We also support .xz, .lzma, .bz2, and .bzip2 compressed text files.
+   utilizing the `clique` command provided by Aegypti's Library to execute the Boolean adjacency matrix `aegypti\benchmarks\testMatrix1`. The file `testMatrix1` represents the example described herein. We also support `.xz`, `.lzma`, `.bz2`, and `.bzip2` compressed text files.
 
-## The console output will display:
+   **Example Output:**
 
-```
-Smart Algorithm for testMatrix1: Triangle Found (1, 3, 5)
-```
+   ```
+   testMatrix1: Clique Found 1, 3, 5
+   ```
 
-which implies that the Boolean adjacency matrix `finlay\benchmarks\testMatrix1` contains a triangle combining the nodes `(1, 3, 5)`.
+   This indicates nodes `1, 3, 5` form a clique.
 
 ---
 
-## Find and Count All Triangles
+## Clique Size
 
-The `-a` flag enables the discovery of all triangles within the graph.
-
-**Example:**
+Use the `-c` flag to count the nodes in the clique:
 
 ```bash
-triangle -i .\benchmarks\testMatrix2 -a
+clique -i ./benchmarks/testMatrix2 -c
 ```
 
 **Output:**
 
 ```
-Smart Algorithm for testMatrix2: Triangles Found (1, 3, 9); (1, 2, 11); (1, 3, 4); (1, 2, 8); (1, 3, 11); (2, 4, 11); (3, 4, 11); (2, 4, 9); (1, 4, 11); (4, 5, 11); (1, 4, 9); (1, 2, 9); (3, 4, 9); (1, 2, 6); (4, 5, 9); (1, 2, 4)
+testMatrix2: Clique Size 4
 ```
-
-When multiple triangles exist, the output provides a list of their vertices.
-
-Similarly, the `-c` flag counts all triangles in the graph.
-
-**Example:**
-
-```bash
-triangle -i .\benchmarks\testMatrix2 -c
-```
-
-**Output:**
-
-```
-Smart Algorithm for testMatrix2: Triangles Count 16
-```
-
-## Runtime Analysis:
-
-We employ the same algorithm used to solve the triangle-free problem.
 
 ---
 
 # Command Options
 
-To display the help message and available options, run the following command in your terminal:
+Display help and options:
 
 ```bash
-triangle -h
+clique -h
 ```
 
-This will output:
+**Output:**
 
 ```bash
-usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
+usage: clique [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
 
-Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.
+Compute the Approximate Clique for undirected graph encoded in DIMACS format.
 
 options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
-  -a, --all             identify all triangles
-  -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --count           count the total amount of triangles
+  -a, --approximation   enable comparison with a polynomial-time approximation approach within a polynomial factor
+  -b, --bruteForce      enable comparison with the exponential-time brute-force approach
+  -c, --count           calculate the size of the clique
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 ```
 
-This output describes all available options.
+---
 
-## Batch Execution
+# Batch Execution
 
 Batch execution allows you to solve multiple graphs within a directory consecutively.
 
-To view available command-line options for the `batch_triangle` command, use the following in your terminal or command prompt:
+To view available command-line options for the `batch_clique` command, use the following in your terminal or command prompt:
 
 ```bash
-batch_triangle -h
+batch_clique -h
 ```
 
 This will display the following help information:
 
 ```bash
-usage: batch_triangle [-h] -i INPUTDIRECTORY [-a] [-b] [-c] [-v] [-l] [--version]
+usage: batch_clique [-h] -i INPUTDIRECTORY [-a] [-b] [-c] [-v] [-l] [--version]
 
-Solve the Triangle-Free Problem for all undirected graphs encoded in DIMACS format and stored in a directory.
+Compute the Approximate Clique for all undirected graphs encoded in DIMACS format and stored in a directory.
 
 options:
   -h, --help            show this help message and exit
   -i INPUTDIRECTORY, --inputDirectory INPUTDIRECTORY
                         Input directory path
-  -a, --all             identify all triangles
-  -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --count           count the total amount of triangles
+  -a, --approximation   enable comparison with a polynomial-time approximation approach within a polynomial factor
+  -b, --bruteForce      enable comparison with the exponential-time brute-force approach
+  -c, --count           calculate the size of the clique
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
-  ```
+```
 
-## The Finlay Testing Application
+---
 
-A command-line tool, `test_triangle`, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:
+# Testing Application
+
+A command-line utility named `test_clique` is provided for evaluating the Algorithm using randomly generated, large sparse matrices. It supports the following options:
 
 ```bash
-usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
+usage: test_clique [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
 
-The Finlay Testing Application using randomly generated, large sparse matrices.
+The Aegypti Testing Application using randomly generated, large sparse matrices.
 
 options:
   -h, --help            show this help message and exit
@@ -207,27 +240,23 @@ options:
                         an integer specifying the number of tests to run
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
-  -a, --all             identify all triangles
-  -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --count           count the total amount of triangles
+  -a, --approximation   enable comparison with a polynomial-time approximation approach within a polynomial factor
+  -b, --bruteForce      enable comparison with the exponential-time brute-force approach
+  -c, --count           calculate the size of the clique
   -w, --write           write the generated random matrix to a file in the current directory
   -v, --verbose         anable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 ```
 
-**This tool is designed to benchmark algorithms for sparse matrix operations.**
-
-It generates random square matrices with configurable dimensions (`-d`), sparsity levels (`-s`), and number of tests (`-n`). While a comparison with a brute-force matrix multiplication approach is available, it's recommended to avoid this for large datasets due to performance limitations. Additionally, the generated matrix can be written to the current directory (`-w`), and verbose output or file logging can be enabled with the (`-v`) or (`-l`) flag, respectively, to record test results.
-
 ---
 
 # Code
 
-- Python code by **Frank Vega**.
+- Python implementation by **Frank Vega**.
 
 ---
 
 # License
 
-- MIT.
+- MIT License.
