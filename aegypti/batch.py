@@ -36,7 +36,7 @@ def main():
     helper.add_argument('-c', '--count', action='store_true', help='calculate the size of the clique')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.3.8')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.3.9')
 
     
     # Initialize the parameters

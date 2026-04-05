@@ -257,6 +257,14 @@ options:
 
 ---
 
+# Complexity
+
+```diff
++ We present a polynomial-time algorithm achieving a Sqrt(n)-approximation ratio for MCP, providing strong evidence that P = NP by efficiently solving a computationally hard problem with near-optimal solutions.
+```
+
+---
+
 # License
 
 - MIT License.

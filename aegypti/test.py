@@ -4,7 +4,6 @@
 import time
 import argparse
 import math
-import networkx as nx
 
 from . import algorithm
 from . import applogger
@@ -34,7 +33,7 @@ def main():
     helper.add_argument('-w', '--write', action='store_true', help='write the generated random matrix to a file in the current directory')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.3.8')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.3.9')
     
     # Initialize the parameters
     args = helper.parse_args()
@@ -99,10 +98,9 @@ def main():
 
         if novel_result and (bruteForce or approximation):
             if bruteForce:    
-                output = f"Exact Ratio (Aegypti/Optimal): {len(brute_force_result)/len(novel_result)}"
+                output = f"Exact Ratio (Optimal/Aegypti): {len(brute_force_result)/len(novel_result)}"
             elif approximation:
-                log = math.log(graph.number_of_nodes())
-                output = f"Upper Bound for Ratio (Aegypti/Optimal): {(graph.number_of_nodes()/(log*log)) * len(approximate_result)/len(novel_result)}"
+                output = f"Upper Bound for Ratio (Approximation/Aegypti): {len(approximate_result)/len(novel_result)}"
             utils.println(output, logger, args.log)
         
 

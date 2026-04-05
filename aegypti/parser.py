@@ -1,7 +1,6 @@
 import lzma
 import bz2
 import numpy as np
-import scipy.sparse as sparse
 import networkx as nx
 
 from . import utils

@@ -4,7 +4,6 @@
 
 import argparse
 import time
-import math
 from . import algorithm
 from . import parser
 from . import applogger
@@ -67,10 +66,9 @@ def solution(inputFile, verbose=False, log=False, count=False, bruteForce=False,
     utils.println(output, logger, log)
     if novel_result and (bruteForce or approximation):
         if bruteForce:    
-            output = f"Exact Ratio (Aegypti/Optimal): {len(brute_force_result)/len(novel_result)}"
+            output = f"Exact Ratio (Optimal/Aegypti): {len(brute_force_result)/len(novel_result)}"
         elif approximation:
-            log = math.log(graph.number_of_nodes())
-            output = f"Upper Bound for Ratio (Aegypti/Optimal): {(graph.number_of_nodes()/(log*log)) * len(approximate_result)/len(novel_result)}"
+            output = f"Upper Bound for Ratio (Approximation/Aegypti): {len(approximate_result)/len(novel_result)}"
         utils.println(output, logger, log)
           
 def main():
@@ -83,7 +81,7 @@ def main():
     helper.add_argument('-c', '--count', action='store_true', help='calculate the size of the clique')
     helper.add_argument('-v', '--verbose', action='store_true', help='anable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.3.8')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.3.9')
     
     # Initialize the parameters
     args = helper.parse_args()
