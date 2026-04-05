@@ -2,7 +2,7 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.3.9"
+VERSION = "0.4.0"
 
 NAME = "aegypti"
 
@@ -15,7 +15,7 @@ INSTALL_REQUIRES = [
 setuptools.setup(
     name=NAME,
     version=VERSION,
-    description="Compute the Approximate Clique for undirected graph encoded in DIMACS format.",
+    description="Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.",
     url="https://github.com/frankvegadelgado/finlay",
     project_urls={
         "Source Code": "https://github.com/frankvegadelgado/finlay",
@@ -45,9 +45,9 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     entry_points={
         'console_scripts': [
-            'clique = aegypti.app:main',
-            'test_clique = aegypti.test:main',
-            'batch_clique = aegypti.batch:main'
+            'triangle = aegypti.app:main',
+            'test_triangle = aegypti.test:main',
+            'batch_triangle = aegypti.batch:main'
         ]
     }
 )

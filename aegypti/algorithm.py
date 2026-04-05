@@ -1,108 +1,119 @@
-# Created on 04/04/2026
+# Modified on 04/04/2026
 # Author: Frank Vega
 
-import itertools
-from . import utils
 
+import numpy as np
+from scipy import sparse
 import networkx as nx
 from .disjoint import FastCliqueUF
 
-def find_clique(graph):
+def find_triangle_coordinates(graph):
     """
-    Compute an approximate clique set for an undirected graph by using a
-    clique‑constrained FastCliqueUF structure. The largest resulting component
-    that satisfies the clique constraint is returned.
+    Detect a single triangle (3-clique) in an undirected NetworkX graph.
+
+    A triangle is a set of three vertices {u, v, w} such that the edges
+    (u, v), (v, w), and (u, w) all exist.
+
+    This function uses a **hybrid approach** for efficiency:
+    1. Primary fast path: A clique-constrained Union-Find (`FastCliqueUF`)
+       that only merges two vertices when the resulting component remains
+       a clique. As soon as any component reaches size ≥ 3, a triangle
+       is guaranteed to exist.
+    2. Fallback: If the UF pass does not detect a triangle, a standard
+       O(m^{3/2})-style enumeration using adjacency-set intersections is
+       performed (still early-exits on the first triangle found).
 
     Args:
-        graph (nx.Graph): A NetworkX Graph object representing the input graph.
+        graph (nx.Graph):
+            An undirected simple graph (no self-loops, no multi-edges).
+            Nodes may be any hashable Python objects.
 
     Returns:
-        set: A set of vertex indices representing the approximate clique set.
-             Returns an empty set if the graph is empty or has no edges.
+        Optional[FrozenSet[Hashable]]:
+            A frozenset containing the three vertices of one triangle if
+            a triangle exists, otherwise None.
+
+    Raises:
+        ValueError: If the input is not an undirected nx.Graph or contains
+                    self-loops.
     """
-    
-    # Ensure the input is a simple undirected graph
-    if not isinstance(graph, nx.Graph):
+    # --- Input validation ----------------------------------------------------
+    if not isinstance(graph, nx.Graph) or graph.is_directed():
         raise ValueError("Input must be an undirected NetworkX Graph.")
-    
-    # If the graph has no nodes, no clique can exist
-    if graph.number_of_nodes() == 0:
-        return set()
-    
-    # Work on a copy so the original graph remains unchanged
-    working_graph = graph.copy()
-    
-    # Remove self-loops; they do not affect clique structure
-    working_graph.remove_edges_from(list(nx.selfloop_edges(working_graph)))
-    
-    # Remove isolated nodes (degree 0), since they cannot belong to any clique
-    isolates = list(nx.isolates(working_graph))
-    working_graph.remove_nodes_from(isolates)
-    
-    # Initialize the clique-constrained UnionFind over all nodes
-    if working_graph.number_of_edges() == 0:
-        # If there are no edges, the largest clique is just one of the isolated nodes (if any)
-        return {isolates[0]} if isolates else set()
-    disjoint_set = FastCliqueUF(working_graph)
-    
-    # Attempt to union each edge; the modified UnionFind only merges
-    # components if the union remains a clique in the graph
+
+    if nx.number_of_selfloops(graph) > 0:
+        raise ValueError("Graph must not contain self-loops.")
+
+    # Early exit: graphs with fewer than 3 nodes or no edges cannot contain triangles
+    if graph.number_of_nodes() < 3 or graph.number_of_edges() == 0:
+        return None
+
+    # --- Fast path: Clique-constrained Union-Find ---------------------------
+    # FastCliqueUF only performs a union when the resulting component is still
+    # a clique. If union(u, v) returns True, a clique of size ≥ 3 was formed
+    # → a triangle has been detected.
+    disjoint_set = FastCliqueUF(graph)
+
+    found_in_uf = False
     for u, v in graph.edges():
-        disjoint_set.union(u, v)
-    
-    # Extract all components of size >= 2 (potential cliques)
-    cliques = [s for s in disjoint_set.to_sets() if len(s) >= 2]
-    
-    # Choose the largest clique-like component if any exist;
-    approximate_clique = max(cliques, key=len)
-    
-    # Return the largest approximate clique found
-    return approximate_clique
+        if disjoint_set.union(u, v):
+            found_in_uf = True
+            break  # Triangle found — no need to process remaining edges
 
-def find_clique_brute_force(graph):
+    if found_in_uf:
+        # Extract the first clique of size ≥ 3 (guaranteed to be a triangle)
+        # to_sets() returns all current components after full path compression.
+        for component in disjoint_set.to_sets():
+            if len(component) >= 3:
+                return frozenset(component)
+        # (This line should never be reached if FastCliqueUF is correct)
+
+    # --- Fallback: Explicit triangle enumeration via adjacency intersection --
+    # If the UF pass did not detect a triangle, we fall back to a standard
+    # efficient triangle-finding algorithm:
+    #   • Precompute adjacency sets for O(1) intersections.
+    #   • Use node ranking to process each undirected edge {u, v} exactly once.
+    #   • For each edge, compute common neighbors → any w forms a triangle.
+    adj_sets = {node: set(graph.neighbors(node)) for node in graph.nodes()}
+    rank = {node: i for i, node in enumerate(graph.nodes())}
+
+    for u in graph.nodes():
+        for v in graph.neighbors(u):
+            # Process each undirected edge exactly once (u has lower rank than v)
+            if rank[u] < rank[v]:
+                # Intersection gives all common neighbors w (each forms a triangle)
+                common_neighbors = adj_sets[u] & adj_sets[v]
+                for w in common_neighbors:
+                    return frozenset({u, v, w})
+
+    # No triangle found after both passes
+    return None
+
+def is_triangle_free_brute_force(adj_matrix):
     """
-    Computes an exact maximum clique in exponential time.
+    Checks if a graph represented by a sparse adjacency matrix is triangle-free using matrix multiplication.
 
     Args:
-        graph: A NetworkX Graph.
+        adj_matrix: A SciPy sparse matrix (e.g., csc_matrix) representing the adjacency matrix.
 
     Returns:
-        A set of vertex indices representing the exact clique, or None if the graph is empty.
+        True if the graph is triangle-free, False otherwise.
+        Raises ValueError if the input matrix is not square.
+        Raises TypeError if the input is not a sparse matrix.
     """
 
-    
-    if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0:
-        return None
+    if not sparse.issparse(adj_matrix):
+        raise TypeError("Input must be a SciPy sparse matrix.")
 
-    n_vertices = len(graph.nodes())
+    rows, cols = adj_matrix.shape
+    if rows != cols:
+        raise ValueError("Adjacency matrix must be square.")
 
-    n_max_vertices = 0
-    best_solution = None
+    # Calculate A^3 (matrix multiplication of A with itself three times)
+    adj_matrix_cubed = adj_matrix @ adj_matrix @ adj_matrix #more efficient than matrix power
 
-    for k in range(1, n_vertices + 1): # Iterate through all possible sizes of the cover
-        for candidate in itertools.combinations(graph.nodes(), k):
-            clique_candidate = set(candidate)
-            if utils.is_clique(graph, clique_candidate) and len(clique_candidate) > n_max_vertices:
-                n_max_vertices = len(clique_candidate)
-                best_solution = clique_candidate
-                
-    return best_solution
-
-
-def find_clique_approximation(graph):
-    """
-    Computes an approximate clique in polynomial time with a polynomial-approximation ratio for undirected graphs.
-
-    Args:
-        graph: A NetworkX Graph.
-
-    Returns:
-        A set of vertex indices representing the approximate clique, or None if the graph is empty.
-    """
-
-    if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0:
-        return None
-
-    #networkx doesn't have a guaranteed maximum clique function, so we use approximation
-    clique = nx.approximation.max_clique(graph)
-    return clique
+    # Check the diagonal of A^3. A graph has a triangle if and only if A^3[i][i] > 0 for some i.
+    # Because A^3[i][i] represents the number of paths of length 3 from vertex i back to itself.
+    # Efficiently get the diagonal of a sparse matrix
+    diagonal = adj_matrix_cubed.diagonal()
+    return np.all(diagonal == 0)

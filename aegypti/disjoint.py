@@ -59,11 +59,13 @@ class FastCliqueUF:
     def union(self, u, v):
         """
         Merge the components of u and v only if the union forms a clique.
+        Return True iff the resulting clique has size >= 3.
         All clique checks and bitset merges are SIMD-accelerated.
         """
         ru, rv = self.find(u), self.find(v)
         if ru == rv:
-            return
+            # Already in same component → check if size >= 3
+            return self.size[ru] >= 3
 
         # Union-by-size heuristic
         if self.size[ru] < self.size[rv]:
@@ -77,19 +79,23 @@ class FastCliqueUF:
 
         # Clique condition:
         # merged_bit must be subset of merged_adj
-        # i.e., merged_bit & ~merged_adj == 0
         if np.any(merged_bit & ~merged_adj):
-            return  # Reject merge: not a clique
+            return False  # Reject merge: not a clique
 
         # Accept merge
         self.parent[rv] = ru
-        self.size[ru] += self.size[rv]
+        new_size = self.size[ru] + self.size[rv]
+        self.size[ru] = new_size
 
         # Update component bitset
         self.comp_bit[ru] = merged_bit
 
         # Update adjacency intersection
         self.comp_adj[ru] = merged_adj
+
+        # Return True only if the resulting clique has size >= 3
+        return new_size >= 3
+
 
     def to_sets(self):
         """
