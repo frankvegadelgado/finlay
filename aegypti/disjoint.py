@@ -97,6 +97,50 @@ class FastCliqueUF:
         return new_size >= 3
 
 
+    def delete_edge(self, u, v):
+        """
+        Remove the edge (u, v) from the FastCliqueUF in-memory bitset
+        structure. This does NOT modify the underlying NetworkX graph; it
+        only clears the corresponding bits from adj[u]/adj[v] and from the
+        component adjacency bitsets comp_adj[ru]/comp_adj[rv] so that
+        future clique tests no longer treat (u, v) as an edge.
+
+        Complexity:
+          O(1) bit-flip work on the per-vertex adjacency bitsets, plus
+          two O(blocks) updates to component adjacency bitsets if the
+          two endpoints are in different singletons. In the regime where
+          we use this (components of size <= 2 in Phase 1), the work is
+          dominated by the O(n/w) component-bitset write, matching the
+          existing per-union cost.
+
+        Args:
+            u, v: endpoint identifiers (must be existing nodes of the
+                  underlying graph passed to __init__).
+        """
+        if u == v:
+            return
+        iu = self.index[u]
+        iv = self.index[v]
+        mask_u = np.uint64(1) << np.uint64(iu % 64)
+        mask_v = np.uint64(1) << np.uint64(iv % 64)
+        block_u = iu // 64
+        block_v = iv // 64
+
+        # Clear v from u's closed-neighbourhood bitset and vice versa.
+        self.adj[u][block_v] &= ~mask_v
+        self.adj[v][block_u] &= ~mask_u
+
+        # Reflect the deletion in the *component* adjacency intersection
+        # bitsets of u's and v's current roots. Each comp_adj is the AND
+        # of the closed neighbourhoods of all vertices in the component;
+        # clearing v from u's neighbourhood weakens u's contribution to
+        # comp_adj[find(u)] at position v, and symmetrically.
+        ru = self.find(u)
+        rv = self.find(v)
+        self.comp_adj[ru][block_v] &= ~mask_v
+        if rv != ru:
+            self.comp_adj[rv][block_u] &= ~mask_u
+
     def to_sets(self):
         """
         Return all disjoint sets after full path compression.

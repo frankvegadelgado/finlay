@@ -1,0 +1,17 @@
+c Petersen graph: triangle-free, 3-regular
+p edge 10 15
+e 1 2
+e 1 5
+e 1 6
+e 2 3
+e 2 7
+e 3 4
+e 3 8
+e 4 5
+e 4 9
+e 5 10
+e 6 8
+e 6 9
+e 7 9
+e 7 10
+e 8 10

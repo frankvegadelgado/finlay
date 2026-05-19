@@ -151,31 +151,12 @@ cd finlay
 </code></pre>
 <p>which implies that the Boolean adjacency matrix <code>finlay\benchmarks\testMatrix1</code> contains a triangle combining the nodes <code>(1, 3, 5)</code>.</p>
 <hr>
-<h2>Find and Count All Triangles</h2>
-<p>The <code>-a</code> flag enables the discovery of all triangles within the graph.</p>
-<p><strong>Example:</strong></p>
-<pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2 -a
-</code></pre>
-<p><strong>Output:</strong></p>
-<pre><code>Smart Algorithm for testMatrix2: Triangles Found (1, 3, 9); (1, 2, 11); (1, 3, 4); (1, 2, 8); (1, 3, 11); (2, 4, 11); (3, 4, 11); (2, 4, 9); (1, 4, 11); (4, 5, 11); (1, 4, 9); (1, 2, 9); (3, 4, 9); (1, 2, 6); (4, 5, 9); (1, 2, 4)
-</code></pre>
-<p>When multiple triangles exist, the output provides a list of their vertices.</p>
-<p>Similarly, the <code>-c</code> flag counts all triangles in the graph.</p>
-<p><strong>Example:</strong></p>
-<pre><code class="language-bash">triangle -i .\benchmarks\testMatrix2 -c
-</code></pre>
-<p><strong>Output:</strong></p>
-<pre><code>Smart Algorithm for testMatrix2: Triangles Count 16
-</code></pre>
-<h2>Runtime Analysis:</h2>
-<p>We employ the same algorithm used to solve the triangle-free problem.</p>
-<hr>
 <h1>Command Options</h1>
 <p>To display the help message and available options, run the following command in your terminal:</p>
 <pre><code class="language-bash">triangle -h
 </code></pre>
 <p>This will output:</p>
-<pre><code class="language-bash">usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
+<pre><code class="language-bash">usage: triangle [-h] -i INPUTFILE [-b] [-c] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.
 
@@ -183,10 +164,9 @@ options:
   -h, --help            show this help message and exit
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
-  -a, --all             identify all triangles
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --count           count the total amount of triangles
-  -v, --verbose         anable verbose output
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 </code></pre>
@@ -197,7 +177,7 @@ options:
 <pre><code class="language-bash">batch_triangle -h
 </code></pre>
 <p>This will display the following help information:</p>
-<pre><code class="language-bash">usage: batch_triangle [-h] -i INPUTDIRECTORY [-a] [-b] [-c] [-v] [-l] [--version]
+<pre><code class="language-bash">usage: batch_triangle [-h] -i INPUTDIRECTORY [-b] [-c] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for all undirected graphs encoded in DIMACS format and stored in a directory.
 
@@ -205,16 +185,15 @@ options:
   -h, --help            show this help message and exit
   -i INPUTDIRECTORY, --inputDirectory INPUTDIRECTORY
                         Input directory path
-  -a, --all             identify all triangles
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --count           count the total amount of triangles
-  -v, --verbose         anable verbose output
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 </code></pre>
 <h2>The Finlay Testing Application</h2>
 <p>A command-line tool, <code>test_triangle</code>, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:</p>
-<pre><code class="language-bash">usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
+<pre><code class="language-bash">usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-c] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application using randomly generated, large sparse matrices.
 
@@ -226,11 +205,10 @@ options:
                         an integer specifying the number of tests to run
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
-  -a, --all             identify all triangles
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --count           count the total amount of triangles
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
   -w, --write           write the generated random matrix to a file in the current directory
-  -v, --verbose         anable verbose output
+  -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 </code></pre>

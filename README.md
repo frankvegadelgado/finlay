@@ -105,7 +105,7 @@ triangle -h
 This will output:
 
 ```bash
-usage: triangle [-h] -i INPUTFILE [-a] [-b] [-c] [-v] [-l] [--version]
+usage: triangle [-h] -i INPUTFILE [-b] [-c] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for an undirected graph encoded in DIMACS format.
 
@@ -114,7 +114,8 @@ options:
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -v, --verbose         anable verbose output
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 ```
@@ -134,7 +135,7 @@ batch_triangle -h
 This will display the following help information:
 
 ```bash
-usage: batch_triangle [-h] -i INPUTDIRECTORY [-a] [-b] [-c] [-v] [-l] [--version]
+usage: batch_triangle [-h] -i INPUTDIRECTORY [-b] [-c] [-v] [-l] [--version]
 
 Solve the Triangle-Free Problem for all undirected graphs encoded in DIMACS format and stored in a directory.
 
@@ -143,7 +144,8 @@ options:
   -i INPUTDIRECTORY, --inputDirectory INPUTDIRECTORY
                         Input directory path
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -v, --verbose         anable verbose output
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
   ```
@@ -153,7 +155,7 @@ options:
 A command-line tool, `test_triangle`, has been developed for testing algorithms on randomly generated, large sparse matrices. It accepts the following options:
 
 ```bash
-usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-a] [-b] [-c] [-w] [-v] [-l] [--version]
+usage: test_triangle [-h] -d DIMENSION [-n NUM_TESTS] [-s SPARSITY] [-b] [-c] [-w] [-v] [-l] [--version]
 
 The Finlay Testing Application using randomly generated, large sparse matrices.
 
@@ -166,8 +168,9 @@ options:
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
   -w, --write           write the generated random matrix to a file in the current directory
-  -v, --verbose         anable verbose output
+  -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
 ```
