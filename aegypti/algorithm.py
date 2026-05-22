@@ -1,86 +1,53 @@
 # Modified on 04/04/2026
 # Author: Frank Vega
 
-
+import networkx as nx
 import numpy as np
 from scipy import sparse
-import networkx as nx
-from .disjoint import FastCliqueUF
+
 
 def find_triangle_coordinates(graph):
     """
     Detect a single triangle (3-clique) in an undirected NetworkX graph.
 
-    Hybrid approach:
-    1. Phase 1 -- fast path: A clique-constrained Union-Find (FastCliqueUF)
-       with *matching-first* edge ordering and *delete-on-reject*.  We
-       compute M = nx.approximation.min_maximal_matching(G) and union all
-       its edges first (each forms a 2-clique).  Then we iterate over the
-       extra (non-matching) edges; each one whose union is rejected is
-       deleted from the FastCliqueUF bitset structure (matching edges are
-       never deleted).  If any union produces a clique of size >= 3, the
-       triangle is returned.
+    This implementation maps vertices to 0..n-1 and stores each
+    neighbourhood as a Python integer bit mask.  It then scans unordered
+    vertex pairs (u, v).  If (u, v) is an edge and their masks intersect,
+    any set bit in the intersection gives a witness w such that
+    {u, v, w} is a triangle.
 
-    2. Phase 2 -- fallback: classical adjacency-intersection enumeration,
-       skipping matching edges (proof: if Phase 1 returned no triangle,
-       no matching edge is in any triangle), so the bound is
-       O((m - |M|)^{3/2}) instead of O(m^{3/2}).
-
-    Args:
-        graph (nx.Graph): undirected simple graph.
-
-    Returns:
-        Optional[FrozenSet[Hashable]]: a frozenset of three triangle
-            vertices, or None if the graph is triangle-free.
+    The outer scan performs O(n^2) pair iterations and O(n + m) setup.
+    At the bit-complexity level, each mask intersection costs O(n / word).
     """
-    from itertools import islice
-
     if not isinstance(graph, nx.Graph) or graph.is_directed():
         raise ValueError("Input must be an undirected NetworkX Graph.")
     if nx.number_of_selfloops(graph) > 0:
         raise ValueError("Graph must not contain self-loops.")
-    if graph.number_of_nodes() < 3 or graph.number_of_edges() == 0:
+
+    nodes = list(graph.nodes())
+    n = len(nodes)
+    if n < 3 or graph.number_of_edges() == 0:
         return None
 
-    disjoint_set = FastCliqueUF(graph)
+    node_to_id = {node: i for i, node in enumerate(nodes)}
+    adj_masks = [0] * n
 
-    matching = nx.approximation.min_maximal_matching(graph)
-    matching_set = set()
-    for u, v in matching:
-        matching_set.add(frozenset((u, v)))
+    for u, v in graph.edges():
+        i = node_to_id[u]
+        j = node_to_id[v]
+        adj_masks[i] |= 1 << j
+        adj_masks[j] |= 1 << i
 
-    found_in_uf = False
-
-    for u, v in matching:
-        if disjoint_set.union(u, v):
-            found_in_uf = True
-            break
-
-    if not found_in_uf:
-        for u, v in graph.edges():
-            if frozenset((u, v)) in matching_set:
+    for i in range(n - 1):
+        mask_i = adj_masks[i]
+        for j in range(i + 1, n):
+            if not (mask_i >> j) & 1:
                 continue
-            if disjoint_set.union(u, v):
-                found_in_uf = True
-                break
-            disjoint_set.delete_edge(u, v)
 
-    if found_in_uf:
-        for component in disjoint_set.to_sets():
-            if len(component) >= 3:
-                return frozenset(islice(component, 3))
-
-    adj_sets = {node: set(graph.neighbors(node)) for node in graph.nodes()}
-    rank = {node: i for i, node in enumerate(graph.nodes())}
-
-    for u in graph.nodes():
-        for v in graph.neighbors(u):
-            if rank[u] < rank[v]:
-                if frozenset((u, v)) in matching_set:
-                    continue
-                common_neighbors = adj_sets[u] & adj_sets[v]
-                for w in common_neighbors:
-                    return frozenset({u, v, w})
+            common = mask_i & adj_masks[j]
+            if common:
+                k = (common & -common).bit_length() - 1
+                return frozenset({nodes[i], nodes[j], nodes[k]})
 
     return None
 

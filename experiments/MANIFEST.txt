@@ -17,3 +17,12 @@ exp12_med_near_tf	Medium near-triangle-free with one planted triangle	n=306	m=42
 exp13_cycle_chord	8-cycle plus chord (0,2) - tiny triangle	n=8	m=9	triangles=1
 exp14_er_tf	Erdos-Renyi G(40,0.04) sampled triangle-free	n=40	m=36	triangles=0
 exp15_decoy30x2	Stress test: 30 triangles each with 2 decoy pendants per vertex	n=270	m=270	triangles=30
+
+exp16_k80_80	Dense complete bipartite K_{80,80}, triangle-free	n=160	m=6400	triangles=0
+exp17_c300	Long cycle C300, triangle-free sparse	n=300	m=300	triangles=0
+exp18_crown60	Crown graph K_{60,60} minus perfect matching, triangle-free	n=120	m=3540	triangles=0
+exp19_bipartite_dense_det	Deterministic dense bipartite graph, triangle-free	n=180	m=2833	triangles=0
+exp20_k80	Dense K80, triangle-rich	n=80	m=3160	triangles=82160
+exp21_k30_30_30	Complete tripartite K_{30,30,30}, triangle-rich	n=90	m=2700	triangles=27000
+exp22_large_cycle_planted_tri	Large cycle with one planted triangle	n=240	m=242	triangles=1
+exp23_sparse_det_planted_tri	Deterministic sparse graph with planted late triangle	n=200	m=2130	triangles=1676
