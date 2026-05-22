@@ -26,3 +26,12 @@ exp20_k80	Dense K80, triangle-rich	n=80	m=3160	triangles=82160
 exp21_k30_30_30	Complete tripartite K_{30,30,30}, triangle-rich	n=90	m=2700	triangles=27000
 exp22_large_cycle_planted_tri	Large cycle with one planted triangle	n=240	m=242	triangles=1
 exp23_sparse_det_planted_tri	Deterministic sparse graph with planted late triangle	n=200	m=2130	triangles=1676
+
+exp24_k120	Very dense K120, triangle-rich early-exit case	n=120	m=7140	triangles=280840
+exp25_k60_60_60	Complete tripartite K_{60,60,60}, many triangles	n=180	m=10800	triangles=216000
+exp26_turan4_50	Complete 4-partite Turan-style graph with many triangles	n=200	m=15000	triangles=500000
+exp27_k80_leaf_cloud	K80 dense core with 180 deterministic leaves	n=260	m=3340	triangles=82160
+exp28_four_k60_bridge	Four K60 cliques connected by sparse bridges	n=240	m=7084	triangles=136880
+exp29_bipartite_plus_k20	Dense bipartite distraction plus planted K20	n=180	m=6630	triangles=1160
+exp30_dense_det_k12_seed	Dense deterministic graph with seeded K12	n=220	m=6637	triangles=36831
+exp31_three_k70_noisy_layers	Three K70 layers with sparse deterministic cross-noise	n=210	m=7791	triangles=165832
