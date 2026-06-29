@@ -2,21 +2,27 @@ from __future__ import annotations
 
 """car/ -- 10,000-instance comparison experiment for Finlay (Aegypti).
 
-This suite runs the three triangle-detection routines shipped in the
-``aegypti`` package against an independent exact oracle, on a deterministic
-benchmark of ~10,000 small graphs spanning both density regimes of the
-Aegypti dispatch (sparse: m <= ceil(n^{4/3}); dense: m > ceil(n^{4/3})).
+This suite runs four triangle-detection routines against an independent exact
+oracle, on a deterministic benchmark of ~10,000 small graphs spanning both
+density regimes of the Aegypti dispatch (sparse: m <= ceil(n^{4/3}); dense:
+m > ceil(n^{4/3})).
 
-The three subjects are:
+The four subjects are:
 
-    1. Aegypti           algorithm.find_triangle_coordinates(graph)
-    2. Chiba-Nishizeki   algorithm.find_triangle_chiba_nishizeki(graph)
-    3. Matrix product    algorithm.is_triangle_free_brute_force(sparse_matrix)
+    1. Aegypti-safe    find_triangle_coordinates(graph, fallback=True)
+    2. Aegypti-fast    find_triangle_coordinates(graph, fallback=False)
+    3. Chiba-Nishizeki find_triangle_chiba_nishizeki(graph)
+    4. Matrix product  is_triangle_free_brute_force(sparse_matrix)
 
-Ground truth (does a triangle exist?) is computed independently of all three
-subjects by direct neighbourhood intersection over every edge, so each subject
-is scored against an oracle it does not itself produce.  For the two subjects
-that return a witness triple, the witness is additionally checked to be a real
+Aegypti-safe falls back to Chiba-Nishizeki when its dense branch is
+inconclusive, and is therefore unconditionally complete. Aegypti-fast uses the
+dense branch as-is (uniform O(n^2)); its `aegypti_fast_miss` column directly
+measures dense-branch completeness (Hypothesis 1). If the installed package
+predates the `fallback` parameter, both variants reduce to the default call.
+
+Ground truth (does a triangle exist?) is computed independently of all subjects
+by direct neighbourhood intersection over every edge. For every subject that
+returns a witness triple, the witness is additionally checked to be a real
 triangle.
 
 Run from the repository root with:
@@ -38,6 +44,7 @@ completeness for the dense branch.
 
 import argparse
 import csv
+import inspect
 import json
 import math
 import platform
@@ -65,6 +72,25 @@ try:
 except Exception:  # pragma: no cover
     AEGYPTI_VERSION = "unknown"
 
+# Whether the installed package exposes the `fallback` parameter that selects
+# the safe (complete) vs fast (uniform O(n^2)) variant. If not, both variants
+# fall back to the single default call.
+_HAS_FALLBACK = "fallback" in inspect.signature(
+    algorithm.find_triangle_coordinates).parameters
+
+
+def _aegypti_safe(G):
+    if _HAS_FALLBACK:
+        return algorithm.find_triangle_coordinates(G, fallback=True)
+    return algorithm.find_triangle_coordinates(G)
+
+
+def _aegypti_fast(G):
+    if _HAS_FALLBACK:
+        return algorithm.find_triangle_coordinates(G, fallback=False)
+    return algorithm.find_triangle_coordinates(G)
+
+
 SEED = 20260629
 OUT_DIR = Path(__file__).resolve().parent
 
@@ -81,8 +107,8 @@ def regime_of(n: int, m: int) -> str:
 def has_triangle_exact(G: nx.Graph) -> bool:
     """Exact triangle existence by direct neighbourhood intersection.
 
-    Independent of all three subjects: for every edge (u, v) it tests whether
-    u and v share a neighbour.  O(sum_e min(deg)) time, exact on small graphs.
+    Independent of all subjects: for every edge (u, v) it tests whether u and v
+    share a neighbour. O(sum_e min(deg)) time, exact on small graphs.
     """
     adj = {v: set(G.neighbors(v)) for v in G.nodes()}
     for u, v in G.edges():
@@ -111,8 +137,14 @@ def to_sparse_matrix(G: nx.Graph, n: int) -> sp.csr_matrix:
     return sp.csr_matrix(A)
 
 
+def _time(fn, *args):
+    t0 = time.perf_counter()
+    out = fn(*args)
+    return out, (time.perf_counter() - t0) * 1000.0
+
+
 # ----------------------------------------------------------------------------
-# Per-instance evaluation of all three subjects.
+# Per-instance evaluation of all four subjects.
 # ----------------------------------------------------------------------------
 def evaluate(name: str, family: str, G: nx.Graph) -> dict:
     G = nx.convert_node_labels_to_integers(G, ordering="sorted")
@@ -120,37 +152,40 @@ def evaluate(name: str, family: str, G: nx.Graph) -> dict:
     m = G.number_of_edges()
     truth = has_triangle_exact(G)
 
-    # 1) Aegypti hybrid
-    t0 = time.perf_counter()
-    aeg = algorithm.find_triangle_coordinates(G)
-    aeg_ms = (time.perf_counter() - t0) * 1000.0
-    aeg_found = aeg is not None
-    aeg_valid = (not aeg_found) or is_valid_triangle(G, aeg)
-    aeg_correct = (aeg_found == truth) and aeg_valid
+    # 1) Aegypti-safe (fallback=True): unconditionally complete.
+    safe, safe_ms = _time(_aegypti_safe, G)
+    safe_found = safe is not None
+    safe_valid = (not safe_found) or is_valid_triangle(G, safe)
+    safe_correct = (safe_found == truth) and safe_valid
 
-    # 2) Chiba-Nishizeki
-    t0 = time.perf_counter()
-    cn = algorithm.find_triangle_chiba_nishizeki(G)
-    cn_ms = (time.perf_counter() - t0) * 1000.0
+    # 2) Aegypti-fast (fallback=False): fast dense branch, misses observable.
+    fast, fast_ms = _time(_aegypti_fast, G)
+    fast_found = fast is not None
+    fast_valid = (not fast_found) or is_valid_triangle(G, fast)
+    fast_correct = (fast_found == truth) and fast_valid
+
+    # 3) Chiba-Nishizeki.
+    cn, cn_ms = _time(algorithm.find_triangle_chiba_nishizeki, G)
     cn_found = cn is not None
     cn_valid = (not cn_found) or is_valid_triangle(G, cn)
     cn_correct = (cn_found == truth) and cn_valid
 
-    # 3) Matrix multiplication baseline (True == triangle-free)
+    # 4) Matrix multiplication baseline (True == triangle-free).
     A = to_sparse_matrix(G, n)
-    t0 = time.perf_counter()
-    mm_free = algorithm.is_triangle_free_brute_force(A)
-    mm_ms = (time.perf_counter() - t0) * 1000.0
+    mm_free, mm_ms = _time(algorithm.is_triangle_free_brute_force, A)
     mm_found = not bool(mm_free)
     mm_correct = (mm_found == truth)
 
-    agree = (aeg_found == cn_found == mm_found)
+    agree = (safe_found == fast_found == cn_found == mm_found)
     return {
         "name": name, "family": family, "n": n, "m": m,
         "regime": regime_of(n, m), "truth": truth,
-        "aegypti_found": aeg_found, "aegypti_valid": aeg_valid,
-        "aegypti_correct": aeg_correct, "aegypti_ms": aeg_ms,
-        "aegypti_miss": bool(truth and not aeg_found),     # oracle says yes, Aegypti said no
+        "aegypti_safe_found": safe_found, "aegypti_safe_valid": safe_valid,
+        "aegypti_safe_correct": safe_correct, "aegypti_safe_ms": safe_ms,
+        "aegypti_safe_miss": bool(truth and not safe_found),
+        "aegypti_fast_found": fast_found, "aegypti_fast_valid": fast_valid,
+        "aegypti_fast_correct": fast_correct, "aegypti_fast_ms": fast_ms,
+        "aegypti_fast_miss": bool(truth and not fast_found),
         "chiba_found": cn_found, "chiba_valid": cn_valid,
         "chiba_correct": cn_correct, "chiba_ms": cn_ms,
         "matmul_found": mm_found, "matmul_correct": mm_correct, "matmul_ms": mm_ms,
@@ -253,13 +288,18 @@ def summarise(rows: list[dict]) -> dict:
     return {
         "instances": len(rows),
         "truth_positive": sum(1 for r in rows if r["truth"]),
-        "aegypti_correct": sum(1 for r in rows if r["aegypti_correct"]),
+        "aegypti_safe_correct": sum(1 for r in rows if r["aegypti_safe_correct"]),
+        "aegypti_safe_misses": sum(1 for r in rows if r["aegypti_safe_miss"]),
+        "aegypti_fast_correct": sum(1 for r in rows if r["aegypti_fast_correct"]),
+        "aegypti_fast_misses": sum(1 for r in rows if r["aegypti_fast_miss"]),
         "chiba_correct": sum(1 for r in rows if r["chiba_correct"]),
         "matmul_correct": sum(1 for r in rows if r["matmul_correct"]),
-        "aegypti_misses": sum(1 for r in rows if r["aegypti_miss"]),
-        "invalid_witnesses": sum(1 for r in rows if not (r["aegypti_valid"] and r["chiba_valid"])),
+        "invalid_witnesses": sum(
+            1 for r in rows
+            if not (r["aegypti_safe_valid"] and r["aegypti_fast_valid"] and r["chiba_valid"])),
         "all_agree": sum(1 for r in rows if r["all_agree"]),
-        "mean_aegypti_ms": _mean([r["aegypti_ms"] for r in rows]),
+        "mean_aegypti_safe_ms": _mean([r["aegypti_safe_ms"] for r in rows]),
+        "mean_aegypti_fast_ms": _mean([r["aegypti_fast_ms"] for r in rows]),
         "mean_chiba_ms": _mean([r["chiba_ms"] for r in rows]),
         "mean_matmul_ms": _mean([r["matmul_ms"] for r in rows]),
     }
@@ -304,29 +344,34 @@ def main() -> None:
     by_regime = {reg: summarise([r for r in rows if r["regime"] == reg])
                  for reg in sorted({r["regime"] for r in rows})}
 
-    n_correct_aeg = overall["aegypti_correct"]
     n = overall["instances"]
     result = {
-        "experiment": "car/ 10,000-instance three-algorithm triangle comparison for Finlay",
+        "experiment": "car/ 10,000-instance four-subject triangle comparison for Finlay",
         "aegypti_version": AEGYPTI_VERSION,
+        "fallback_parameter_available": _HAS_FALLBACK,
         "seed": SEED,
         "subjects": {
-            "aegypti": "algorithm.find_triangle_coordinates",
-            "chiba_nishizeki": "algorithm.find_triangle_chiba_nishizeki",
-            "matrix_multiplication": "algorithm.is_triangle_free_brute_force",
+            "aegypti_safe": "find_triangle_coordinates(G, fallback=True)"
+                            + ("" if _HAS_FALLBACK else "  [parameter unavailable: default call]"),
+            "aegypti_fast": "find_triangle_coordinates(G, fallback=False)"
+                            + ("" if _HAS_FALLBACK else "  [parameter unavailable: default call]"),
+            "chiba_nishizeki": "find_triangle_chiba_nishizeki(G)",
+            "matrix_multiplication": "is_triangle_free_brute_force(A)",
         },
         "oracle": "independent exact neighbourhood-intersection triangle test",
         "conclusion": {
             "instances": n,
-            "aegypti_correct": n_correct_aeg,
-            "aegypti_accuracy": (n_correct_aeg / n) if n else None,
-            "aegypti_misses": overall["aegypti_misses"],
+            "aegypti_safe_correct": overall["aegypti_safe_correct"],
+            "aegypti_safe_misses": overall["aegypti_safe_misses"],
+            "aegypti_fast_correct": overall["aegypti_fast_correct"],
+            "aegypti_fast_misses": overall["aegypti_fast_misses"],
             "chiba_correct": overall["chiba_correct"],
             "matmul_correct": overall["matmul_correct"],
             "invalid_witnesses": overall["invalid_witnesses"],
-            "all_three_agree": overall["all_agree"],
-            "all_correct": n_correct_aeg == overall["chiba_correct"] == overall["matmul_correct"] == n,
-            "scope_warning": "Finite small-graph evidence with exact oracles; not a worst-case completeness proof for the dense branch.",
+            "all_four_agree": overall["all_agree"],
+            "safe_all_correct": overall["aegypti_safe_correct"] == n,
+            "scope_warning": "Finite small-graph evidence with exact oracles; "
+                             "not a worst-case completeness proof for the fast dense branch.",
         },
         "overall_summary": overall,
         "summary_by_family": by_family,
@@ -352,9 +397,11 @@ def main() -> None:
             w.writerows(rows)
 
     # Summary CSV.
-    summ_cols = ["scope", "instances", "truth_positive", "aegypti_correct",
-                 "chiba_correct", "matmul_correct", "aegypti_misses",
-                 "invalid_witnesses", "all_agree", "mean_aegypti_ms",
+    summ_cols = ["scope", "instances", "truth_positive",
+                 "aegypti_safe_correct", "aegypti_safe_misses",
+                 "aegypti_fast_correct", "aegypti_fast_misses",
+                 "chiba_correct", "matmul_correct", "invalid_witnesses", "all_agree",
+                 "mean_aegypti_safe_ms", "mean_aegypti_fast_ms",
                  "mean_chiba_ms", "mean_matmul_ms"]
     with (OUT_DIR / "car_summary.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=summ_cols)
@@ -367,44 +414,55 @@ def main() -> None:
             w.writerow(row)
 
     # Human-readable report.
+    tbl_cols = ["instances", "truth_positive",
+                "aegypti_safe_correct", "aegypti_fast_correct", "aegypti_fast_misses",
+                "chiba_correct", "matmul_correct",
+                "mean_aegypti_safe_ms", "mean_aegypti_fast_ms",
+                "mean_chiba_ms", "mean_matmul_ms"]
     fam_rows = [{"family": k, **v} for k, v in by_family.items()]
     reg_rows = [{"regime": k, **v} for k, v in by_regime.items()]
     report = f"""# Finlay (Aegypti) CAR Experiment
 
 Generated: {datetime.now(timezone.utc).isoformat()}
 Aegypti version imported: {AEGYPTI_VERSION}
+`fallback` parameter available: {_HAS_FALLBACK}
 Seed: {SEED}
 
-This report compares three triangle-detection routines from the installed
-`aegypti` package on {n} deterministic small-graph instances, scored against an
-independent exact triangle oracle.
+This report compares four triangle-detection routines on {n} deterministic
+small-graph instances, scored against an independent exact triangle oracle.
 
 Subjects:
-1. **Aegypti** -- `find_triangle_coordinates` (hybrid, O(n^2) worst case)
-2. **Chiba-Nishizeki** -- `find_triangle_chiba_nishizeki` (O(m^{{3/2}}))
-3. **Matrix multiplication** -- `is_triangle_free_brute_force` (O(n^{{2.37}}))
+1. **Aegypti-safe** -- `find_triangle_coordinates(G, fallback=True)` (unconditionally complete, O(m^{{3/2}}) worst case)
+2. **Aegypti-fast** -- `find_triangle_coordinates(G, fallback=False)` (uniform O(n^2); dense branch may miss)
+3. **Chiba-Nishizeki** -- `find_triangle_chiba_nishizeki(G)` (O(m^{{3/2}}))
+4. **Matrix multiplication** -- `is_triangle_free_brute_force(A)` (O(n^{{2.37}}))
 
 ## Headline
 
-- Instances: {n}
-- Aegypti correct: {n_correct_aeg}/{n}
-- Aegypti misses (oracle says triangle, Aegypti said none): {overall['aegypti_misses']}
+- Instances: {n}  (with a triangle: {overall['truth_positive']})
+- Aegypti-safe correct: {overall['aegypti_safe_correct']}/{n}  (misses: {overall['aegypti_safe_misses']})
+- Aegypti-fast correct: {overall['aegypti_fast_correct']}/{n}  (dense-branch misses: {overall['aegypti_fast_misses']})
 - Chiba-Nishizeki correct: {overall['chiba_correct']}/{n}
 - Matrix multiplication correct: {overall['matmul_correct']}/{n}
 - Invalid witnesses returned: {overall['invalid_witnesses']}
-- All three agree: {overall['all_agree']}/{n}
+- All four agree: {overall['all_agree']}/{n}
 
-Scope: finite small-graph evidence with exact oracles; this is a reproducible
-regression / integrity check, not a worst-case completeness proof for the dense
-branch of Aegypti.
+`aegypti_fast_misses` is the empirical content of Hypothesis 1: the number of
+triangle-containing inputs on which the fast dense branch left fewer than three
+vertices uncovered. Aegypti-safe converts any such case into a correct answer
+via its Chiba-Nishizeki fallback.
+
+Scope: finite small-graph evidence with exact oracles; a reproducible
+regression / integrity check, not a worst-case completeness proof for the fast
+dense branch.
 
 ## By regime
 
-{_md_table(reg_rows, ["regime", "instances", "truth_positive", "aegypti_correct", "chiba_correct", "matmul_correct", "aegypti_misses", "mean_aegypti_ms", "mean_chiba_ms", "mean_matmul_ms"])}
+{_md_table(reg_rows, ["regime"] + tbl_cols)}
 
 ## By family
 
-{_md_table(fam_rows, ["family", "instances", "truth_positive", "aegypti_correct", "chiba_correct", "matmul_correct", "aegypti_misses", "mean_aegypti_ms", "mean_chiba_ms", "mean_matmul_ms"])}
+{_md_table(fam_rows, ["family"] + tbl_cols)}
 
 ## Reproduction
 

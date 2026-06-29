@@ -181,6 +181,30 @@ It generates random square matrices with configurable dimensions (`-d`), sparsit
 
 ---
 
+# Car Experiment
+
+The `car/` directory contains a reproducible comparison experiment that runs four triangle-detection routines against an independent exact triangle oracle. `find_triangle_coordinates` is run in both of its modes:
+
+| Subject | Function | Notes |
+| ------- | -------- | ----- |
+| **Aegypti-safe** | `find_triangle_coordinates(graph, fallback=True)` | Unconditionally complete; falls back to Chiba–Nishizeki when the dense branch is inconclusive (`O(m^{3/2})` worst case). |
+| **Aegypti-fast** | `find_triangle_coordinates(graph, fallback=False)` | Uniform `O(n^2)`; the dense branch may return `None` on a triangle-containing graph. |
+| **Chiba–Nishizeki** | `find_triangle_chiba_nishizeki(graph)` | Exact, `O(m^{3/2})`. |
+| **Matrix multiplication** | `is_triangle_free_brute_force(sparse_matrix)` | Reference baseline, `O(n^{2.37})`. |
+
+`car/car_experiment.py` builds a deterministic benchmark of ~10,000 small graphs (fixed seed) drawn from six families that span both regimes of the Aegypti dispatch — sparse (`m ≤ ⌈n^{4/3}⌉`) and dense (`m > ⌈n^{4/3}⌉`): sparse and dense Erdős–Rényi graphs, triangle-free bipartite graphs, planted-triangle sparse graphs, planted-clique dense graphs, and structured graphs (complete, even cycles, wheels, complete bipartite, random regular). Each instance is scored against an exact neighbourhood-intersection oracle, and every returned witness is checked to be a genuine triangle.
+
+Run it from the repository root:
+
+```bash
+python car/car_experiment.py            # full ~10,000-instance suite
+python car/car_experiment.py --quick    # smaller, faster sweep
+```
+
+It writes `car_experiment.json`, `car_summary.csv`, `car_by_instance.csv`, and a human-readable `CAR_REPORT.md` into the `car/` folder. The key column `aegypti_fast_miss` flags any instance where the oracle finds a triangle but the fast dense branch returns none — the empirical content of the Hvala independent-set hypothesis. Aegypti-safe converts every such case into a correct answer through its fallback. (If the installed package predates the `fallback` parameter, both variants reduce to the default call.)
+
+---
+
 # Code
 
 - Python code by **Frank Vega**.
