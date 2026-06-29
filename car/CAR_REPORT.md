@@ -1,55 +1,58 @@
 # Finlay (Aegypti) CAR Experiment
 
-Generated: 2026-06-29T15:56:13.562322+00:00
-Aegypti version imported: unknown
-`fallback` parameter available: True
+Generated: 2026-06-29T16:43:54.999217+00:00
+Aegypti version: unknown   `fallback` param: True   Hvala diagnostics: True
 Seed: 20260629
 
-This report compares four triangle-detection routines on 9986 deterministic
-small-graph instances, scored against an independent exact triangle oracle.
-
-Subjects:
-1. **Aegypti-safe** -- `find_triangle_coordinates(G, fallback=True)` (unconditionally complete, O(m^{3/2}) worst case)
-2. **Aegypti-fast** -- `find_triangle_coordinates(G, fallback=False)` (uniform O(n^2); dense branch may miss)
-3. **Chiba-Nishizeki** -- `find_triangle_chiba_nishizeki(G)` (O(m^{3/2}))
-4. **Matrix multiplication** -- `is_triangle_free_brute_force(A)` (O(n^{2.37}))
+Four subjects on 12330 instances, scored against an independent exact oracle:
+**Aegypti-safe** `(fallback=True)`, **Aegypti-fast** `(fallback=False)`,
+**Chiba-Nishizeki**, and **matrix multiplication**. The benchmark adds dense
+small-clique families (complete tri-/four-partite, balanced bipartite + one
+edge) and an exhaustive sweep of all graphs with n <= 7 (Graph Atlas), to
+stress the fast dense branch.
 
 ## Headline
 
-- Instances: 9986  (with a triangle: 6680)
-- Aegypti-safe correct: 9986/9986  (misses: 0)
-- Aegypti-fast correct: 9986/9986  (dense-branch misses: 0)
-- Chiba-Nishizeki correct: 9986/9986
-- Matrix multiplication correct: 9986/9986
-- Invalid witnesses returned: 0
-- All four agree: 9986/9986
+- Instances: 12330  (with a triangle: 8860)
+- Aegypti-safe correct: 12330/12330  (misses: 0)
+- Aegypti-fast correct: 12330/12330  (dense-branch misses: 0)
+- Chiba-Nishizeki correct: 12330/12330
+- Matrix multiplication correct: 12330/12330
+- Invalid witnesses: 0    All four agree: 12330/12330
 
-`aegypti_fast_misses` is the empirical content of Hypothesis 1: the number of
-triangle-containing inputs on which the fast dense branch left fewer than three
-vertices uncovered. Aegypti-safe converts any such case into a correct answer
-via its Chiba-Nishizeki fallback.
+### Dense-branch diagnostics (Hypothesis 1)
 
-Scope: finite small-graph evidence with exact oracles; a reproducible
-regression / integrity check, not a worst-case completeness proof for the fast
-dense branch.
+- Dense-regime instances: 5639  (triangle-containing: 4799)
+- Fast dense-branch misses on positives: 0
+- Safe fallback triggered: 840
+- Max |C| / OPT_VC(complement) observed: 1.2000
+- Min |V\C| over triangle-containing dense instances: 3
+
+`fast_dense_misses` is the empirical content of Hypothesis 1: triangle-containing
+dense inputs on which the fast branch left fewer than three vertices uncovered.
+Aegypti-safe converts each into a correct answer via its fallback.
 
 ## By regime
 
-| regime | instances | truth_positive | aegypti_safe_correct | aegypti_fast_correct | aegypti_fast_misses | chiba_correct | matmul_correct | mean_aegypti_safe_ms | mean_aegypti_fast_ms | mean_chiba_ms | mean_matmul_ms |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| dense | 4448 | 3608 | 4448 | 4448 | 0 | 4448 | 4448 | 1.4823 | 1.4541 | 0.1564 | 0.1614 |
-| sparse | 5538 | 3072 | 5538 | 5538 | 0 | 5538 | 5538 | 0.0841 | 0.0725 | 0.0571 | 0.1142 |
+| regime | instances | truth_positive | aegypti_fast_misses | dense_instances | dense_positives | fallback_triggered | max_cover_ratio | min_uncovered_on_positive | mean_aegypti_fast_ms | mean_chiba_ms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| dense | 5639 | 4799 | 0 | 5639 | 4799 | 840 | 1.2000 | 3 | 1.3420 | 0.0344 |
+| sparse | 6691 | 4061 | 0 | 0 | 0 | 0 | -- | -- | 0.0303 | 0.0193 |
 
 ## By family
 
-| family | instances | truth_positive | aegypti_safe_correct | aegypti_fast_correct | aegypti_fast_misses | chiba_correct | matmul_correct | mean_aegypti_safe_ms | mean_aegypti_fast_ms | mean_chiba_ms | mean_matmul_ms |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| er_dense | 2500 | 2500 | 2500 | 2500 | 0 | 2500 | 2500 | 1.4391 | 1.4444 | 0.1668 | 0.1743 |
-| er_sparse | 2486 | 1139 | 2486 | 2486 | 0 | 2486 | 2486 | 0.0889 | 0.0795 | 0.0628 | 0.1166 |
-| planted_clique | 1000 | 1000 | 1000 | 1000 | 0 | 1000 | 1000 | 1.4114 | 1.3818 | 0.1267 | 0.1579 |
-| planted_triangle | 1500 | 1500 | 1500 | 1500 | 0 | 1500 | 1500 | 0.0814 | 0.0730 | 0.0562 | 0.1116 |
-| structured | 1000 | 541 | 1000 | 1000 | 0 | 1000 | 1000 | 0.2633 | 0.2169 | 0.0720 | 0.1174 |
-| tri_free_bipartite | 1500 | 0 | 1500 | 1500 | 0 | 1500 | 1500 | 0.9622 | 0.9018 | 0.1037 | 0.1213 |
+| family | instances | truth_positive | aegypti_fast_misses | dense_instances | dense_positives | fallback_triggered | max_cover_ratio | min_uncovered_on_positive | mean_aegypti_fast_ms | mean_chiba_ms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| atlas_exhaustive_n<=7 | 1244 | 1080 | 0 | 91 | 91 | 0 | 1.0000 | 3 | 0.0208 | 0.0071 |
+| er_dense | 2500 | 2500 | 0 | 2425 | 2425 | 0 | 1.2000 | 3 | 1.4220 | 0.0284 |
+| er_sparse | 2486 | 1139 | 0 | 0 | 0 | 0 | -- | -- | 0.0360 | 0.0228 |
+| near_turan | 400 | 400 | 0 | 400 | 400 | 0 | 1.0000 | 3 | 1.7064 | 0.0228 |
+| omega3_tripartite | 400 | 400 | 0 | 400 | 400 | 0 | 1.0000 | 3 | 0.6693 | 0.0177 |
+| omega4_fourpartite | 300 | 300 | 0 | 300 | 300 | 0 | 1.0000 | 4 | 0.6575 | 0.0202 |
+| planted_clique | 1000 | 1000 | 0 | 987 | 987 | 0 | 1.1667 | 3 | 1.3897 | 0.0251 |
+| planted_triangle | 1500 | 1500 | 0 | 0 | 0 | 0 | -- | -- | 0.0342 | 0.0205 |
+| structured | 1000 | 541 | 0 | 365 | 196 | 169 | 1.0000 | 3 | 0.2026 | 0.0267 |
+| tri_free_bipartite | 1500 | 0 | 0 | 671 | 0 | 671 | 1.0000 | -- | 0.8725 | 0.0543 |
 
 ## Reproduction
 

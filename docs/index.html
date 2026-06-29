@@ -165,7 +165,7 @@ options:
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(n + m^{3/2}) adjacency-intersection baseline
   -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
@@ -186,7 +186,7 @@ options:
   -i INPUTDIRECTORY, --inputDirectory INPUTDIRECTORY
                         Input directory path
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(n + m^{3/2}) adjacency-intersection baseline
   -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
@@ -206,7 +206,7 @@ options:
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(n + m^{3/2}) adjacency-intersection baseline
   -w, --write           write the generated random matrix to a file in the current directory
   -v, --verbose         enable verbose output
   -l, --log             enable file logging
@@ -229,28 +229,28 @@ options:
 <tr>
 <td><strong>Aegypti-safe</strong></td>
 <td><code>find_triangle_coordinates(graph, fallback=True)</code></td>
-<td>Unconditionally complete; falls back to Chiba–Nishizeki when the dense branch is inconclusive (<code>O(m^{3/2})</code> worst case).</td>
+<td>Unconditionally complete; falls back to Chiba–Nishizeki when the dense branch is inconclusive (<code>O(n + m^{3/2})</code> worst case).</td>
 </tr>
 <tr>
 <td><strong>Aegypti-fast</strong></td>
 <td><code>find_triangle_coordinates(graph, fallback=False)</code></td>
-<td>Uniform <code>O(n^2)</code>; the dense branch may return <code>None</code> on a triangle-containing graph.</td>
+<td>Uniform <code>O(n^2)</code> one-sided certifier; the dense branch may return <code>None</code> on a triangle-containing graph. Default mode.</td>
 </tr>
 <tr>
 <td><strong>Chiba–Nishizeki</strong></td>
 <td><code>find_triangle_chiba_nishizeki(graph)</code></td>
-<td>Exact, <code>O(m^{3/2})</code>.</td>
+<td>Exact, <code>O(n + m^{3/2})</code>.</td>
 </tr>
 <tr>
 <td><strong>Matrix multiplication</strong></td>
 <td><code>is_triangle_free_brute_force(sparse_matrix)</code></td>
-<td>Reference baseline, <code>O(n^{2.37})</code>.</td>
+<td>Reference baseline.</td>
 </tr>
 </tbody>
 </table>
-<p><code>car/car_experiment.py</code> builds a deterministic benchmark of ~10,000 small graphs (fixed seed) drawn from six families that span both regimes of the Aegypti dispatch — sparse (<code>m ≤ ⌈n^{4/3}⌉</code>) and dense (<code>m &gt; ⌈n^{4/3}⌉</code>): sparse and dense Erdős–Rényi graphs, triangle-free bipartite graphs, planted-triangle sparse graphs, planted-clique dense graphs, and structured graphs (complete, even cycles, wheels, complete bipartite, random regular). Each instance is scored against an exact neighbourhood-intersection oracle, and every returned witness is checked to be a genuine triangle.</p>
+<p><code>car/car_experiment.py</code> builds a deterministic benchmark (~12,000 instances, fixed seed) spanning both regimes of the Aegypti dispatch — sparse (<code>m ≤ ⌈n^{4/3}⌉</code>) and dense (<code>m &gt; ⌈n^{4/3}⌉</code>). It combines random/structured families (sparse and dense Erdős–Rényi, triangle-free bipartite, planted-triangle, planted-clique, structured), <strong>adversarial dense small-clique families</strong> (complete tripartite ω=3, complete 4-partite ω=4, balanced bipartite + one edge ω=3) that stress the fast dense branch, and an <strong>exhaustive sweep of all graphs on ≤ 7 vertices</strong> (Graph Atlas). Each instance is scored against an exact neighbourhood-intersection oracle; every witness is checked to be a genuine triangle; and for dense instances the Hvala-cover diagnostics (<code>|C|</code>, <code>|V∖C|</code>, <code>ω(G)</code>, <code>|C|/OPT</code>, fallback flag) are recorded.</p>
 <p>Run it from the repository root:</p>
-<pre><code class="language-bash">python car/car_experiment.py            # full ~10,000-instance suite
+<pre><code class="language-bash">python car/car_experiment.py            # full suite
 python car/car_experiment.py --quick    # smaller, faster sweep
 </code></pre>
 <p>It writes <code>car_experiment.json</code>, <code>car_summary.csv</code>, <code>car_by_instance.csv</code>, and a human-readable <code>CAR_REPORT.md</code> into the <code>car/</code> folder. The key column <code>aegypti_fast_miss</code> flags any instance where the oracle finds a triangle but the fast dense branch returns none — the empirical content of the Hvala independent-set hypothesis. Aegypti-safe converts every such case into a correct answer through its fallback. (If the installed package predates the <code>fallback</code> parameter, both variants reduce to the default call.)</p>

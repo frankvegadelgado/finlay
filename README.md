@@ -114,7 +114,7 @@ options:
   -i INPUTFILE, --inputFile INPUTFILE
                         input file path
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(n + m^{3/2}) adjacency-intersection baseline
   -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
@@ -144,7 +144,7 @@ options:
   -i INPUTDIRECTORY, --inputDirectory INPUTDIRECTORY
                         Input directory path
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(n + m^{3/2}) adjacency-intersection baseline
   -v, --verbose         enable verbose output
   -l, --log             enable file logging
   --version             show program's version number and exit
@@ -168,7 +168,7 @@ options:
   -s SPARSITY, --sparsity SPARSITY
                         sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)
   -b, --bruteForce      compare with a brute-force approach using matrix multiplication
-  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline
+  -c, --combinatorial   compare with the classical Chiba-Nishizeki O(n + m^{3/2}) adjacency-intersection baseline
   -w, --write           write the generated random matrix to a file in the current directory
   -v, --verbose         enable verbose output
   -l, --log             enable file logging
@@ -187,17 +187,17 @@ The `car/` directory contains a reproducible comparison experiment that runs fou
 
 | Subject | Function | Notes |
 | ------- | -------- | ----- |
-| **Aegypti-safe** | `find_triangle_coordinates(graph, fallback=True)` | Unconditionally complete; falls back to Chiba–Nishizeki when the dense branch is inconclusive (`O(m^{3/2})` worst case). |
-| **Aegypti-fast** | `find_triangle_coordinates(graph, fallback=False)` | Uniform `O(n^2)`; the dense branch may return `None` on a triangle-containing graph. |
-| **Chiba–Nishizeki** | `find_triangle_chiba_nishizeki(graph)` | Exact, `O(m^{3/2})`. |
-| **Matrix multiplication** | `is_triangle_free_brute_force(sparse_matrix)` | Reference baseline, `O(n^{2.37})`. |
+| **Aegypti-safe** | `find_triangle_coordinates(graph, fallback=True)` | Unconditionally complete; falls back to Chiba–Nishizeki when the dense branch is inconclusive (`O(n + m^{3/2})` worst case). |
+| **Aegypti-fast** | `find_triangle_coordinates(graph, fallback=False)` | Uniform `O(n^2)` one-sided certifier; the dense branch may return `None` on a triangle-containing graph. Default mode. |
+| **Chiba–Nishizeki** | `find_triangle_chiba_nishizeki(graph)` | Exact, `O(n + m^{3/2})`. |
+| **Matrix multiplication** | `is_triangle_free_brute_force(sparse_matrix)` | Reference baseline. |
 
-`car/car_experiment.py` builds a deterministic benchmark of ~10,000 small graphs (fixed seed) drawn from six families that span both regimes of the Aegypti dispatch — sparse (`m ≤ ⌈n^{4/3}⌉`) and dense (`m > ⌈n^{4/3}⌉`): sparse and dense Erdős–Rényi graphs, triangle-free bipartite graphs, planted-triangle sparse graphs, planted-clique dense graphs, and structured graphs (complete, even cycles, wheels, complete bipartite, random regular). Each instance is scored against an exact neighbourhood-intersection oracle, and every returned witness is checked to be a genuine triangle.
+`car/car_experiment.py` builds a deterministic benchmark (~12,000 instances, fixed seed) spanning both regimes of the Aegypti dispatch — sparse (`m ≤ ⌈n^{4/3}⌉`) and dense (`m > ⌈n^{4/3}⌉`). It combines random/structured families (sparse and dense Erdős–Rényi, triangle-free bipartite, planted-triangle, planted-clique, structured), **adversarial dense small-clique families** (complete tripartite ω=3, complete 4-partite ω=4, balanced bipartite + one edge ω=3) that stress the fast dense branch, and an **exhaustive sweep of all graphs on ≤ 7 vertices** (Graph Atlas). Each instance is scored against an exact neighbourhood-intersection oracle; every witness is checked to be a genuine triangle; and for dense instances the Hvala-cover diagnostics (`|C|`, `|V∖C|`, `ω(G)`, `|C|/OPT`, fallback flag) are recorded.
 
 Run it from the repository root:
 
 ```bash
-python car/car_experiment.py            # full ~10,000-instance suite
+python car/car_experiment.py            # full suite
 python car/car_experiment.py --quick    # smaller, faster sweep
 ```
 

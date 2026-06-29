@@ -15,8 +15,8 @@ def find_triangle_coordinates(graph, fallback=False):
     The algorithm splits on density at the threshold ceil(n^{4/3}):
 
       * Sparse regime (m <= ceil(n^{4/3})): run the Chiba-Nishizeki
-        adjacency-intersection routine, which is exact and costs O(m^{3/2})
-        = O(n^2) on inputs this sparse.
+        adjacency-intersection routine, which is exact and costs
+        O(n + m^{3/2}) = O(n^2) on inputs this sparse.
 
       * Dense regime (m > ceil(n^{4/3})): build the complement and cover it
         with the linear-time Hvala vertex cover. The vertices left uncovered
@@ -35,7 +35,7 @@ def find_triangle_coordinates(graph, fallback=False):
         inconclusive (fewer than three uncovered vertices, or the O(1)
         certification fails), the exact Chiba-Nishizeki routine is run as a
         fallback, so the detector is UNCONDITIONALLY sound and complete. The
-        worst-case running time is O(m^{3/2}).
+        worst-case running time is O(n + m^{3/2}).
 
     Args:
         graph: an undirected NetworkX Graph without self-loops.
@@ -93,9 +93,19 @@ def is_triangle_free_brute_force(adj_matrix):
 
 
 def find_triangle_chiba_nishizeki(graph):
-    """Standalone classical Chiba--Nishizeki O(m^{3/2}) baseline."""
-    import heapq
+    """Standalone classical Chiba--Nishizeki O(n + m^{3/2}) triangle detector.
 
+    Scans each edge once and searches the smaller of the two endpoints'
+    adjacency sets for a common neighbour. A common neighbour, together with
+    the edge, is a triangle. The scan costs
+
+        sum_{(u, v) in E} min(deg(u), deg(v)) = O(m^{3/2}),
+
+    the standard Chiba--Nishizeki bound; together with the O(n + m)
+    construction of the adjacency sets over all n vertices (including isolated
+    ones), the worst-case running time is O(n + m^{3/2}). No vertex ordering is
+    required for correctness or for the time bound.
+    """
     if not isinstance(graph, nx.Graph) or graph.is_directed():
         raise ValueError("Input must be an undirected NetworkX Graph.")
     if nx.number_of_selfloops(graph) > 0:
@@ -104,36 +114,9 @@ def find_triangle_chiba_nishizeki(graph):
         return None
 
     adj = {v: set(graph.neighbors(v)) for v in graph.nodes()}
-    remaining = {v: set(neigh) for v, neigh in adj.items()}
-    rank = {}
-    order = []
-    heap = [(len(remaining[v]), v) for v in remaining]
-    heapq.heapify(heap)
-    removed = set()
-    while heap:
-        d, v = heapq.heappop(heap)
-        if v in removed:
-            continue
-        if len(remaining[v]) != d:
-            heapq.heappush(heap, (len(remaining[v]), v))
-            continue
-        rank[v] = len(order)
-        order.append(v)
-        removed.add(v)
-        for w in list(remaining[v]):
-            remaining[w].discard(v)
-            heapq.heappush(heap, (len(remaining[w]), w))
-        remaining[v].clear()
-
     for u, v in graph.edges():
-        if rank[u] > rank[v]:
-            u, v = v, u
-        a_u = adj[u]
-        a_v = adj[v]
-        if len(a_u) > len(a_v):
-            small, large = a_v, a_u
-        else:
-            small, large = a_u, a_v
+        a_u, a_v = adj[u], adj[v]
+        small, large = (a_u, a_v) if len(a_u) <= len(a_v) else (a_v, a_u)
         for w in small:
             if w != u and w != v and w in large:
                 return frozenset({u, v, w})

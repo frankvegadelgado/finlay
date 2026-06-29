@@ -28,7 +28,7 @@ def main():
     helper.add_argument('-n', '--num_tests', type=int, default=5, help="an integer specifying the number of tests to run")
     helper.add_argument('-s', '--sparsity', type=restricted_float, default=0.95, help="sparsity of the matrices (0.0 for dense, close to 1.0 for very sparse)")
     helper.add_argument('-b', '--bruteForce', action='store_true', help='compare with a brute-force approach using matrix multiplication')
-    helper.add_argument('-c', '--combinatorial', action='store_true', help='compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline')
+    helper.add_argument('-c', '--combinatorial', action='store_true', help='compare with the classical Chiba-Nishizeki O(n + m^{3/2}) adjacency-intersection baseline')
     helper.add_argument('-w', '--write', action='store_true', help='write the generated random matrix to a file in the current directory')
     helper.add_argument('-v', '--verbose', action='store_true', help='enable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')

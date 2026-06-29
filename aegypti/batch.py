@@ -22,7 +22,7 @@ def main():
     helper = argparse.ArgumentParser(prog="batch_triangle", description="Solve the Triangle-Free Problem for all undirected graphs encoded in DIMACS format and stored in a directory.")
     helper.add_argument('-i', '--inputDirectory', type=str, help='Input directory path', required=True)
     helper.add_argument('-b', '--bruteForce', action='store_true', help='compare with a brute-force approach using matrix multiplication')
-    helper.add_argument('-c', '--combinatorial', action='store_true', help='compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline')
+    helper.add_argument('-c', '--combinatorial', action='store_true', help='compare with the classical Chiba-Nishizeki O(n + m^{3/2}) adjacency-intersection baseline')
     helper.add_argument('-v', '--verbose', action='store_true', help='enable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
     helper.add_argument('--version', action='version', version='%(prog)s 0.4.4')
