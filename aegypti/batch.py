@@ -25,7 +25,7 @@ def main():
     helper.add_argument('-c', '--combinatorial', action='store_true', help='compare with the classical Chiba-Nishizeki O(m^{3/2}) adjacency-intersection baseline')
     helper.add_argument('-v', '--verbose', action='store_true', help='enable verbose output')
     helper.add_argument('-l', '--log', action='store_true', help='enable file logging')
-    helper.add_argument('--version', action='version', version='%(prog)s 0.4.3')
+    helper.add_argument('--version', action='version', version='%(prog)s 0.4.4')
 
     # Initialize the parameters
     args = helper.parse_args()
