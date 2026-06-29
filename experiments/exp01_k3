@@ -1,5 +1,0 @@
-c Tiny K3: smallest possible triangle
-p edge 3 3
-e 1 2
-e 1 3
-e 2 3

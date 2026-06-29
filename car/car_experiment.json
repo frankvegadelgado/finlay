@@ -1,0 +1,152 @@
+{
+  "aegypti_version": "unknown",
+  "conclusion": {
+    "aegypti_accuracy": 1.0,
+    "aegypti_correct": 9986,
+    "aegypti_misses": 0,
+    "all_correct": true,
+    "all_three_agree": 9986,
+    "chiba_correct": 9986,
+    "instances": 9986,
+    "invalid_witnesses": 0,
+    "matmul_correct": 9986,
+    "scope_warning": "Finite small-graph evidence with exact oracles; not a worst-case completeness proof for the dense branch."
+  },
+  "elapsed_seconds": 14.30500078201294,
+  "environment": {
+    "networkx": "3.6.1",
+    "numpy": "2.4.6",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.3",
+    "scipy": "unknown"
+  },
+  "experiment": "car/ 10,000-instance three-algorithm triangle comparison for Finlay",
+  "oracle": "independent exact neighbourhood-intersection triangle test",
+  "overall_summary": {
+    "aegypti_correct": 9986,
+    "aegypti_misses": 0,
+    "all_agree": 9986,
+    "chiba_correct": 9986,
+    "instances": 9986,
+    "invalid_witnesses": 0,
+    "matmul_correct": 9986,
+    "mean_aegypti_ms": 0.7047486481557182,
+    "mean_chiba_ms": 0.10395846153129525,
+    "mean_matmul_ms": 0.13638082326996245,
+    "truth_positive": 6680
+  },
+  "seed": 20260629,
+  "subjects": {
+    "aegypti": "algorithm.find_triangle_coordinates",
+    "chiba_nishizeki": "algorithm.find_triangle_chiba_nishizeki",
+    "matrix_multiplication": "algorithm.is_triangle_free_brute_force"
+  },
+  "summary_by_family": {
+    "er_dense": {
+      "aegypti_correct": 2500,
+      "aegypti_misses": 0,
+      "all_agree": 2500,
+      "chiba_correct": 2500,
+      "instances": 2500,
+      "invalid_witnesses": 0,
+      "matmul_correct": 2500,
+      "mean_aegypti_ms": 1.5058998799649999,
+      "mean_chiba_ms": 0.17058251998387278,
+      "mean_matmul_ms": 0.17835987939033657,
+      "truth_positive": 2500
+    },
+    "er_sparse": {
+      "aegypti_correct": 2486,
+      "aegypti_misses": 0,
+      "all_agree": 2486,
+      "chiba_correct": 2486,
+      "instances": 2486,
+      "invalid_witnesses": 0,
+      "matmul_correct": 2486,
+      "mean_aegypti_ms": 0.087892237257614,
+      "mean_chiba_ms": 0.06619967697341855,
+      "mean_matmul_ms": 0.12106025757827014,
+      "truth_positive": 1139
+    },
+    "planted_clique": {
+      "aegypti_correct": 1000,
+      "aegypti_misses": 0,
+      "all_agree": 1000,
+      "chiba_correct": 1000,
+      "instances": 1000,
+      "invalid_witnesses": 0,
+      "matmul_correct": 1000,
+      "mean_aegypti_ms": 1.3677763997693546,
+      "mean_chiba_ms": 0.12487969995709136,
+      "mean_matmul_ms": 0.15484910045051947,
+      "truth_positive": 1000
+    },
+    "planted_triangle": {
+      "aegypti_correct": 1500,
+      "aegypti_misses": 0,
+      "all_agree": 1500,
+      "chiba_correct": 1500,
+      "instances": 1500,
+      "invalid_witnesses": 0,
+      "matmul_correct": 1500,
+      "mean_aegypti_ms": 0.08081899963629742,
+      "mean_chiba_ms": 0.059157799230888486,
+      "mean_matmul_ms": 0.11020953386711578,
+      "truth_positive": 1500
+    },
+    "structured": {
+      "aegypti_correct": 1000,
+      "aegypti_misses": 0,
+      "all_agree": 1000,
+      "chiba_correct": 1000,
+      "instances": 1000,
+      "invalid_witnesses": 0,
+      "matmul_correct": 1000,
+      "mean_aegypti_ms": 0.21731209836434573,
+      "mean_chiba_ms": 0.07288980128942057,
+      "mean_matmul_ms": 0.11454950016923249,
+      "truth_positive": 541
+    },
+    "tri_free_bipartite": {
+      "aegypti_correct": 1500,
+      "aegypti_misses": 0,
+      "all_agree": 1500,
+      "chiba_correct": 1500,
+      "instances": 1500,
+      "invalid_witnesses": 0,
+      "matmul_correct": 1500,
+      "mean_aegypti_ms": 0.8987021341066187,
+      "mean_chiba_ms": 0.10706286656204611,
+      "mean_matmul_ms": 0.12022033395866553,
+      "truth_positive": 0
+    }
+  },
+  "summary_by_regime": {
+    "dense": {
+      "aegypti_correct": 4448,
+      "aegypti_misses": 0,
+      "all_agree": 4448,
+      "chiba_correct": 4448,
+      "instances": 4448,
+      "invalid_witnesses": 0,
+      "matmul_correct": 4448,
+      "mean_aegypti_ms": 1.4819470095108371,
+      "mean_chiba_ms": 0.15847700108175597,
+      "mean_matmul_ms": 0.16228394767279122,
+      "truth_positive": 3608
+    },
+    "sparse": {
+      "aegypti_correct": 5538,
+      "aegypti_misses": 0,
+      "all_agree": 5538,
+      "chiba_correct": 5538,
+      "instances": 5538,
+      "invalid_witnesses": 0,
+      "matmul_correct": 5538,
+      "mean_aegypti_ms": 0.08051998955919079,
+      "mean_chiba_ms": 0.06017036764894613,
+      "mean_matmul_ms": 0.11557600251449432,
+      "truth_positive": 3072
+    }
+  }
+}
