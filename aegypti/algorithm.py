@@ -7,6 +7,67 @@ import math
 from scipy import sparse
 from hvala.algorithm import find_vertex_cover
 
+def maximize_solution(G: nx.Graph, S: set):
+    """
+    Repair a candidate set into an independent set and greedily maximize it,
+    in linear time O(n + m).
+
+    Phase 1 (repair): Nodes of S in conflict (adjacent to other members of S)
+    are removed. Each conflicting edge inside S is resolved by discarding the
+    endpoint with the higher current conflict count, so a single removal fixes
+    as many conflicts as possible. Counts are maintained incrementally, giving
+    O(n + m) total work.
+
+    Phase 2 (grow): All nodes outside the repaired set (including those removed
+    in Phase 1) are scanned in ascending-degree order (counting sort, O(n)) and
+    added whenever they have no neighbor already in the set. This yields a
+    maximal independent set containing the repaired kernel, at O(n + m) cost.
+
+    Args:
+        G (nx.Graph): An undirected NetworkX graph.
+        S (set): Candidate node set (may contain conflicts).
+
+    Returns:
+        set: A maximal independent set of G.
+    """
+    independent = set(S)
+
+    # --- Phase 1: remove conflict nodes ---
+    # conflicts[u] = number of neighbors of u inside the current set.
+    # Total adjacency scans are bounded by 2m -> O(n + m).
+    conflicts = {u: sum(1 for v in G.adj[u] if v in independent) for u in independent}
+
+    for u, v in G.edges():
+        if u != v and u in independent and v in independent:
+            # Discard the endpoint involved in more remaining conflicts.
+            loser = u if conflicts[u] >= conflicts[v] else v
+            independent.discard(loser)
+            # Keep counts accurate; each node is removed at most once,
+            # so these updates cost O(m) overall.
+            for w in G.adj[loser]:
+                if w in conflicts:
+                    conflicts[w] -= 1
+            del conflicts[loser]
+
+    # --- Phase 2: add non-conflicting nodes to enlarge the set ---
+    # Counting sort by degree (O(n)); low-degree nodes first tends to
+    # block fewer future additions.
+    buckets = {}
+    max_degree = 0
+    for u in G.nodes():
+        if u not in independent:
+            d = G.degree(u)
+            buckets.setdefault(d, []).append(u)
+            if d > max_degree:
+                max_degree = d
+
+    for d in range(max_degree + 1):
+        for u in buckets.get(d, ()):
+            if all(w not in independent for w in G.adj[u]):
+                independent.add(u)
+
+    return independent
+
 
 def find_triangle_coordinates(graph, fallback=False):
     """
@@ -63,7 +124,15 @@ def find_triangle_coordinates(graph, fallback=False):
 
     # Dense regime: read a clique of G off the complement's vertex cover.
     complement = nx.complement(graph)
-    mis = set(complement) - find_vertex_cover(complement)
+    cover = find_vertex_cover(complement)
+    nodes = set(complement)
+    mis = nodes - cover
+    selected = list(cover)
+    while len(mis) < 3 and selected:
+        u = selected.pop()
+        candidate = (cover - {u}) | set(complement.neighbors(u))
+        iset = nodes - set(candidate)
+        mis = maximize_solution(complement, iset)
     if len(mis) >= 3:
         sol = list(mis)
         u, v, w = sol.pop(), sol.pop(), sol.pop()

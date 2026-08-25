@@ -1,6 +1,6 @@
 # Finlay (Aegypti) CAR Experiment
 
-Generated: 2026-06-29T16:43:54.999217+00:00
+Generated: 2026-08-25T06:53:51.356842+00:00
 Aegypti version: unknown   `fallback` param: True   Hvala diagnostics: True
 Seed: 20260629
 
@@ -36,23 +36,23 @@ Aegypti-safe converts each into a correct answer via its fallback.
 
 | regime | instances | truth_positive | aegypti_fast_misses | dense_instances | dense_positives | fallback_triggered | max_cover_ratio | min_uncovered_on_positive | mean_aegypti_fast_ms | mean_chiba_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| dense | 5639 | 4799 | 0 | 5639 | 4799 | 840 | 1.2000 | 3 | 1.3420 | 0.0344 |
-| sparse | 6691 | 4061 | 0 | 0 | 0 | 0 | -- | -- | 0.0303 | 0.0193 |
+| dense | 5639 | 4799 | 0 | 5639 | 4799 | 840 | 1.2000 | 3 | 1.6986 | 0.0382 |
+| sparse | 6691 | 4061 | 0 | 0 | 0 | 0 | -- | -- | 0.0317 | 0.0200 |
 
 ## By family
 
 | family | instances | truth_positive | aegypti_fast_misses | dense_instances | dense_positives | fallback_triggered | max_cover_ratio | min_uncovered_on_positive | mean_aegypti_fast_ms | mean_chiba_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| atlas_exhaustive_n<=7 | 1244 | 1080 | 0 | 91 | 91 | 0 | 1.0000 | 3 | 0.0208 | 0.0071 |
-| er_dense | 2500 | 2500 | 0 | 2425 | 2425 | 0 | 1.2000 | 3 | 1.4220 | 0.0284 |
-| er_sparse | 2486 | 1139 | 0 | 0 | 0 | 0 | -- | -- | 0.0360 | 0.0228 |
-| near_turan | 400 | 400 | 0 | 400 | 400 | 0 | 1.0000 | 3 | 1.7064 | 0.0228 |
-| omega3_tripartite | 400 | 400 | 0 | 400 | 400 | 0 | 1.0000 | 3 | 0.6693 | 0.0177 |
-| omega4_fourpartite | 300 | 300 | 0 | 300 | 300 | 0 | 1.0000 | 4 | 0.6575 | 0.0202 |
-| planted_clique | 1000 | 1000 | 0 | 987 | 987 | 0 | 1.1667 | 3 | 1.3897 | 0.0251 |
-| planted_triangle | 1500 | 1500 | 0 | 0 | 0 | 0 | -- | -- | 0.0342 | 0.0205 |
-| structured | 1000 | 541 | 0 | 365 | 196 | 169 | 1.0000 | 3 | 0.2026 | 0.0267 |
-| tri_free_bipartite | 1500 | 0 | 0 | 671 | 0 | 671 | 1.0000 | -- | 0.8725 | 0.0543 |
+| atlas_exhaustive_n<=7 | 1244 | 1080 | 0 | 91 | 91 | 0 | 1.0000 | 3 | 0.0212 | 0.0073 |
+| er_dense | 2500 | 2500 | 0 | 2425 | 2425 | 0 | 1.2000 | 3 | 1.6577 | 0.0335 |
+| er_sparse | 2486 | 1139 | 0 | 0 | 0 | 0 | -- | -- | 0.0380 | 0.0240 |
+| near_turan | 400 | 400 | 0 | 400 | 400 | 0 | 1.0000 | 3 | 1.7707 | 0.0246 |
+| omega3_tripartite | 400 | 400 | 0 | 400 | 400 | 0 | 1.0000 | 3 | 0.7089 | 0.0191 |
+| omega4_fourpartite | 300 | 300 | 0 | 300 | 300 | 0 | 1.0000 | 4 | 0.7051 | 0.0216 |
+| planted_clique | 1000 | 1000 | 0 | 987 | 987 | 0 | 1.1667 | 3 | 1.5124 | 0.0274 |
+| planted_triangle | 1500 | 1500 | 0 | 0 | 0 | 0 | -- | -- | 0.0353 | 0.0210 |
+| structured | 1000 | 541 | 0 | 365 | 196 | 169 | 1.0000 | 3 | 0.3492 | 0.0273 |
+| tri_free_bipartite | 1500 | 0 | 0 | 671 | 0 | 671 | 1.0000 | -- | 1.6051 | 0.0577 |
 
 ## Reproduction
 
