@@ -1,4 +1,4 @@
-# Version: v0.4.8
+# Version: v0.4.9
 # Modified on 04/04/2026
 # Author: Frank Vega
 
@@ -11,34 +11,52 @@ from hvala.algorithm import find_vertex_cover
 
 def maximize_solution(G: nx.Graph, S: set):
     """
-    Repair a candidate set into an independent set and greedily maximize it.
+    Repair a candidate set into an independent set and greedily maximize it 
+    up to a target size of 3.
     
-    By maintaining a hash set of blocked nodes, this function checks node 
-    conflicts in O(1) time and updates neighbor blocks only upon adding a node.
-    This guarantees an O(n + m) overall runtime.
+    By capping the maximum independent set size at 3 (the exact size needed 
+    to certify a triangle), conflict checks against the current independent 
+    set take O(1) operations per node. This completely avoids iterating over 
+    full neighborhoods, guaranteeing a strict O(n) overall runtime.
 
     Args:
-        G (nx.Graph): An undirected NetworkX graph.
+        G (nx.Graph): An undirected NetworkX graph (the complement graph).
         S (set): Candidate node set (may contain conflicts).
 
     Returns:
-        set: A maximal independent set of G.
+        set: An independent set of G (capped at size 3).
     """
     independent = set()
-    blocked = set()
     
-    # --- Phase 1: Fast repair ---
+    # --- Phase 1: Fast repair (capped at size 3) ---
     for u in S:
-        if u not in blocked:
+        conflict = False
+        # O(1) inner loop since |independent| < 3
+        for v in independent:
+            if G.has_edge(u, v):
+                conflict = True
+                break
+        
+        if not conflict:
             independent.add(u)
-            blocked.update(G[u])
-            
-    # --- Phase 2: Greedily maximize ---
+            if len(independent) == 3:
+                return independent
+                
+    # --- Phase 2: Greedily maximize (capped at size 3) ---
     for u in G.nodes():
-        if u not in independent and u not in blocked:
-            independent.add(u)
-            blocked.update(G[u])
+        if u not in independent:
+            conflict = False
+            # O(1) inner loop since |independent| < 3
+            for v in independent:
+                if G.has_edge(u, v):
+                    conflict = True
+                    break
             
+            if not conflict:
+                independent.add(u)
+                if len(independent) == 3:
+                    return independent
+                    
     return independent
 
 
