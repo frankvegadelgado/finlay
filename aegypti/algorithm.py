@@ -1,10 +1,11 @@
-# Version: v0.4.7
+# Version: v0.4.8
 # Modified on 04/04/2026
 # Author: Frank Vega
 
 import networkx as nx
 import numpy as np
 import math
+import itertools
 from scipy import sparse
 from hvala.algorithm import find_vertex_cover
 
@@ -84,26 +85,36 @@ def find_triangle_coordinates(graph):
             sol = list(mis)
             if len(mis) == 1:
                 v = sol.pop()
-                neighbors = set(graph.neighbors(v))
-                subgraph = graph.subgraph(neighbors)
-                if subgraph.number_of_edges() > 0:
-                    mis.update(set(next(iter(set(subgraph.edges())))))
+                # O(n) to find G's neighbors using the complement graph
+                neighbors_G = nodes - set(complement.neighbors(v)) - {v}
+                
+                # Check at most m_H + 1 pairs. Max time: O(m_H)
+                for x, y in itertools.combinations(neighbors_G, 2):
+                    if not complement.has_edge(x, y):
+                        mis.update({x, y})
+                        break
             else:
                 v, w = sol.pop(), sol.pop()
-                visited.add(frozenset({v}))
-                visited.add(frozenset({w}))  
                 disconnected_v = nodes - set(complement.neighbors(v))
                 disconnected_w = nodes - set(complement.neighbors(w))
                 mis.update(disconnected_v & disconnected_w)
                 if len(mis) < 3:
                     for z in [v, w]:
                         mis = {z}
-                        neighbors = set(graph.neighbors(z))
-                        subgraph = graph.subgraph(neighbors)
-                        if subgraph.number_of_edges() > 0:
-                            mis.update(set(next(iter(set(subgraph.edges()))))) 
+                        aux = frozenset(mis)
+                        if aux not in visited:
+                            # Apply the same O(m_H) complement trick here
+                            neighbors_G = nodes - set(complement.neighbors(z)) - {z}
+                            for x, y in itertools.combinations(neighbors_G, 2):
+                                if not complement.has_edge(x, y):
+                                    mis.update({x, y})
+                                    break
+                            
                             if len(mis) >= 3:
                                 break  
+                visited.add(frozenset({v}))
+                visited.add(frozenset({w}))
+                                                    
             if len(mis) >= 3:
                 break
         u = selected.pop()

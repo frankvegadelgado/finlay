@@ -1,6 +1,6 @@
 # Finlay (Aegypti) CAR Experiment
 
-Generated: 2026-08-27T04:44:01.699641+00:00
+Generated: 2026-08-27T07:01:39.879303+00:00
 Aegypti version: unknown   Hvala diagnostics: True
 Seed: 20260629
 
@@ -29,23 +29,23 @@ stress the dense branch.
 
 | regime | instances | truth_positive | aegypti_misses | dense_instances | dense_positives | max_cover_ratio | min_uncovered_on_positive | mean_aegypti_ms | mean_chiba_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| dense | 5639 | 4799 | 0 | 5639 | 4799 | 1.2000 | 3 | 2.1538 | 0.0456 |
-| sparse | 6691 | 4061 | 0 | 0 | 0 | -- | -- | 0.0404 | 0.0238 |
+| dense | 5639 | 4799 | 0 | 5639 | 4799 | 1.2000 | 3 | 1.8575 | 0.0497 |
+| sparse | 6691 | 4061 | 0 | 0 | 0 | -- | -- | 0.0434 | 0.0256 |
 
 ## By family
 
 | family | instances | truth_positive | aegypti_misses | dense_instances | dense_positives | max_cover_ratio | min_uncovered_on_positive | mean_aegypti_ms | mean_chiba_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| atlas_exhaustive_n<=7 | 1244 | 1080 | 0 | 91 | 91 | 1.0000 | 3 | 0.0376 | 0.0106 |
-| er_dense | 2500 | 2500 | 0 | 2425 | 2425 | 1.2000 | 3 | 1.7897 | 0.0354 |
-| er_sparse | 2486 | 1139 | 0 | 0 | 0 | -- | -- | 0.0402 | 0.0240 |
-| near_turan | 400 | 400 | 0 | 400 | 400 | 1.0000 | 3 | 2.4103 | 0.0326 |
-| omega3_tripartite | 400 | 400 | 0 | 400 | 400 | 1.0000 | 3 | 0.8190 | 0.0233 |
-| omega4_fourpartite | 300 | 300 | 0 | 300 | 300 | 1.0000 | 4 | 0.7765 | 0.0255 |
-| planted_clique | 1000 | 1000 | 0 | 987 | 987 | 1.1667 | 3 | 1.8526 | 0.0338 |
-| planted_triangle | 1500 | 1500 | 0 | 0 | 0 | -- | -- | 0.0490 | 0.0272 |
-| structured | 1000 | 541 | 0 | 365 | 196 | 1.0000 | 3 | 0.6466 | 0.0364 |
-| tri_free_bipartite | 1500 | 0 | 0 | 671 | 0 | 1.0000 | -- | 2.4646 | 0.0760 |
+| atlas_exhaustive_n<=7 | 1244 | 1080 | 0 | 91 | 91 | 1.0000 | 3 | 0.0290 | 0.0095 |
+| er_dense | 2500 | 2500 | 0 | 2425 | 2425 | 1.2000 | 3 | 1.7396 | 0.0347 |
+| er_sparse | 2486 | 1139 | 0 | 0 | 0 | -- | -- | 0.0397 | 0.0236 |
+| near_turan | 400 | 400 | 0 | 400 | 400 | 1.0000 | 3 | 2.1459 | 0.0294 |
+| omega3_tripartite | 400 | 400 | 0 | 400 | 400 | 1.0000 | 3 | 0.8406 | 0.0231 |
+| omega4_fourpartite | 300 | 300 | 0 | 300 | 300 | 1.0000 | 4 | 0.8645 | 0.0284 |
+| planted_clique | 1000 | 1000 | 0 | 987 | 987 | 1.1667 | 3 | 1.9025 | 0.0340 |
+| planted_triangle | 1500 | 1500 | 0 | 0 | 0 | -- | -- | 0.0575 | 0.0322 |
+| structured | 1000 | 541 | 0 | 365 | 196 | 1.0000 | 3 | 0.3262 | 0.0362 |
+| tri_free_bipartite | 1500 | 0 | 0 | 671 | 0 | 1.0000 | -- | 1.6748 | 0.0972 |
 
 ## Reproduction
 
