@@ -181,30 +181,6 @@ It generates random square matrices with configurable dimensions (`-d`), sparsit
 
 ---
 
-# Car Experiment
-
-The `car/` directory contains a reproducible comparison experiment that runs four triangle-detection routines against an independent exact triangle oracle. `find_triangle_coordinates` is run in both of its modes:
-
-| Subject | Function | Notes |
-| ------- | -------- | ----- |
-| **Aegypti-safe** | `find_triangle_coordinates(graph, fallback=True)` | Unconditionally complete; falls back to Chiba–Nishizeki when the dense branch is inconclusive (`O(n + m^{3/2})` worst case). |
-| **Aegypti-fast** | `find_triangle_coordinates(graph, fallback=False)` | Uniform `O(n^2)` one-sided certifier; the dense branch may return `None` on a triangle-containing graph. Default mode. |
-| **Chiba–Nishizeki** | `find_triangle_chiba_nishizeki(graph)` | Exact, `O(n + m^{3/2})`. |
-| **Matrix multiplication** | `is_triangle_free_brute_force(sparse_matrix)` | Reference baseline. |
-
-`car/car_experiment.py` builds a deterministic benchmark (~12,000 instances, fixed seed) spanning both regimes of the Aegypti dispatch — sparse (`m ≤ ⌈n^{4/3}⌉`) and dense (`m > ⌈n^{4/3}⌉`). It combines random/structured families (sparse and dense Erdős–Rényi, triangle-free bipartite, planted-triangle, planted-clique, structured), **adversarial dense small-clique families** (complete tripartite ω=3, complete 4-partite ω=4, balanced bipartite + one edge ω=3) that stress the fast dense branch, and an **exhaustive sweep of all graphs on ≤ 7 vertices** (Graph Atlas). Each instance is scored against an exact neighbourhood-intersection oracle; every witness is checked to be a genuine triangle; and for dense instances the Hvala-cover diagnostics (`|C|`, `|V∖C|`, `ω(G)`, `|C|/OPT`, fallback flag) are recorded.
-
-Run it from the repository root:
-
-```bash
-python car/car_experiment.py            # full suite
-python car/car_experiment.py --quick    # smaller, faster sweep
-```
-
-It writes `car_experiment.json`, `car_summary.csv`, `car_by_instance.csv`, and a human-readable `CAR_REPORT.md` into the `car/` folder. The key column `aegypti_fast_miss` flags any instance where the oracle finds a triangle but the fast dense branch returns none — the empirical content of the Hvala independent-set hypothesis. Aegypti-safe converts every such case into a correct answer through its fallback. (If the installed package predates the `fallback` parameter, both variants reduce to the default call.)
-
----
-
 # Code
 
 - Python code by **Frank Vega**.

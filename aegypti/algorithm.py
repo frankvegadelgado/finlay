@@ -1,4 +1,4 @@
-# Version: v0.4.6
+# Version: v0.4.7
 # Modified on 04/04/2026
 # Author: Frank Vega
 
@@ -12,10 +12,9 @@ def maximize_solution(G: nx.Graph, S: set):
     """
     Repair a candidate set into an independent set and greedily maximize it.
     
-    By utilizing O(1) average-case hash map lookups and evaluating only the 
-    intersection with the actively maintained independent set using Python's 
-    highly optimized `isdisjoint`, the algorithm operates in O(n) set 
-    operations, bypassing the need to scan all edges O(m).
+    By maintaining a hash set of blocked nodes, this function checks node 
+    conflicts in O(1) time and updates neighbor blocks only upon adding a node.
+    This guarantees an O(n + m) overall runtime.
 
     Args:
         G (nx.Graph): An undirected NetworkX graph.
@@ -25,24 +24,24 @@ def maximize_solution(G: nx.Graph, S: set):
         set: A maximal independent set of G.
     """
     independent = set()
+    blocked = set()
     
     # --- Phase 1: Fast repair ---
-    # Keep nodes from S that do not conflict with already kept nodes
     for u in S:
-        # G[u] returns a dictionary-like adjacency view. 
-        # isdisjoint evaluates lazily and breaks early.
-        if independent.isdisjoint(G[u]):
+        if u not in blocked:
             independent.add(u)
+            blocked.update(G[u])
             
     # --- Phase 2: Greedily maximize ---
     for u in G.nodes():
-        if u not in independent and independent.isdisjoint(G[u]):
+        if u not in independent and u not in blocked:
             independent.add(u)
+            blocked.update(G[u])
             
     return independent
 
 
-def find_triangle_coordinates(graph, fallback=False):
+def find_triangle_coordinates(graph):
     """
     Detect a single triangle (3-clique) in an undirected NetworkX graph.
 
@@ -53,14 +52,6 @@ def find_triangle_coordinates(graph, fallback=False):
 
       * Dense regime (m > ceil(n^{4/3})): build the complement and cover it
         with the linear-time Hvala vertex cover. 
-
-    Completeness & Complexity:
-      * ``fallback=False`` (default) -- "Aegypti-fast". The dense branch is
-        used as-is, bounded to a strict O(n^2) running time due to the O(n) 
-        repair step. It empirically achieves full completeness, practically 
-        breaking the Combinatorial BMM Conjecture.
-      * ``fallback=True`` -- "Aegypti-safe". Unconditionally sound and 
-        complete with an O(n + m^{3/2}) worst-case fallback.
     """
 
     if not isinstance(graph, nx.Graph) or graph.is_directed():
@@ -85,7 +76,36 @@ def find_triangle_coordinates(graph, fallback=False):
     
     # Bounded repair loop: Iterates up to |C| <= n times.
     # Each maximize_solution call takes O(n) operations, yielding O(n^2) overall.
+    visited = {frozenset({})}
     while len(mis) < 3 and selected:
+        aux = frozenset(mis)
+        if aux not in visited:
+            visited.add(aux)    
+            sol = list(mis)
+            if len(mis) == 1:
+                v = sol.pop()
+                neighbors = set(graph.neighbors(v))
+                subgraph = graph.subgraph(neighbors)
+                if subgraph.number_of_edges() > 0:
+                    mis.update(set(next(iter(set(subgraph.edges())))))
+            else:
+                v, w = sol.pop(), sol.pop()
+                visited.add(frozenset({v}))
+                visited.add(frozenset({w}))  
+                disconnected_v = nodes - set(complement.neighbors(v))
+                disconnected_w = nodes - set(complement.neighbors(w))
+                mis.update(disconnected_v & disconnected_w)
+                if len(mis) < 3:
+                    for z in [v, w]:
+                        mis = {z}
+                        neighbors = set(graph.neighbors(z))
+                        subgraph = graph.subgraph(neighbors)
+                        if subgraph.number_of_edges() > 0:
+                            mis.update(set(next(iter(set(subgraph.edges()))))) 
+                            if len(mis) >= 3:
+                                break  
+            if len(mis) >= 3:
+                break
         u = selected.pop()
         candidate = (cover - {u}) | set(complement.neighbors(u))
         iset = nodes - set(candidate)
@@ -96,9 +116,6 @@ def find_triangle_coordinates(graph, fallback=False):
         u, v, w = sol.pop(), sol.pop(), sol.pop()
         if graph.has_edge(u, v) and graph.has_edge(v, w) and graph.has_edge(u, w):
             return frozenset({u, v, w})
-
-    if fallback:
-        return find_triangle_chiba_nishizeki(graph)
 
     return None
 

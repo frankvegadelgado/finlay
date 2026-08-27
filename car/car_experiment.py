@@ -2,16 +2,15 @@ from __future__ import annotations
 
 """car/ -- triangle-detection comparison + dense-branch stress experiment.
 
-Runs four routines against an independent exact oracle on a deterministic
+Runs three routines against an independent exact oracle on a deterministic
 benchmark spanning both density regimes of the Aegypti dispatch
 (sparse: m <= ceil(n^{4/3}); dense: m > ceil(n^{4/3})):
 
-    1. Aegypti-safe    find_triangle_coordinates(graph, fallback=True)
-    2. Aegypti-fast    find_triangle_coordinates(graph, fallback=False)
-    3. Chiba-Nishizeki find_triangle_chiba_nishizeki(graph)
-    4. Matrix product  is_triangle_free_brute_force(sparse_matrix)
+    1. Aegypti          find_triangle_coordinates(graph)
+    2. Chiba-Nishizeki  find_triangle_chiba_nishizeki(graph)
+    3. Matrix product   is_triangle_free_brute_force(sparse_matrix)
 
-The benchmark now includes families designed to *stress the fast dense branch*,
+The benchmark includes families designed to stress the dense branch,
 where the gap between "has a triangle" and "has a large clique" is widest:
 
     * complete tripartite graphs K_{a,b,c}      (dense, clique number 3)
@@ -21,9 +20,8 @@ where the gap between "has a triangle" and "has a large clique" is widest:
 
 plus the original random/structured families. For every dense-regime instance
 the script additionally records the Hvala-cover diagnostics that determine
-Aegypti-fast completeness: |C|, |V\\C| (uncovered), omega(G), OPT_VC(complement)
-= n - omega(G), the ratio |C| / OPT_VC, and whether the dense branch succeeded
-or the safe fallback would trigger.
+Aegypti completeness: |C|, |V\C| (uncovered), omega(G), OPT_VC(complement)
+= n - omega(G), the ratio |C| / OPT_VC, and whether the dense branch succeeded.
 
 Ground truth (does a triangle exist?) is computed independently of all subjects
 by direct neighbourhood intersection.
@@ -36,13 +34,11 @@ Run from the repository root with:
 Outputs (written next to this script): car_experiment.json, car_summary.csv,
 car_by_instance.csv, CAR_REPORT.md.
 
-Scope: finite empirical evidence (exhaustive only up to n = 7), not a proof of
-worst-case completeness for the fast dense branch.
+Scope: finite empirical evidence (exhaustive only up to n = 7).
 """
 
 import argparse
 import csv
-import inspect
 import json
 import math
 import platform
@@ -76,23 +72,6 @@ try:
     _HAS_HVALA = True
 except Exception:  # pragma: no cover
     _HAS_HVALA = False
-
-# Whether the installed package exposes the `fallback` parameter that selects
-# the safe (complete) vs fast (uniform O(n^2)) variant.
-_HAS_FALLBACK = "fallback" in inspect.signature(
-    algorithm.find_triangle_coordinates).parameters
-
-
-def _aegypti_safe(G):
-    if _HAS_FALLBACK:
-        return algorithm.find_triangle_coordinates(G, fallback=True)
-    return algorithm.find_triangle_coordinates(G)
-
-
-def _aegypti_fast(G):
-    if _HAS_FALLBACK:
-        return algorithm.find_triangle_coordinates(G, fallback=False)
-    return algorithm.find_triangle_coordinates(G)
 
 
 SEED = 20260629
@@ -147,7 +126,7 @@ def _time(fn, *args):
 
 
 # ----------------------------------------------------------------------------
-# Per-instance evaluation of all four subjects + dense-branch diagnostics.
+# Per-instance evaluation of subjects + dense-branch diagnostics.
 # ----------------------------------------------------------------------------
 def evaluate(name: str, family: str, G: nx.Graph) -> dict:
     G = nx.convert_node_labels_to_integers(G, ordering="sorted")
@@ -156,15 +135,10 @@ def evaluate(name: str, family: str, G: nx.Graph) -> dict:
     regime = regime_of(n, m)
     truth = has_triangle_exact(G)
 
-    safe, safe_ms = _time(_aegypti_safe, G)
-    safe_found = safe is not None
-    safe_valid = (not safe_found) or is_valid_triangle(G, safe)
-    safe_correct = (safe_found == truth) and safe_valid
-
-    fast, fast_ms = _time(_aegypti_fast, G)
-    fast_found = fast is not None
-    fast_valid = (not fast_found) or is_valid_triangle(G, fast)
-    fast_correct = (fast_found == truth) and fast_valid
+    aeg, aeg_ms = _time(algorithm.find_triangle_coordinates, G)
+    aeg_found = aeg is not None
+    aeg_valid = (not aeg_found) or is_valid_triangle(G, aeg)
+    aeg_correct = (aeg_found == truth) and aeg_valid
 
     cn, cn_ms = _time(algorithm.find_triangle_chiba_nishizeki, G)
     cn_found = cn is not None
@@ -179,29 +153,25 @@ def evaluate(name: str, family: str, G: nx.Graph) -> dict:
     # Dense-branch diagnostics (only when the dense branch actually runs).
     cover_C = uncovered = omega = opt_vc = cover_ratio = None
     dense_branch_runs = (regime == "dense")
-    dense_success = fallback_triggered = None
+    dense_success = None
     if dense_branch_runs and _HAS_HVALA:
         H = nx.complement(G)
         C = _hvala_cover(H)
         cover_C = len(C)
         uncovered = n - cover_C            # |V \ C| = |mis|
         dense_success = uncovered >= 3      # then certified as a triangle of G
-        fallback_triggered = not dense_success
         if n <= OMEGA_CAP:
             omega = clique_number(G)        # = alpha(complement)
             opt_vc = n - omega              # OPT_VC(complement)
             cover_ratio = (cover_C / opt_vc) if opt_vc and opt_vc > 0 else None
 
-    agree = (safe_found == fast_found == cn_found == mm_found)
+    agree = (aeg_found == cn_found == mm_found)
     return {
         "name": name, "family": family, "n": n, "m": m,
         "regime": regime, "truth": truth,
-        "aegypti_safe_found": safe_found, "aegypti_safe_valid": safe_valid,
-        "aegypti_safe_correct": safe_correct, "aegypti_safe_ms": safe_ms,
-        "aegypti_safe_miss": bool(truth and not safe_found),
-        "aegypti_fast_found": fast_found, "aegypti_fast_valid": fast_valid,
-        "aegypti_fast_correct": fast_correct, "aegypti_fast_ms": fast_ms,
-        "aegypti_fast_miss": bool(truth and not fast_found),
+        "aegypti_found": aeg_found, "aegypti_valid": aeg_valid,
+        "aegypti_correct": aeg_correct, "aegypti_ms": aeg_ms,
+        "aegypti_miss": bool(truth and not aeg_found),
         "chiba_found": cn_found, "chiba_valid": cn_valid,
         "chiba_correct": cn_correct, "chiba_ms": cn_ms,
         "matmul_found": mm_found, "matmul_correct": mm_correct, "matmul_ms": mm_ms,
@@ -210,7 +180,7 @@ def evaluate(name: str, family: str, G: nx.Graph) -> dict:
         "dense_branch_runs": dense_branch_runs,
         "cover_C": cover_C, "uncovered": uncovered,
         "omega": omega, "opt_vc_complement": opt_vc, "cover_ratio": cover_ratio,
-        "dense_success": dense_success, "fallback_triggered": fallback_triggered,
+        "dense_success": dense_success,
     }
 
 
@@ -352,26 +322,22 @@ def summarise(rows: list[dict]) -> dict:
     return {
         "instances": len(rows),
         "truth_positive": sum(1 for r in rows if r["truth"]),
-        "aegypti_safe_correct": sum(1 for r in rows if r["aegypti_safe_correct"]),
-        "aegypti_safe_misses": sum(1 for r in rows if r["aegypti_safe_miss"]),
-        "aegypti_fast_correct": sum(1 for r in rows if r["aegypti_fast_correct"]),
-        "aegypti_fast_misses": sum(1 for r in rows if r["aegypti_fast_miss"]),
+        "aegypti_correct": sum(1 for r in rows if r["aegypti_correct"]),
+        "aegypti_misses": sum(1 for r in rows if r["aegypti_miss"]),
         "chiba_correct": sum(1 for r in rows if r["chiba_correct"]),
         "matmul_correct": sum(1 for r in rows if r["matmul_correct"]),
         "invalid_witnesses": sum(
             1 for r in rows
-            if not (r["aegypti_safe_valid"] and r["aegypti_fast_valid"] and r["chiba_valid"])),
+            if not (r["aegypti_valid"] and r["chiba_valid"])),
         "all_agree": sum(1 for r in rows if r["all_agree"]),
-        "mean_aegypti_safe_ms": _mean([r["aegypti_safe_ms"] for r in rows]),
-        "mean_aegypti_fast_ms": _mean([r["aegypti_fast_ms"] for r in rows]),
+        "mean_aegypti_ms": _mean([r["aegypti_ms"] for r in rows]),
         "mean_chiba_ms": _mean([r["chiba_ms"] for r in rows]),
         "mean_matmul_ms": _mean([r["matmul_ms"] for r in rows]),
         # dense-branch diagnostics
         "dense_instances": len(dense_rows),
         "dense_positives": len(dense_pos),
         "dense_branch_successes": sum(1 for r in dense_rows if r["dense_success"]),
-        "fallback_triggered": sum(1 for r in dense_rows if r["fallback_triggered"]),
-        "fast_dense_misses": sum(1 for r in dense_pos if r["aegypti_fast_miss"]),
+        "dense_misses": sum(1 for r in dense_pos if r["aegypti_miss"]),
         "max_cover_ratio": _max(ratios),
         "min_uncovered_on_positive": _min(unc_pos),
     }
@@ -418,38 +384,32 @@ def main() -> None:
 
     n = overall["instances"]
     result = {
-        "experiment": "car/ four-subject triangle comparison + dense-branch stress for Finlay",
+        "experiment": "car/ triangle comparison + dense-branch stress for Finlay",
         "aegypti_version": AEGYPTI_VERSION,
-        "fallback_parameter_available": _HAS_FALLBACK,
         "hvala_diagnostics_available": _HAS_HVALA,
         "omega_cap": OMEGA_CAP,
         "seed": SEED,
         "subjects": {
-            "aegypti_safe": "find_triangle_coordinates(G, fallback=True)",
-            "aegypti_fast": "find_triangle_coordinates(G, fallback=False)",
+            "aegypti": "find_triangle_coordinates(G)",
             "chiba_nishizeki": "find_triangle_chiba_nishizeki(G)",
             "matrix_multiplication": "is_triangle_free_brute_force(A)",
         },
         "oracle": "independent exact neighbourhood-intersection triangle test",
         "conclusion": {
             "instances": n,
-            "aegypti_safe_correct": overall["aegypti_safe_correct"],
-            "aegypti_safe_misses": overall["aegypti_safe_misses"],
-            "aegypti_fast_correct": overall["aegypti_fast_correct"],
-            "aegypti_fast_misses": overall["aegypti_fast_misses"],
+            "aegypti_correct": overall["aegypti_correct"],
+            "aegypti_misses": overall["aegypti_misses"],
             "chiba_correct": overall["chiba_correct"],
             "matmul_correct": overall["matmul_correct"],
             "invalid_witnesses": overall["invalid_witnesses"],
-            "all_four_agree": overall["all_agree"],
-            "safe_all_correct": overall["aegypti_safe_correct"] == n,
+            "all_agree": overall["all_agree"],
+            "all_correct": overall["aegypti_correct"] == n,
             "dense_instances": overall["dense_instances"],
             "dense_positives": overall["dense_positives"],
-            "fast_dense_misses": overall["fast_dense_misses"],
-            "fallback_triggered": overall["fallback_triggered"],
+            "dense_misses": overall["dense_misses"],
             "max_cover_ratio_complement": overall["max_cover_ratio"],
             "min_uncovered_on_positive": overall["min_uncovered_on_positive"],
-            "scope_warning": "Finite evidence (exhaustive only up to n=7); "
-                             "not a worst-case completeness proof for the fast dense branch.",
+            "scope_warning": "Finite evidence (exhaustive only up to n=7).",
         },
         "overall_summary": overall,
         "summary_by_family": by_family,
@@ -474,14 +434,11 @@ def main() -> None:
             w.writerows(rows)
 
     summ_cols = ["scope", "instances", "truth_positive",
-                 "aegypti_safe_correct", "aegypti_safe_misses",
-                 "aegypti_fast_correct", "aegypti_fast_misses",
+                 "aegypti_correct", "aegypti_misses",
                  "chiba_correct", "matmul_correct", "invalid_witnesses", "all_agree",
                  "dense_instances", "dense_positives", "dense_branch_successes",
-                 "fallback_triggered", "fast_dense_misses",
-                 "max_cover_ratio", "min_uncovered_on_positive",
-                 "mean_aegypti_safe_ms", "mean_aegypti_fast_ms",
-                 "mean_chiba_ms", "mean_matmul_ms"]
+                 "dense_misses", "max_cover_ratio", "min_uncovered_on_positive",
+                 "mean_aegypti_ms", "mean_chiba_ms", "mean_matmul_ms"]
     with (OUT_DIR / "car_summary.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=summ_cols)
         w.writeheader()
@@ -492,45 +449,38 @@ def main() -> None:
             row.update({k: s.get(k) for k in summ_cols if k != "scope"})
             w.writerow(row)
 
-    tbl_cols = ["instances", "truth_positive", "aegypti_fast_misses",
-                "dense_instances", "dense_positives", "fallback_triggered",
+    tbl_cols = ["instances", "truth_positive", "aegypti_misses",
+                "dense_instances", "dense_positives",
                 "max_cover_ratio", "min_uncovered_on_positive",
-                "mean_aegypti_fast_ms", "mean_chiba_ms"]
+                "mean_aegypti_ms", "mean_chiba_ms"]
     fam_rows = [{"family": k, **v} for k, v in by_family.items()]
     reg_rows = [{"regime": k, **v} for k, v in by_regime.items()]
     report = f"""# Finlay (Aegypti) CAR Experiment
 
 Generated: {datetime.now(timezone.utc).isoformat()}
-Aegypti version: {AEGYPTI_VERSION}   `fallback` param: {_HAS_FALLBACK}   Hvala diagnostics: {_HAS_HVALA}
+Aegypti version: {AEGYPTI_VERSION}   Hvala diagnostics: {_HAS_HVALA}
 Seed: {SEED}
 
-Four subjects on {n} instances, scored against an independent exact oracle:
-**Aegypti-safe** `(fallback=True)`, **Aegypti-fast** `(fallback=False)`,
-**Chiba-Nishizeki**, and **matrix multiplication**. The benchmark adds dense
-small-clique families (complete tri-/four-partite, balanced bipartite + one
+Three subjects on {n} instances, scored against an independent exact oracle:
+**Aegypti**, **Chiba-Nishizeki**, and **matrix multiplication**. The benchmark adds
+dense small-clique families (complete tri-/four-partite, balanced bipartite + one
 edge) and an exhaustive sweep of all graphs with n <= 7 (Graph Atlas), to
-stress the fast dense branch.
+stress the dense branch.
 
 ## Headline
 
 - Instances: {n}  (with a triangle: {overall['truth_positive']})
-- Aegypti-safe correct: {overall['aegypti_safe_correct']}/{n}  (misses: {overall['aegypti_safe_misses']})
-- Aegypti-fast correct: {overall['aegypti_fast_correct']}/{n}  (dense-branch misses: {overall['aegypti_fast_misses']})
+- Aegypti correct: {overall['aegypti_correct']}/{n}  (misses: {overall['aegypti_misses']})
 - Chiba-Nishizeki correct: {overall['chiba_correct']}/{n}
 - Matrix multiplication correct: {overall['matmul_correct']}/{n}
-- Invalid witnesses: {overall['invalid_witnesses']}    All four agree: {overall['all_agree']}/{n}
+- Invalid witnesses: {overall['invalid_witnesses']}    All three agree: {overall['all_agree']}/{n}
 
-### Dense-branch diagnostics (Hypothesis 1)
+### Dense-branch diagnostics
 
 - Dense-regime instances: {overall['dense_instances']}  (triangle-containing: {overall['dense_positives']})
-- Fast dense-branch misses on positives: {overall['fast_dense_misses']}
-- Safe fallback triggered: {overall['fallback_triggered']}
+- Dense-branch misses on positives: {overall['dense_misses']}
 - Max |C| / OPT_VC(complement) observed: {_fmt(overall['max_cover_ratio'])}
 - Min |V\\C| over triangle-containing dense instances: {_fmt(overall['min_uncovered_on_positive'])}
-
-`fast_dense_misses` is the empirical content of Hypothesis 1: triangle-containing
-dense inputs on which the fast branch left fewer than three vertices uncovered.
-Aegypti-safe converts each into a correct answer via its fallback.
 
 ## By regime
 
