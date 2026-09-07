@@ -1,4 +1,4 @@
-# Version: v0.5.0
+# Version: v0.5.1
 # Modified on 04/04/2026
 # Author: Frank Vega
 
@@ -6,7 +6,6 @@ import networkx as nx
 import numpy as np
 import math
 from scipy import sparse
-from .disjoint import FastCliqueUF
 
 
 def find_triangle_coordinates(graph):
@@ -18,8 +17,8 @@ def find_triangle_coordinates(graph):
       * Sparse regime (m <= ceil(n^{4/3})): run the Chiba-Nishizeki
         adjacency-intersection routine.
 
-      * Dense regime (m > ceil(n^{4/3})): build the disjoint set
-        for finding the detection. 
+      * Dense regime (m > ceil(n^{4/3})): build a reduction graph
+        and run the Chiba-Nishizeki algorithm. 
     """
 
     if not isinstance(graph, nx.Graph) or graph.is_directed():
@@ -45,32 +44,32 @@ def find_triangle_coordinates(graph):
     if m <= bound:
         return find_triangle_chiba_nishizeki(working_graph)
     else:
-        disjoint_set = FastCliqueUF(working_graph)
-        found = None
-        for u in working_graph:
-            neighbors = list(working_graph.neighbors(u))
-            for v in neighbors:
-                if disjoint_set.add(v):
-                    found = u
-                    break
-            if found is not None:
-                break
-            while neighbors:
-                w = neighbors.pop()
-                disjoint_set.remove(w)
-        if found is not None:
-            # Extract all components of size >= 2 (potential cliques)
-            cliques = [s for s in disjoint_set.to_sets() if len(s) >= 2]
-    
-            # Choose the largest clique-like component if any exist;
-            max_clique = max(cliques, key=len)  
-            sol = list(max_clique) + [found]
-            u, v, w = sol.pop(), sol.pop(), sol.pop()
-            if working_graph.has_edge(u, v) and working_graph.has_edge(v, w) and working_graph.has_edge(u, w):
-                return frozenset({u, v, w})
-            else:    
-                raise RuntimeError(f"The strict quadratic reduction failed with {(u, v, w)}")
-
+        mapping = {u: k for k, u in enumerate(working_graph.nodes())}
+        sqrt = max(2, math.floor(math.sqrt(working_graph.number_of_nodes())))
+        nodes = {}
+        for u in working_graph.nodes():
+            nodes.setdefault(mapping[u] % sqrt, set()).add(u)
+        for k in nodes.keys():
+            working_subgraph = working_graph.subgraph(nodes[k]) 
+            triangle = find_triangle_chiba_nishizeki(working_subgraph) 
+            if triangle is not None:
+                return triangle
+        G = nx.Graph()
+        for u, v in working_graph.edges():
+            i, j = mapping[u] % sqrt, mapping[v] % sqrt
+            if not G.has_edge(i, j): 
+                G.add_edge(i, j)      
+        adj = {v: set(G.neighbors(v)) for v in G.nodes()}
+        for u, v in G.edges():
+            a_u, a_v = adj[u], adj[v]
+            small, large = (a_u, a_v) if len(a_u) <= len(a_v) else (a_v, a_u)
+            for w in small:
+                if w in large:
+                    component = nodes[u] | nodes[v] | nodes[w]
+                    working_subgraph = working_graph.subgraph(component) 
+                    triangle = find_triangle_chiba_nishizeki(working_subgraph) 
+                    if triangle is not None:
+                        return triangle
     return None
 
 def is_triangle_free_brute_force(adj_matrix):
