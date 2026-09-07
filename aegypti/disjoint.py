@@ -1,103 +1,102 @@
-import numpy as np
-
 class FastCliqueUF:
     """
     A Union-Find structure that only merges components if the union
-    induces a clique in the underlying graph. All clique checks and
-    component updates are accelerated using numpy.uint64 SIMD blocks,
-    giving O(k / w) merge time where w = 64 bits per block.
+    induces a clique in the underlying graph. 
+    Bitwise operations leverage Python's native arbitrary-precision integers
+    to achieve O(1) checks.
     """
 
     def __init__(self, graph):
+        """
+        Runtime: O(N * d) where N is the number of nodes and d is the maximum degree.
+        Precomputes the bitmasks as large Python integers.
+        """
         self.graph = graph
         self.nodes = list(graph.nodes())
         self.index = {u: i for i, u in enumerate(self.nodes)}
         self.n = len(self.nodes)
 
-        # Number of 64-bit blocks needed to represent n bits
-        self.blocks = (self.n + 63) // 64
-
-        # Standard Union-Find parent + size
         self.parent = {u: u for u in self.nodes}
-        self.size = {u: 1 for u in self.nodes}
 
-        # Precompute adjacency bitsets for each node as numpy uint64 arrays
-        self.adj = {}
+        # Precompute adjacency bitsets for each node as a single Python integer (bitmask)
+        self.adj_mask = {}
         for u in self.nodes:
-            arr = np.zeros(self.blocks, dtype=np.uint64)
+            mask = 0
             for v in graph.neighbors(u):
-                idx = self.index[v]
-                arr[idx // 64] |= np.uint64(1) << (idx % 64)
-            # A node is always adjacent to itself for clique purposes
-            idx = self.index[u]
-            arr[idx // 64] |= np.uint64(1) << (idx % 64)
-            self.adj[u] = arr
-
-        # Component bitsets: which nodes are in the component
-        self.comp_bit = {
-            u: self._singleton_bitset(u) for u in self.nodes
-        }
-
-        # Component adjacency intersection bitsets
-        self.comp_adj = {
-            u: self.adj[u].copy() for u in self.nodes
-        }
-
-    def _singleton_bitset(self, u):
-        """Return a bitset with only node u set."""
-        arr = np.zeros(self.blocks, dtype=np.uint64)
-        idx = self.index[u]
-        arr[idx // 64] |= np.uint64(1) << (idx % 64)
-        return arr
+                mask |= (1 << self.index[v])
+            mask |= (1 << self.index[u])
+            self.adj_mask[u] = mask
+        
+        self.added_mask = 0
 
     def find(self, u):
-        """Path-compressed find."""
+        """
+        Runtime: Amortized O(alpha(N)), where alpha is the inverse Ackermann function.
+        Path-compressed find.
+        """
         if self.parent[u] != u:
             self.parent[u] = self.find(self.parent[u])
         return self.parent[u]
 
-    def union(self, u, v):
+    def add(self, u):
         """
-        Merge the components of u and v only if the union forms a clique.
-        All clique checks and bitset merges are SIMD-accelerated.
+        Runtime: O(1).
+        Adds a node 'u' to the structure. Returns True if there is at least one edge 
+        between 'u' and any previously added element, False otherwise.
         """
-        ru, rv = self.find(u), self.find(v)
-        if ru == rv:
-            return
+        u_bit = 1 << self.index[u]
+        overlap = self.added_mask & self.adj_mask[u]
+        has_edge = bool(overlap & ~u_bit)
+        self.added_mask |= u_bit
+        
+        return has_edge
 
-        # Union-by-size heuristic
-        if self.size[ru] < self.size[rv]:
-            ru, rv = rv, ru
-
-        # Proposed merged component bitset
-        merged_bit = self.comp_bit[ru] | self.comp_bit[rv]
-
-        # Intersection of adjacency bitsets of both components
-        merged_adj = self.comp_adj[ru] & self.comp_adj[rv]
-
-        # Clique condition:
-        # merged_bit must be subset of merged_adj
-        # i.e., merged_bit & ~merged_adj == 0
-        if np.any(merged_bit & ~merged_adj):
-            return  # Reject merge: not a clique
-
-        # Accept merge
-        self.parent[rv] = ru
-        self.size[ru] += self.size[rv]
-
-        # Update component bitset
-        self.comp_bit[ru] = merged_bit
-
-        # Update adjacency intersection
-        self.comp_adj[ru] = merged_adj
+    def remove(self, u):
+        """
+        Runtime: O(1).
+        Removes a node 'u' from the added elements by clearing its corresponding bit.
+        """
+        self.added_mask &= ~(1 << self.index[u])
 
     def to_sets(self):
         """
-        Return all disjoint sets after full path compression.
-        This reconstructs components by grouping nodes by their root.
+        Runtime: O(N^2 * alpha(N)).
+        Builds the connected components by evaluating the edges of the currently 
+        added nodes, strictly enforcing that each merged component remains a clique.
         """
+        self.parent = {u: u for u in self.nodes}
+        
+        # Temporary structures to validate cliques during reconstruction
+        comp_mask = {u: (1 << self.index[u]) for u in self.nodes}
+        comp_adj = {u: self.adj_mask[u] for u in self.nodes}
+        
+        added_nodes = [u for u in self.nodes if self.added_mask & (1 << self.index[u])]
+        n_added = len(added_nodes)
+        
+        for i in range(n_added):
+            for j in range(i + 1, n_added):
+                u = added_nodes[i]
+                v = added_nodes[j]
+                
+                # If there is an original edge between u and v
+                if self.adj_mask[u] & (1 << self.index[v]):
+                    ru = self.find(u)
+                    rv = self.find(v)
+                    
+                    if ru != rv:
+                        merged_mask = comp_mask[ru] | comp_mask[rv]
+                        merged_adj = comp_adj[ru] & comp_adj[rv]
+                        
+                        # Strict Clique condition: the merged mask must be
+                        # a subset of the merged adjacencies.
+                        if not (merged_mask & ~merged_adj):
+                            self.parent[ru] = rv
+                            comp_mask[rv] = merged_mask
+                            comp_adj[rv] = merged_adj
+                        
         groups = {}
-        for u in self.nodes:
+        for u in added_nodes:
             r = self.find(u)
             groups.setdefault(r, set()).add(u)
+            
         return list(groups.values())
