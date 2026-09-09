@@ -1,12 +1,13 @@
-# Version: v0.5.1
-# Modified on 04/04/2026
+# Version: v0.5.2
+# Modified on 08/09/2026
 # Author: Frank Vega
 
 import networkx as nx
 import numpy as np
 import math
+import random
 from scipy import sparse
-
+from hvala.algorithm import find_vertex_cover
 
 def find_triangle_coordinates(graph):
     """
@@ -17,7 +18,7 @@ def find_triangle_coordinates(graph):
       * Sparse regime (m <= ceil(n^{4/3})): run the Chiba-Nishizeki
         adjacency-intersection routine.
 
-      * Dense regime (m > ceil(n^{4/3})): build a reduction graph
+      * Dense regime (m > ceil(n^{4/3})): build a sparse graph
         and run the Chiba-Nishizeki algorithm. 
     """
 
@@ -44,34 +45,48 @@ def find_triangle_coordinates(graph):
     if m <= bound:
         return find_triangle_chiba_nishizeki(working_graph)
     else:
-        mapping = {u: k for k, u in enumerate(working_graph.nodes())}
-        sqrt = max(2, math.floor(math.sqrt(working_graph.number_of_nodes())))
-        nodes = {}
-        for u in working_graph.nodes():
-            nodes.setdefault(mapping[u] % sqrt, set()).add(u)
-        for k in nodes.keys():
-            working_subgraph = working_graph.subgraph(nodes[k]) 
-            triangle = find_triangle_chiba_nishizeki(working_subgraph) 
-            if triangle is not None:
-                return triangle
-        G = nx.Graph()
-        for u, v in working_graph.edges():
-            i, j = mapping[u] % sqrt, mapping[v] % sqrt
-            if not G.has_edge(i, j): 
-                G.add_edge(i, j)      
-        adj = {v: set(G.neighbors(v)) for v in G.nodes()}
-        for u, v in G.edges():
-            a_u, a_v = adj[u], adj[v]
-            small, large = (a_u, a_v) if len(a_u) <= len(a_v) else (a_v, a_u)
-            for w in small:
-                if w in large:
-                    component = nodes[u] | nodes[v] | nodes[w]
-                    working_subgraph = working_graph.subgraph(component) 
+        sparse_graph = working_graph.copy()
+        complement = nx.complement(working_graph)
+        rng = random.Random(m * n + n)
+        while m > bound:
+            cover = find_vertex_cover(complement)
+            mis = set(complement) - cover
+            if len(mis) >= 3:
+                sol = list(mis)
+                u, v, w = sol.pop(), sol.pop(), sol.pop()
+                if working_graph.has_edge(u, v) and working_graph.has_edge(v, w) and working_graph.has_edge(u, w):
+                    return frozenset({u, v, w})
+                else:
+                    raise RuntimeError(f"Invalid reduction producing a false triangle {(u, v, w)}")
+            vertices = list(sparse_graph.nodes())
+            rng.shuffle(vertices)
+            mapping = {u: k for k, u in enumerate(vertices)}
+            sqrt = max(2, math.floor(math.sqrt(n)))
+            nodes = {}
+            for u in sparse_graph.nodes():
+                nodes.setdefault(mapping[u] % sqrt, set()).add(u)
+            
+            for k in nodes.keys():
+                working_subgraph = sparse_graph.subgraph(nodes[k]) 
+                if working_subgraph.number_of_edges() > 0:
                     triangle = find_triangle_chiba_nishizeki(working_subgraph) 
                     if triangle is not None:
                         return triangle
-    return None
+                    else:
+                        edges_subgraph = list(working_subgraph.edges())
+                        sparse_graph.remove_edges_from(edges_subgraph)
+                        complement.add_edges_from(edges_subgraph)
 
+            isolates = list(nx.isolates(sparse_graph))
+            sparse_graph.remove_nodes_from(isolates)
+            complement.remove_nodes_from(isolates)
+
+            m = sparse_graph.number_of_edges()
+            n = sparse_graph.number_of_nodes()
+            bound = math.ceil(math.pow(n, 4/3))
+
+        return find_triangle_chiba_nishizeki(sparse_graph)    
+ 
 def is_triangle_free_brute_force(adj_matrix):
     if not sparse.issparse(adj_matrix):
         raise TypeError("Input must be a SciPy sparse matrix.")
