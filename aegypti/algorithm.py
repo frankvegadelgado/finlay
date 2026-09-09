@@ -1,4 +1,4 @@
-# Version: v0.5.2
+# Version: v0.5.3
 # Modified on 08/09/2026
 # Author: Frank Vega
 
@@ -11,17 +11,14 @@ from hvala.algorithm import find_vertex_cover
 
 def find_triangle_coordinates(graph):
     """
-    Detect a single triangle (3-clique) in an undirected NetworkX graph.
-
+    Detect a single triangle (3-clique) in an undirected NetworkX Graph.
+    
     The algorithm splits on density at the threshold ceil(n^{4/3}):
-
-      * Sparse regime (m <= ceil(n^{4/3})): run the Chiba-Nishizeki
-        adjacency-intersection routine.
-
-      * Dense regime (m > ceil(n^{4/3})): build a sparse graph
-        and run the Chiba-Nishizeki algorithm. 
+      * Sparse regime (m <= ceil(n^{4/3})): run the Chiba-Nishizeki routine 
+        optimized with non-decreasing degree ordering.
+      * Dense regime (m > ceil(n^{4/3})): utilizes a bisection partition strategy 
+        combined with bipartite short-circuiting to heavily restrict iterations.
     """
-
     if not isinstance(graph, nx.Graph) or graph.is_directed():
         raise ValueError("Input must be an undirected NetworkX Graph.")
     if nx.number_of_selfloops(graph) > 0:
@@ -29,26 +26,28 @@ def find_triangle_coordinates(graph):
     if graph.number_of_nodes() < 3 or graph.number_of_edges() == 0:
         return None
 
-    # Work on a copy so the original graph remains unchanged
     working_graph = graph.copy()
-    
-    # Remove self-loops; they do not affect clique structure
     working_graph.remove_edges_from(list(nx.selfloop_edges(working_graph)))
     
-    # Remove isolated nodes (degree 0), since they cannot belong to any clique
     isolates = list(nx.isolates(working_graph))
     working_graph.remove_nodes_from(isolates)
 
     m = working_graph.number_of_edges()
     n = working_graph.number_of_nodes()
     bound = math.ceil(math.pow(n, 4/3))
+    
     if m <= bound:
         return find_triangle_chiba_nishizeki(working_graph)
     else:
         sparse_graph = working_graph.copy()
         complement = nx.complement(working_graph)
         rng = random.Random(m * n + n)
+        
         while m > bound:
+            # Short-circuit: A bipartite graph guarantees no triangles exist.
+            if nx.is_bipartite(sparse_graph):
+                break
+                
             cover = find_vertex_cover(complement)
             mis = set(complement) - cover
             if len(mis) >= 3:
@@ -58,13 +57,15 @@ def find_triangle_coordinates(graph):
                     return frozenset({u, v, w})
                 else:
                     raise RuntimeError(f"Invalid reduction producing a false triangle {(u, v, w)}")
+            
+            # Alternative Bisection Partitioning Strategy
             vertices = list(sparse_graph.nodes())
             rng.shuffle(vertices)
-            mapping = {u: k for k, u in enumerate(vertices)}
-            sqrt = max(2, math.floor(math.sqrt(n)))
-            nodes = {}
-            for u in sparse_graph.nodes():
-                nodes.setdefault(mapping[u] % sqrt, set()).add(u)
+            
+            midpoint = n // 2
+            bucket_1 = set(vertices[:midpoint])
+            bucket_2 = set(vertices[midpoint:])
+            nodes = {0: bucket_1, 1: bucket_2}
             
             for k in nodes.keys():
                 working_subgraph = sparse_graph.subgraph(nodes[k]) 
@@ -105,12 +106,22 @@ def find_triangle_chiba_nishizeki(graph):
     if graph.number_of_nodes() < 3 or graph.number_of_edges() == 0:
         return None
 
+    # Optimized: Sorted in non-decreasing degree order
+    degrees = dict(graph.degree())
+    nodes_sorted = sorted(graph.nodes(), key=lambda x: degrees[x])
+    
     adj = {v: set(graph.neighbors(v)) for v in graph.nodes()}
-    for u, v in graph.edges():
-        a_u, a_v = adj[u], adj[v]
-        small, large = (a_u, a_v) if len(a_u) <= len(a_v) else (a_v, a_u)
-        for w in small:
-            if w != u and w != v and w in large:
-                return frozenset({u, v, w})
+    
+    for u in nodes_sorted:
+        a_u = adj[u]
+        for v in list(a_u):
+            a_v = adj[v]
+            small, large = (a_u, a_v) if len(a_u) <= len(a_v) else (a_v, a_u)
+            for w in small:
+                if w != u and w != v and w in large:
+                    return frozenset({u, v, w})
+            # Dynamically remove evaluated edges to prune the search space
+            adj[v].discard(u)
+        adj[u].clear()
 
     return None
