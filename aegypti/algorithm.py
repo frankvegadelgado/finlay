@@ -16,7 +16,7 @@ def find_triangle_coordinates(graph):
     The algorithm splits on density at the threshold ceil(n^{4/3}):
       * Sparse regime (m <= ceil(n^{4/3})): run the Chiba-Nishizeki routine 
         optimized with non-decreasing degree ordering.
-      * Dense regime (m > ceil(n^{4/3})): utilizes a bisection partition strategy 
+      * Dense regime (m > ceil(n^{4/3})): utilizes a square root partition strategy 
         combined with bipartite short-circuiting to heavily restrict iterations.
     """
     if not isinstance(graph, nx.Graph) or graph.is_directed():
@@ -62,10 +62,11 @@ def find_triangle_coordinates(graph):
             vertices = list(sparse_graph.nodes())
             rng.shuffle(vertices)
             
-            midpoint = n // 2
-            bucket_1 = set(vertices[:midpoint])
-            bucket_2 = set(vertices[midpoint:])
-            nodes = {0: bucket_1, 1: bucket_2}
+            mapping = {u: k for k, u in enumerate(vertices)}
+            sqrt = max(2, math.floor(math.sqrt(n)))
+            nodes = {}
+            for u in sparse_graph.nodes():
+                nodes.setdefault(mapping[u] % sqrt, set()).add(u)
             
             for k in nodes.keys():
                 working_subgraph = sparse_graph.subgraph(nodes[k]) 
