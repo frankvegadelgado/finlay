@@ -1,11 +1,11 @@
-# Version: v0.5.3
+# Version: v0.5.4
 # Modified on 08/09/2026
 # Author: Frank Vega
 
 import networkx as nx
 import numpy as np
 import math
-import random
+import secrets
 from scipy import sparse
 from hvala.algorithm import find_vertex_cover
 
@@ -41,7 +41,6 @@ def find_triangle_coordinates(graph):
     else:
         sparse_graph = working_graph.copy()
         complement = nx.complement(working_graph)
-        rng = random.Random(m * n + n)
         
         while m > bound:
             # Short-circuit: A bipartite graph guarantees no triangles exist.
@@ -60,7 +59,7 @@ def find_triangle_coordinates(graph):
             
             # Alternative Bisection Partitioning Strategy
             vertices = list(sparse_graph.nodes())
-            rng.shuffle(vertices)
+            secrets.SystemRandom().shuffle(vertices)
             
             mapping = {u: k for k, u in enumerate(vertices)}
             sqrt = max(2, math.floor(math.sqrt(n)))
