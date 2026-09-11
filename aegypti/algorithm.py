@@ -1,5 +1,5 @@
-# Version: v0.5.4
-# Modified on 10/09/2026
+# Version: v0.5.5
+# Modified on 11/09/2026
 # Author: Frank Vega
 
 import networkx as nx
@@ -45,7 +45,7 @@ def find_triangle_coordinates(graph):
         while m > bound:
             # Short-circuit: A bipartite graph guarantees no triangles exist.
             if nx.is_bipartite(sparse_graph):
-                break
+                return None
                 
             cover = find_vertex_cover(complement)
             mis = set(complement) - cover
