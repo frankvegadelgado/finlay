@@ -14,11 +14,11 @@
     "matmul_correct": 12330,
     "scope_warning": "Finite evidence (exhaustive only up to n=7)."
   },
-  "elapsed_seconds": 24.768909692764282,
+  "elapsed_seconds": 14.017761945724487,
   "environment": {
     "networkx": "3.6.1",
-    "numpy": "2.4.6",
-    "platform": "Windows-11-10.0.26200-SP0",
+    "numpy": "2.5.0",
+    "platform": "Windows-11-10.0.26100-SP0",
     "python": "3.12.3",
     "scipy": "unknown"
   },
@@ -35,9 +35,9 @@
     "instances": 12330,
     "invalid_witnesses": 0,
     "matmul_correct": 12330,
-    "mean_aegypti_ms": 1.1118456610045067,
-    "mean_chiba_ms": 0.05001802921635017,
-    "mean_matmul_ms": 0.18997892134375183,
+    "mean_aegypti_ms": 0.6193246123655144,
+    "mean_chiba_ms": 0.030680672837374467,
+    "mean_matmul_ms": 0.1047805274571598,
     "truth_positive": 8860
   },
   "seed": 20260629,
@@ -58,9 +58,9 @@
       "instances": 1244,
       "invalid_witnesses": 0,
       "matmul_correct": 1244,
-      "mean_aegypti_ms": 0.09426085213621778,
-      "mean_chiba_ms": 0.016801688145565197,
-      "mean_matmul_ms": 0.16396350482574845,
+      "mean_aegypti_ms": 0.05712387169983801,
+      "mean_chiba_ms": 0.00936454618679078,
+      "mean_matmul_ms": 0.07706559547657368,
       "truth_positive": 1080
     },
     "er_dense": {
@@ -74,9 +74,9 @@
       "instances": 2500,
       "invalid_witnesses": 0,
       "matmul_correct": 2500,
-      "mean_aegypti_ms": 2.946620480011916,
-      "mean_chiba_ms": 0.05425811998284189,
-      "mean_matmul_ms": 0.25523904006113296,
+      "mean_aegypti_ms": 1.6075927559286356,
+      "mean_chiba_ms": 0.03159996010363102,
+      "mean_matmul_ms": 0.1403985584154725,
       "truth_positive": 2500
     },
     "er_sparse": {
@@ -90,9 +90,9 @@
       "instances": 2486,
       "invalid_witnesses": 0,
       "matmul_correct": 2486,
-      "mean_aegypti_ms": 0.20447011265553156,
-      "mean_chiba_ms": 0.052298551953514946,
-      "mean_matmul_ms": 0.1767391392150241,
+      "mean_aegypti_ms": 0.12399131122733784,
+      "mean_chiba_ms": 0.03158833703426277,
+      "mean_matmul_ms": 0.09684307741979774,
       "truth_positive": 1139
     },
     "near_turan": {
@@ -106,9 +106,9 @@
       "instances": 400,
       "invalid_witnesses": 0,
       "matmul_correct": 400,
-      "mean_aegypti_ms": 2.8534824999587727,
-      "mean_chiba_ms": 0.10020050010098203,
-      "mean_matmul_ms": 0.18200550008259597,
+      "mean_aegypti_ms": 1.7757522489409894,
+      "mean_chiba_ms": 0.06689924513921142,
+      "mean_matmul_ms": 0.10835776571184397,
       "truth_positive": 400
     },
     "omega3_tripartite": {
@@ -122,9 +122,9 @@
       "instances": 400,
       "invalid_witnesses": 0,
       "matmul_correct": 400,
-      "mean_aegypti_ms": 1.2844112499806215,
-      "mean_chiba_ms": 0.030435749949901947,
-      "mean_matmul_ms": 0.16602274999058864,
+      "mean_aegypti_ms": 0.8101654960773885,
+      "mean_chiba_ms": 0.020880996016785502,
+      "mean_matmul_ms": 0.09981601149775088,
       "truth_positive": 400
     },
     "omega4_fourpartite": {
@@ -138,9 +138,9 @@
       "instances": 300,
       "invalid_witnesses": 0,
       "matmul_correct": 300,
-      "mean_aegypti_ms": 1.3943793335662729,
-      "mean_chiba_ms": 0.0363876666839739,
-      "mean_matmul_ms": 0.1860133332957048,
+      "mean_aegypti_ms": 0.8203016842405001,
+      "mean_chiba_ms": 0.023188656195998192,
+      "mean_matmul_ms": 0.10694100676725309,
       "truth_positive": 300
     },
     "planted_clique": {
@@ -154,9 +154,9 @@
       "instances": 1000,
       "invalid_witnesses": 0,
       "matmul_correct": 1000,
-      "mean_aegypti_ms": 2.3719423999864375,
-      "mean_chiba_ms": 0.04259459993772907,
-      "mean_matmul_ms": 0.2080404999651364,
+      "mean_aegypti_ms": 1.458507500588894,
+      "mean_chiba_ms": 0.028879488352686167,
+      "mean_matmul_ms": 0.12955169612541795,
       "truth_positive": 1000
     },
     "planted_triangle": {
@@ -170,9 +170,9 @@
       "instances": 1500,
       "invalid_witnesses": 0,
       "matmul_correct": 1500,
-      "mean_aegypti_ms": 0.18598493330015722,
-      "mean_chiba_ms": 0.051736866669671144,
-      "mean_matmul_ms": 0.1625040000047496,
+      "mean_aegypti_ms": 0.11674520062903564,
+      "mean_chiba_ms": 0.029714263665179413,
+      "mean_matmul_ms": 0.08983059879392385,
       "truth_positive": 1500
     },
     "structured": {
@@ -186,9 +186,9 @@
       "instances": 1000,
       "invalid_witnesses": 0,
       "matmul_correct": 1000,
-      "mean_aegypti_ms": 0.3199368000605318,
-      "mean_chiba_ms": 0.03956730000209063,
-      "mean_matmul_ms": 0.16249809998407727,
+      "mean_aegypti_ms": 0.15235698781907558,
+      "mean_chiba_ms": 0.024491903837770224,
+      "mean_matmul_ms": 0.08777811704203486,
       "truth_positive": 541
     },
     "tri_free_bipartite": {
@@ -202,9 +202,9 @@
       "instances": 1500,
       "invalid_witnesses": 0,
       "matmul_correct": 1500,
-      "mean_aegypti_ms": 0.4484031333292175,
-      "mean_chiba_ms": 0.071482333400733,
-      "mean_matmul_ms": 0.16779233329968216,
+      "mean_aegypti_ms": 0.11436412793894608,
+      "mean_chiba_ms": 0.04606880899518728,
+      "mean_matmul_ms": 0.09126566133151452,
       "truth_positive": 0
     }
   },
@@ -220,9 +220,9 @@
       "instances": 5639,
       "invalid_witnesses": 0,
       "matmul_correct": 5639,
-      "mean_aegypti_ms": 2.232559319051675,
-      "mean_chiba_ms": 0.05903770170971692,
-      "mean_matmul_ms": 0.21670453983521223,
+      "mean_aegypti_ms": 1.235895385524074,
+      "mean_chiba_ms": 0.03655504368907553,
+      "mean_matmul_ms": 0.1232335194489501,
       "truth_positive": 4799
     },
     "sparse": {
@@ -236,9 +236,9 @@
       "instances": 6691,
       "invalid_witnesses": 0,
       "matmul_correct": 6691,
-      "mean_aegypti_ms": 0.16733746824886736,
-      "mean_chiba_ms": 0.042416484874683004,
-      "mean_matmul_ms": 0.16745526827644572,
+      "mean_aegypti_ms": 0.09969487244007459,
+      "mean_chiba_ms": 0.025729906549414185,
+      "mean_matmul_ms": 0.08922882788434476,
       "truth_positive": 4061
     }
   }
