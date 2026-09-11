@@ -35,8 +35,10 @@ def find_triangle_coordinates(graph):
     m = working_graph.number_of_edges()
     n = working_graph.number_of_nodes()
     bound = math.ceil(math.pow(n, 4/3))
-    
-    if m <= bound:
+ 
+    if nx.is_bipartite(working_graph):
+        return None
+    elif m <= bound:
         return find_triangle_chiba_nishizeki(working_graph)
     else:
         sparse_graph = working_graph.copy()
@@ -57,12 +59,17 @@ def find_triangle_coordinates(graph):
                 else:
                     raise RuntimeError(f"Invalid reduction producing a false triangle {(u, v, w)}")
             
+            sqrt = max(2, math.floor(math.sqrt(n)))
+            coloring = nx.greedy_color(sparse_graph, strategy='largest_first')
+            pivot_vertices = [v for v, c in coloring.items() if c > 1]
+            if len(pivot_vertices) <= sqrt:
+                return find_triangle_coloring_restricted(sparse_graph, pivot_vertices)
+            
             # Alternative Bisection Partitioning Strategy
             vertices = list(sparse_graph.nodes())
             secrets.SystemRandom().shuffle(vertices)
             
             mapping = {u: k for k, u in enumerate(vertices)}
-            sqrt = max(2, math.floor(math.sqrt(n)))
             nodes = {}
             for u in sparse_graph.nodes():
                 nodes.setdefault(mapping[u] % sqrt, set()).add(u)
@@ -88,6 +95,29 @@ def find_triangle_coordinates(graph):
 
         return find_triangle_chiba_nishizeki(sparse_graph)    
  
+
+def find_triangle_coloring_restricted(graph, pivot_vertices):
+    """Chiba-Nishizeki with the outer loop restricted to pivot_vertices,
+    but full adjacency (from `graph`, not an induced subgraph) used for
+    every neighbor/intersection check."""
+    degrees = dict(graph.degree())
+    pivots_sorted = sorted(pivot_vertices, key=lambda x: degrees[x])
+    adj = {v: set(graph.neighbors(v)) for v in graph.nodes()}
+    for u in pivots_sorted:
+        a_u = adj[u]
+        for v in list(a_u):
+            a_v = adj[v]
+            small, large = (a_u, a_v) if len(a_u) <= len(a_v) else (a_v, a_u)
+            for w in small:
+                if w != u and w != v and w in large:
+                    return frozenset({u, v, w})
+            # NOTE: unlike the standard routine, we do NOT prune a_u/a_v
+            # here by removing evaluated edges -- pivots are a strict
+            # subset of all vertices, so an edge (u, v) with v not a
+            # pivot would never get its own outer-loop pass to complete
+            # the pruning invariant the original routine relies on.
+    return None
+
 def is_triangle_free_brute_force(adj_matrix):
     if not sparse.issparse(adj_matrix):
         raise TypeError("Input must be a SciPy sparse matrix.")
