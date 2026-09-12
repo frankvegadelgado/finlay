@@ -2,12 +2,14 @@ from pathlib import Path
 
 import setuptools
 
-VERSION = "0.5.5"
+VERSION = "0.5.6"
 
 NAME = "aegypti"
 
 INSTALL_REQUIRES = [
-    "hvala>=0.1.2"
+    "networkx >=3.4.2",
+    "numpy >=2.2.1",
+    "scipy >=1.15.0"
 ]
 
 setuptools.setup(
