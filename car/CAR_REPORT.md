@@ -1,6 +1,6 @@
 # Finlay (Aegypti) CAR Experiment
 
-Generated: 2026-09-12T16:15:45.789353+00:00
+Generated: 2026-09-12T18:39:45.337682+00:00
 Aegypti version: unknown
 Seed: 20260629
 
@@ -27,23 +27,23 @@ stress the dense branch.
 
 | regime | instances | truth_positive | aegypti_misses | dense_instances | dense_positives | mean_aegypti_ms | mean_chiba_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| dense | 5639 | 4799 | 0 | 5639 | 4799 | 0.4103 | 0.0335 |
-| sparse | 6691 | 4061 | 0 | 0 | 0 | 0.1006 | 0.0263 |
+| dense | 5639 | 4799 | 0 | 5639 | 4799 | 0.4975 | 0.0355 |
+| sparse | 6691 | 4061 | 0 | 0 | 0 | 0.1003 | 0.0261 |
 
 ## By family
 
 | family | instances | truth_positive | aegypti_misses | dense_instances | dense_positives | mean_aegypti_ms | mean_chiba_ms |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| atlas_exhaustive_n<=7 | 1244 | 1080 | 0 | 91 | 91 | 0.0492 | 0.0089 |
-| er_dense | 2500 | 2500 | 0 | 2425 | 2425 | 0.5039 | 0.0270 |
-| er_sparse | 2486 | 1139 | 0 | 0 | 0 | 0.1223 | 0.0318 |
-| near_turan | 400 | 400 | 0 | 400 | 400 | 0.4603 | 0.0620 |
-| omega3_tripartite | 400 | 400 | 0 | 400 | 400 | 0.2795 | 0.0173 |
-| omega4_fourpartite | 300 | 300 | 0 | 300 | 300 | 0.3796 | 0.0206 |
-| planted_clique | 1000 | 1000 | 0 | 987 | 987 | 0.4141 | 0.0243 |
-| planted_triangle | 1500 | 1500 | 0 | 0 | 0 | 0.1201 | 0.0304 |
-| structured | 1000 | 541 | 0 | 365 | 196 | 0.1732 | 0.0250 |
-| tri_free_bipartite | 1500 | 0 | 0 | 671 | 0 | 0.1233 | 0.0498 |
+| atlas_exhaustive_n<=7 | 1244 | 1080 | 0 | 91 | 91 | 0.0495 | 0.0092 |
+| er_dense | 2500 | 2500 | 0 | 2425 | 2425 | 0.6265 | 0.0297 |
+| er_sparse | 2486 | 1139 | 0 | 0 | 0 | 0.1238 | 0.0317 |
+| near_turan | 400 | 400 | 0 | 400 | 400 | 0.5587 | 0.0636 |
+| omega3_tripartite | 400 | 400 | 0 | 400 | 400 | 0.3358 | 0.0201 |
+| omega4_fourpartite | 300 | 300 | 0 | 300 | 300 | 0.4541 | 0.0214 |
+| planted_clique | 1000 | 1000 | 0 | 987 | 987 | 0.5429 | 0.0272 |
+| planted_triangle | 1500 | 1500 | 0 | 0 | 0 | 0.1192 | 0.0308 |
+| structured | 1000 | 541 | 0 | 365 | 196 | 0.1515 | 0.0252 |
+| tri_free_bipartite | 1500 | 0 | 0 | 671 | 0 | 0.1161 | 0.0477 |
 
 ## Reproduction
 
